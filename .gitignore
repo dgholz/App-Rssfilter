@@ -1,0 +1,5 @@
+.syntax.err
+bin
+lib
+man
+*.rss
