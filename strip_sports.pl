@@ -2,106 +2,104 @@
 
 use strict;
 use warnings;
-use local::lib qw( . );
-use v5.12;
+use feature qw( :5.14 );
 use ojo;
+use List::Util qw( first );
 use List::MoreUtils;
 use File::Slurp;
 use Path::Class::File qw( file );
+use Log::Log4perl qw( :easy );
+use YAML::Any;
 
-my @feeds = qw( http://www.abc.net.au/news/feed/45910/rss.xml );
+Log::Log4perl->easy_init( { level => $DEBUG } );
 
-my $config = {
-    groups => {
-        ABC => {
-            feeds => [
-                {
-                    name => 'Bega 2550',
-                    url  => 'http://www.abc.net.au/news/feed/8706/rss.xml',
-                },
-                {
-                    name => 'South East NSW',
-                    url  => 'http://www.abc.net.au/local/rss/southeastnsw/all.xml',
-                },
-                {
-                    name => 'NSW',
-                    url  => 'http://www.abc.net.au/news/feed/52498/rss.xml',
-                },
-                {
-                    name => 'Business',
-                    url  => 'http://www.abc.net.au/news/feed/51892/rss.xml',
-                },
-                {
-                    name => 'Top Stories',
-                    url  => 'http://www.abc.net.au/news/feed/45910/rss.xml',
-                },
-            ],
-            filters => [ \&omit_sports, \&omit_previews ],
-        },
-    },
-};
-
+my $config = Load(<<"End_Of_Config");
+filter:
+- OmitSports
+- OmitPreviews
+groups:
+- group: ABC
+  feeds:
+  - Bega 2550:      http://www.abc.net.au/news/feed/8706/rss.xml
+  - South East NSW: http://www.abc.net.au/local/rss/southeastnsw/all.xml
+  - NSW:            http://www.abc.net.au/news/feed/52498/rss.xml
+  - Business:       http://www.abc.net.au/news/feed/51892/rss.xml
+  - Top Stories:    http://www.abc.net.au/news/feed/45910/rss.xml
+End_Of_Config
 
 sub filter_items {
-    my ( $feed, @filters ) = @_;
-    $feed->find('item')->each(
+    my ( $feed_dom, @filters ) = @_;
+    my %memo;
+    @memo{ @filters } = map { Filter->can( $_ ) } @filters;
+    @filters = grep { defined $memo{ $_ } } @filters;
+    $feed_dom->find('item')->each(
         sub {
             my ($item) = @_;
-            if ( List::MoreUtils::any { $_->($item) } @filters ) {
-                $item->replace('');
-                return;
+            if ( my $filter = first { $memo{$_}->($item) } @filters ) {
+                DEBUG( "$filter matched ", $item->guid->text );
+                $item->title->replace_content("$filter - ".$item->title->content_xml);
             }
         }
     );
-    return $feed;
+    return $feed_dom;
 }
 
-sub omit_categories {
-    my ( $item, @bad_cats ) = @_;
-    my %cats =
-      map { $_ => 1 } $item->find("category")->map( sub { $_->text } )->each;
-    return List::MoreUtils::any { defined $_ } @cats{@bad_cats};
-}
+package Filter {
+    use List::MoreUtils;
+    sub OmitCategory {
+        my ( $item, @bad_cats ) = @_;
+        my %cats =
+          map { $_ => 1 } $item->find("category")->map( sub { $_->text } )->each;
+        return List::MoreUtils::any { defined $_ } @cats{@bad_cats};
+    }
 
-sub omit_sports {
-    push @_, qw( Sport );
-    return &omit_categories;
-}
+    sub OmitSports {
+        push @_, qw( Sport );
+        return &OmitCategory;
+    }
 
-sub omit_previews {
-    my ( $item ) = @_;
-    return $item->guid->text =~ / preview /xms;
-}
+    sub OmitPreviews {
+        my ( $item ) = @_;
+        return $item->guid->text =~ / preview /xms;
+    }
 
-sub omit_dupes {
-    my ( $item, $prev ) = @_;
-    return 1 < ++$prev->{ $item->guid->text };
-}
+    my %prev;
+    sub OmitDupes {
+        my ( $item ) = @_;
+        return 1 < ++$prev{ $item->guid->text };
+    }
+};
 
 sub load_existing {
-    my ( $group_name, $feed ) = @_;
-    $feed->{filename} //= Path::Class::File->new( $group_name, ( $feed->{name} . q{.rss} ) );
-    $feed->{filename} =~ tr/ /_/;
-    if( ! -e $feed->{filename} ) {
-        write_file( $feed->{filename}, '' );
+    my ( $filename ) = @_;
+    DEBUG( "loading $filename ..." );
+    if( ! -e $filename ) {
+        write_file( $filename, '' );
     }
-    return Mojo::DOM->new( scalar read_file( $feed->{filename} ) );
+    return Mojo::DOM->new( scalar read_file( $filename ) );
 }
 
-while( my ( $name, $group ) = each $config->{groups} ) {
-    my %link;
+for my $group ( @{ $config->{groups} } ) {
+    my $group_name = $group->{group};
+    DEBUG( "filtering feeds in $group_name" );
     my @filters = map { @{ $_ // [] } } $config->{filter}, $group->{filter};
-    push @filters,  sub { push @_, %link; return &omit_dupes; };
-    if( not -d $name ) {
-        mkdir $name;
+    push @filters, q{OmitDupes};
+    if( not -d $group_name ) {
+        DEBUG( "no $group_name directory! making one" );
+        mkdir $group_name;
     }
     foreach my $feed ( @{ $group->{feeds} } ) {
-        my @feed_filters =  map { @{ $_ // [] } } $feed->{filter}, \@filters;
-        my $old = load_existing( $name, $feed );
-        my $new = g( $feed->{url} )->dom;
+        my ($feed_name, $feed_url) = each $feed;
+        my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
+        my $old = load_existing( $filename );
+        my $new = g( $feed_url )->dom;
         next if $new->find( 'rss channel pubDate' ) eq $old->find( 'rss channel pubDate' );
+        DEBUG( "found a newer feed!" );
+        DEBUG( "filtering $feed_name" );
         $new = filter_items( $new, @filters );
-        $old->find('item')->map( sub { omit_dupes( $_, \%link ) } );
-        write_file( $feed->{filename}, $new->to_xml );
+        DEBUG( "collecting guids from old feed" );
+        $old->find('item')->map( \&Filter::OmitDupes );
+        DEBUG( "writing out new filtered feed to $filename" );
+        write_file( $filename, $new->to_xml );
     }
 }
