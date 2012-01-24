@@ -1,7 +1,4 @@
 .syntax.err
-bin
-lib
-man
-*.rss
 .*.swp
 log
+www
