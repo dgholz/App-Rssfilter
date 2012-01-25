@@ -10,6 +10,7 @@ use File::Slurp;
 use Path::Class::File qw( file );
 use Log::Log4perl qw( :easy );
 use YAML::Any;
+use DateTime::Format::Strptime;
 
 Log::Log4perl->easy_init( { level => $DEBUG } );
 
@@ -79,6 +80,11 @@ sub load_existing {
     return Mojo::DOM->new( scalar read_file( $filename ) );
 }
 
+sub to_http_date {
+    return DateTime::Format::Strptime->new( pattern => "%a, %d %b %Y %T %z")->parse_datetime( shift )->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T GMT" );
+}
+
+
 for my $group ( @{ $config->{groups} } ) {
     my $group_name = $group->{group};
     DEBUG( "filtering feeds in $group_name" );
@@ -92,8 +98,8 @@ for my $group ( @{ $config->{groups} } ) {
         my ( $feed_name, $feed_url ) = each $feed;
         my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
         my $old = load_existing( $filename );
-        my $last_update = $old->find( 'rss channel pubDate' ) || '1970-01-01';
-        my $new = g( $feed_url, { 'If-Modified-Since' => $last_update } );
+        my $last_update = $old->find( 'rss channel pubDate' ) || 'Thu, 01 Jan 1970 00:00:00 GMT';
+        my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_update ) } );
         if ( $new->code == 200 ) {
             DEBUG( "found a newer feed!" );
             DEBUG( "filtering $feed_name" );
