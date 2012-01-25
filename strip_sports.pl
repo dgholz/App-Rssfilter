@@ -37,7 +37,7 @@ sub filter_items {
             my ($item) = @_;
             if ( my $filter = first { $memo{$_}->($item) } @filters ) {
                 DEBUG( "$filter matched ", $item->guid->text );
-                $item->title->replace_content("$filter - ".$item->title->content_xml);
+                $item->title->replace_content(uc($filter) ." - ".$item->title->content_xml);
             }
         }
     );
@@ -49,7 +49,7 @@ package Filter {
     sub OmitCategory {
         my ( $item, @bad_cats ) = @_;
         my %cats =
-          map { $_ => 1 } $item->find("category")->map( sub { $_->text } )->each;
+          map { $_ => 1 } $item->find("category")->map( sub { $_->text =~ s/:.*$//r } )->each;
         return List::MoreUtils::any { defined $_ } @cats{@bad_cats};
     }
 
@@ -100,6 +100,6 @@ for my $group ( @{ $config->{groups} } ) {
         DEBUG( "collecting guids from old feed" );
         $old->find('item')->map( \&Filter::OmitDupes );
         DEBUG( "writing out new filtered feed to $filename" );
-        write_file( $filename, $new->to_xml );
+        write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
     }
 }
