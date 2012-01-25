@@ -74,7 +74,7 @@ sub load_existing {
     my ( $filename ) = @_;
     DEBUG( "loading $filename ..." );
     if( ! -e $filename ) {
-        write_file( $filename, '' );
+        return Mojo::DOM->new;
     }
     return Mojo::DOM->new( scalar read_file( $filename ) );
 }
@@ -89,17 +89,19 @@ for my $group ( @{ $config->{groups} } ) {
         mkdir $group_name;
     }
     foreach my $feed ( @{ $group->{feeds} } ) {
-        my ($feed_name, $feed_url) = each $feed;
+        my ( $feed_name, $feed_url ) = each $feed;
         my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
         my $old = load_existing( $filename );
-        my $new = g( $feed_url )->dom;
-        next if $new->find( 'rss channel pubDate' ) eq $old->find( 'rss channel pubDate' );
-        DEBUG( "found a newer feed!" );
-        DEBUG( "filtering $feed_name" );
-        $new = filter_items( $new, @filters );
-        DEBUG( "collecting guids from old feed" );
+        my $last_update = $old->find( 'rss channel pubDate' ) || '1970-01-01';
+        my $new = g( $feed_url, { 'If-Modified-Since' => $last_update } );
+        if ( $new->code == 200 ) {
+            DEBUG( "found a newer feed!" );
+            DEBUG( "filtering $feed_name" );
+            $new = filter_items( $new->dom, @filters );
+            DEBUG( "collecting guids from old feed" );
+            DEBUG( "writing out new filtered feed to $filename" );
+            write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
+        }
         $old->find('item')->map( \&Filter::OmitDupes );
-        DEBUG( "writing out new filtered feed to $filename" );
-        write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
     }
 }
