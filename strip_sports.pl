@@ -98,7 +98,7 @@ for my $group ( @{ $config->{groups} } ) {
         my ( $feed_name, $feed_url ) = each $feed;
         my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
         my $old = load_existing( $filename );
-        my $last_update = $old->find( 'rss channel pubDate' ) || 'Thu, 01 Jan 1970 00:00:00 GMT';
+        my $last_update = $old->find( 'rss channel pubDate' )->text || 'Thu, 01 Jan 1970 00:00:00 GMT';
         DEBUG( 'last update was ', $last_update );
         my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_update ) } );
         if ( $new->code == 200 ) {
