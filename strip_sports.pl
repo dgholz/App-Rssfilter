@@ -15,11 +15,12 @@ use DateTime::Format::Strptime;
 Log::Log4perl->easy_init( { level => $DEBUG } );
 
 my $config = Load(<<"End_Of_Config");
-filter:
-- OmitSports
-- OmitPreviews
 groups:
 - group: ABC
+  filter:
+  - MatchSports
+  - MatchPreviews
+  ifFilterMatched: MarkTitle
   feeds:
   - Bega 2550:      http://www.abc.net.au/news/feed/8706/rss.xml
   - South East NSW: http://www.abc.net.au/local/rss/southeastnsw/all.xml
@@ -29,7 +30,7 @@ groups:
 End_Of_Config
 
 sub filter_items {
-    my ( $feed_dom, @filters ) = @_;
+    my ( $feed_dom, $match_cb, @filters ) = @_;
     my %memo;
     @memo{ @filters } = map { Filter->can( $_ ) } @filters;
     @filters = grep { defined $memo{ $_ } } @filters;
@@ -37,8 +38,8 @@ sub filter_items {
         sub {
             my ($item) = @_;
             if ( my $filter = first { $memo{$_}->($item) } @filters ) {
-                DEBUG( "$filter matched ", $item->guid->text );
-                $item->title->replace_content(uc($filter) ." - ".$item->title->content_xml);
+                DEBUG( "will $match_cb since $filter matched ", $item->guid->text );
+                Filter->can( $match_cb )->( $item, $filter );
             }
         }
     );
@@ -47,28 +48,43 @@ sub filter_items {
 
 package Filter {
     use List::MoreUtils;
-    sub OmitCategory {
+    sub MatchCategory {
         my ( $item, @bad_cats ) = @_;
         my %cats =
           map { $_ => 1 } $item->find("category")->map( sub { $_->text =~ s/:.*$//r } )->each;
         return List::MoreUtils::any { defined $_ } @cats{@bad_cats};
     }
 
-    sub OmitSports {
+    sub MatchSports {
         push @_, qw( Sport );
-        return &OmitCategory;
+        return &MatchCategory;
     }
 
-    sub OmitPreviews {
+    sub MatchPreviews {
         my ( $item ) = @_;
         return $item->guid->text =~ / preview /xms;
     }
 
-    my %prev;
-    sub OmitDupes {
+    sub MatchDupes {
         my ( $item ) = @_;
-        return 1 < ++$prev{ $item->guid->text };
+        state %prev;
+        my $link = $item->guid->text;
+        my $url  = $item->link->text =~ s/ [?] .* \z//xmsr;
+        my $res  = grep { defined } @prev{ $link, $url };
+        @prev{ $link, $url } = ( 1, 1 );
+        return 0 < $res;
     }
+
+    sub MarkTitle {
+        my ( $item, $filter ) = @_;
+        $item->title->replace_content(uc($filter) ." - ".$item->title->content_xml);
+    }
+
+    sub DeleteItem {
+        my ( $item, $filter ) = @_;
+        $item->replace(q{});
+    }
+
 };
 
 sub load_existing {
@@ -88,8 +104,10 @@ sub to_http_date {
 for my $group ( @{ $config->{groups} } ) {
     my $group_name = $group->{group};
     DEBUG( "filtering feeds in $group_name" );
-    my @filters = map { @{ $_ // [] } } $config->{filter}, $group->{filter};
-    push @filters, q{OmitDupes};
+    my @filters = map { @{ $_ // [] } } $group->{filter}, $config->{filter};
+    push @filters, q{MatchDupes};
+    my $matching_filter_cb = first { defined } map { $_->{ifFilterMatched} } $group, $config;
+    $matching_filter_cb //= q{MarkTitle};
     if( not -d $group_name ) {
         DEBUG( "no $group_name directory! making one" );
         mkdir $group_name;
@@ -98,17 +116,17 @@ for my $group ( @{ $config->{groups} } ) {
         my ( $feed_name, $feed_url ) = each $feed;
         my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
         my $old = load_existing( $filename );
-        my $last_update = $old->find( 'rss channel pubDate' )->text || 'Thu, 01 Jan 1970 00:00:00 GMT';
+        my $last_update = $old->at( 'rss > channel > pubDate' )->text || 'Thu, 01 Jan 1970 00:00:00 GMT';
         DEBUG( 'last update was ', $last_update );
         my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_update ) } );
         if ( $new->code == 200 ) {
-            DEBUG( "found a newer feed!" );
+            DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > pubDate')->text );
             DEBUG( "filtering $feed_name" );
-            $new = filter_items( $new->dom, @filters );
+            $new = filter_items( $new->dom, $matching_filter_cb, @filters );
             DEBUG( "collecting guids from old feed" );
             DEBUG( "writing out new filtered feed to $filename" );
             write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
         }
-        $old->find('item')->map( \&Filter::OmitDupes );
+        $old->find('item')->map( \&Filter::MatchDupes );
     }
 }
