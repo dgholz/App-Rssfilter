@@ -11,6 +11,8 @@ use Path::Class::File qw( file );
 use Log::Log4perl qw( :easy );
 use YAML::Any;
 use DateTime::Format::Strptime;
+use Try::Tiny;
+use Carp::Always;
 
 Log::Log4perl->easy_init( { level => $DEBUG } );
 
@@ -18,15 +20,21 @@ my $config = Load(<<"End_Of_Config");
 groups:
 - group: ABC
   filter:
-  - MatchSports
-  - MatchPreviews
-  ifFilterMatched: MarkTitle
+  - MatchAbcSports
+  - MatchAbcPreviews
+  ifFilterMatched: DeleteItem
   feeds:
   - Bega 2550:      http://www.abc.net.au/news/feed/8706/rss.xml
   - South East NSW: http://www.abc.net.au/local/rss/southeastnsw/all.xml
   - NSW:            http://www.abc.net.au/news/feed/52498/rss.xml
   - Business:       http://www.abc.net.au/news/feed/51892/rss.xml
   - Top Stories:    http://www.abc.net.au/news/feed/45910/rss.xml
+- group: BBC
+  filter:
+  - MatchBbcSports
+  ifFilterMatched: MarkTitle
+  feeds:
+  - Edinburgh East and Fife: http://feeds.bbci.co.uk/news/scotland/edinburgh_east_and_fife/rss.xml
 End_Of_Config
 
 sub filter_items {
@@ -48,21 +56,26 @@ sub filter_items {
 
 package Filter {
     use List::MoreUtils;
-    sub MatchCategory {
+    sub MatchAbcCategory {
         my ( $item, @bad_cats ) = @_;
         my %cats =
           map { $_ => 1 } $item->find("category")->map( sub { $_->text =~ s/:.*$//r } )->each;
         return List::MoreUtils::any { defined $_ } @cats{@bad_cats};
     }
 
-    sub MatchSports {
+    sub MatchAbcSports {
         push @_, qw( Sport );
-        return &MatchCategory;
+        return &MatchAbcCategory;
     }
 
-    sub MatchPreviews {
+    sub MatchAbcPreviews {
         my ( $item ) = @_;
         return $item->guid->text =~ / preview /xms;
+    }
+
+    sub MatchBbcSports {
+        my ( $item ) = @_;
+        return $item->guid->text =~ qr{ / sport [1] / }xms;
     }
 
     sub MatchDupes {
@@ -97,7 +110,7 @@ sub load_existing {
 }
 
 sub to_http_date {
-    return DateTime::Format::Strptime->new( pattern => "%a, %d %b %Y %T %z")->parse_datetime( shift )->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T GMT" );
+    return DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %z")->parse_datetime( shift )->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T GMT" );
 }
 
 
@@ -116,11 +129,14 @@ for my $group ( @{ $config->{groups} } ) {
         my ( $feed_name, $feed_url ) = each $feed;
         my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
         my $old = load_existing( $filename );
-        my $last_update = $old->at( 'rss > channel > pubDate' )->text || 'Thu, 01 Jan 1970 00:00:00 GMT';
-        DEBUG( 'last update was ', $last_update );
-        my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_update ) } );
+        my $last_modified = 'Thu, 01 Jan 1970 00:00:00 +0000';
+        if ( my $last_update = try { $old->at( 'rss > channel > lastBuildDate, pubDate' ) } ) {
+            $last_modified = $last_update->text || $last_modified;
+        }
+        DEBUG( 'last update was ', $last_modified );
+        my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_modified ) } );
         if ( $new->code == 200 ) {
-            DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > pubDate')->text );
+            DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             DEBUG( "filtering $feed_name" );
             $new = filter_items( $new->dom, $matching_filter_cb, @filters );
             DEBUG( "collecting guids from old feed" );
