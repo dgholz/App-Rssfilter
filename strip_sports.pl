@@ -75,7 +75,7 @@ package Filter {
 
     sub MatchBbcSports {
         my ( $item ) = @_;
-        return $item->guid->text =~ qr{ / sport [1] / }xms;
+        return $item->guid->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
     }
 
     sub MatchDupes {
@@ -110,7 +110,14 @@ sub load_existing {
 }
 
 sub to_http_date {
-    return DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %z")->parse_datetime( shift )->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T GMT" );
+    my ( $datetime_str ) = @_;
+    my $datetime;
+try {
+        $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %z")->parse_datetime( $datetime_str );
+} catch {
+        $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %Z")->parse_datetime( $datetime_str );
+};
+    return $datetime->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T %Z" );
 }
 
 
