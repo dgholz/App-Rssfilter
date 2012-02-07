@@ -13,6 +13,7 @@ use YAML::Any;
 use DateTime::Format::Strptime;
 use Try::Tiny;
 use Carp::Always;
+use Carp;
 
 Log::Log4perl->easy_init( { level => $DEBUG } );
 
@@ -36,6 +37,19 @@ groups:
   feeds:
   - Edinburgh East and Fife: http://feeds.bbci.co.uk/news/scotland/edinburgh_east_and_fife/rss.xml
 End_Of_Config
+
+sub requested_groups_or_everything {
+    my @request = @_;
+    @request = @ARGV if not @request;
+    my @groups = @{ $config->{groups} };
+    return @groups if not @request;
+    my %groups_I_know_about = map { $_->{ group } => $_ } @groups;
+    if ( my @unknown_groups  = grep { not exists $groups_I_know_about{ $_ } } @request ) {
+        croak "don't know how to get groups: ". join(q{, }, @unknown_groups );
+    }
+    my @known_groups = grep { defined } @groups_I_know_about{ @request };
+    return @known_groups ? @known_groups : @groups;
+}
 
 sub filter_items {
     my ( $feed_dom, $match_cb, @filters ) = @_;
@@ -120,8 +134,8 @@ try {
     return $datetime->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T %Z" );
 }
 
-
-for my $group ( @{ $config->{groups} } ) {
+sub update_group {
+    my ( $group ) = @_;
     my $group_name = $group->{group};
     DEBUG( "filtering feeds in $group_name" );
     my @filters = map { @{ $_ // [] } } $group->{filter}, $config->{filter};
@@ -133,23 +147,31 @@ for my $group ( @{ $config->{groups} } ) {
         mkdir $group_name;
     }
     foreach my $feed ( @{ $group->{feeds} } ) {
-        my ( $feed_name, $feed_url ) = each $feed;
-        my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group_name, ( $feed_name . q{.rss} ) );
-        my $old = load_existing( $filename );
-        my $last_modified = 'Thu, 01 Jan 1970 00:00:00 +0000';
-        if ( my $last_update = try { $old->at( 'rss > channel > lastBuildDate, pubDate' ) } ) {
-            $last_modified = $last_update->text || $last_modified;
-        }
-        DEBUG( 'last update was ', $last_modified );
-        my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_modified ) } );
-        if ( $new->code == 200 ) {
-            DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
-            DEBUG( "filtering $feed_name" );
-            $new = filter_items( $new->dom, $matching_filter_cb, @filters );
-            DEBUG( "collecting guids from old feed" );
-            DEBUG( "writing out new filtered feed to $filename" );
-            write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
-        }
-        $old->find('item')->map( \&Filter::MatchDupes );
+        update_feed( $group, $feed, $matching_filter_cb, @filters );
     }
+}
+
+sub update_feed {
+    my ( $group, $feed, $matching_filter_cb, @filters ) = @_;
+    my ( $feed_name, $feed_url ) = each $feed;
+    my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group->{name}, ( $feed_name . q{.rss} ) );
+    my $old = load_existing( $filename );
+    my $last_modified = 'Thu, 01 Jan 1970 00:00:00 +0000';
+    if ( my $last_update = try { $old->at( 'rss > channel > lastBuildDate, pubDate' ) } ) {
+        $last_modified = $last_update->text || $last_modified;
+    }
+    DEBUG( 'last update was ', $last_modified );
+    my $new = g( $feed_url, { 'If-Modified-Since' => to_http_date( $last_modified ) } );
+    if ( $new->code == 200 ) {
+        DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
+        DEBUG( "filtering $feed_name" );
+        $new = filter_items( $new->dom, $matching_filter_cb, @filters );
+        DEBUG( "collecting guids from old feed" );
+        DEBUG( "writing out new filtered feed to $filename" );
+        write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
+    }
+}
+
+for my $group ( requested_groups_or_everything() ) {
+    update_group( $group );
 }
