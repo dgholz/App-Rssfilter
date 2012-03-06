@@ -154,7 +154,7 @@ sub update_group {
 sub update_feed {
     my ( $group, $feed, $matching_filter_cb, @filters ) = @_;
     my ( $feed_name, $feed_url ) = each $feed;
-    my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group->{name}, ( $feed_name . q{.rss} ) );
+    my ( $filename ) = map { tr/ /_/sr } Path::Class::File->new( $group->{group}, ( $feed_name . q{.rss} ) );
     my $old = load_existing( $filename );
     my $last_modified = 'Thu, 01 Jan 1970 00:00:00 +0000';
     if ( my $last_update = try { $old->at( 'rss > channel > lastBuildDate, pubDate' ) } ) {
@@ -168,7 +168,7 @@ sub update_feed {
         $new = filter_items( $new->dom, $matching_filter_cb, @filters );
         DEBUG( "collecting guids from old feed" );
         DEBUG( "writing out new filtered feed to $filename" );
-        write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
+        write_file( $filename,  $new->to_xml );
     }
 }
 
