@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+# PODNAME: rssfilter
+
+use strict;
+use warnings;
+use feature qw( :5.14 );
+use App::Rssfilter;
+use YAML::XS;
+
+my $config = Load(<<"End_Of_Config");
+groups:
+- group: ABC
+  match:
+  - AbcSport
+  - AbcPreviews
+  ifMatched: DeleteItem
+  feeds:
+  - Bega 2550:      http://www.abc.net.au/news/feed/8706/rss.xml
+  - South East NSW: http://www.abc.net.au/local/rss/southeastnsw/all.xml
+  - NSW:            http://www.abc.net.au/news/feed/52498/rss.xml
+  - Business:       http://www.abc.net.au/news/feed/51892/rss.xml
+  - Top Stories:    http://www.abc.net.au/news/feed/45910/rss.xml
+- group: BBC
+  match:
+  - BbcSports
+  ifMatched: DeleteItem
+  feeds:
+  - Edinburgh East and Fife: http://feeds.bbci.co.uk/news/scotland/edinburgh_east_and_fife/rss.xml
+End_Of_Config
+
+App::Rssfilter->run($config);
+
+1;
