@@ -92,7 +92,7 @@ sub update_feed {
         $new = filter_items( $new->dom, $filter, @matchers );
         DEBUG( "collecting guids from old feed" );
         DEBUG( "writing out new filtered feed to $filename" );
-        write_file( $filename, { binmode => ':utf8' }, $new->to_xml );
+        write_file( $filename, $new->to_xml );
     }
 }
 
