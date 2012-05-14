@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-use List::MoreUtils qw( any );
-
 package Rss::Match::Category {
+    use List::MoreUtils qw( any );
+
     use Method::Signatures;
     method match ( $item, @bad_cats ) {
         my %cats =
