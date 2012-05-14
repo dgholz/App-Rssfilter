@@ -2,11 +2,11 @@
 
 # ABSTRACT: Fetch and filter RSS feeds
 
-package App::Rssfilter;
-
 use strict;
 use warnings;
 use feature qw( :5.14 );
+
+package App::Rssfilter;
 
 use Carp;
 use Rss::Filter;
