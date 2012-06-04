@@ -3,6 +3,12 @@ use Test::Most;
 use Rss::Match::Category;
 use Mojo::DOM;
 
+throws_ok(
+    sub { Rss::Match::Category->match },
+    qr/missing required argument/,
+    'throws error when not given an item to match'
+);
+
 is(
     Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Stationary' ),
     1,
