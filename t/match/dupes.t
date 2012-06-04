@@ -3,6 +3,18 @@ use Test::Most;
 use Rss::Match::Dupes;
 use Mojo::DOM;
 
+throws_ok(
+    sub { Rss::Match::Dupes->match },
+    qr/missing required argument/,
+    'throws error when not given an item to match'
+);
+
+throws_ok(
+    sub { Rss::Match::Dupes->match( qw( one two ) ) },
+    qr/too many arguments/,
+    'throws error when given more than one argument'
+);
+
 isnt(
     Rss::Match::Dupes->match( Mojo::DOM->new( '<?xml version="1.0"?><guid>snowflake</guid><link>butterfly</link>' ) ),
     1,
