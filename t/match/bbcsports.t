@@ -15,27 +15,23 @@ throws_ok(
     'throws error when given more than one argument'
 );
 
-is(
+ok(
     Rss::Match::BbcSports->match( Mojo::DOM->new( '<guid>www.bbc.co.uk/sport/<\guid>' ) ),
-    1,
     'match item whose guid contains the BBC sport URL'
 );
 
-is(
+ok(
     Rss::Match::BbcSports->match( Mojo::DOM->new( '<guid>www.bbc.co.uk/sport1/<\guid>' ) ),
-    1,
     'match item whose guid contains the variant BBC sport URL'
 );
 
-isnt(
-    Rss::Match::BbcSports->match( Mojo::DOM->new( '<guid>www.bbc.co.uk/science<\guid>' ) ),
-    1,
+ok(
+    ! Rss::Match::BbcSports->match( Mojo::DOM->new( '<guid>www.bbc.co.uk/science<\guid>' ) ),
     'does not match item whose guid does not contains the BBC sport URL'
 );
 
-isnt(
-    Rss::Match::BbcSports->match( Mojo::DOM->new( '<guid>espn.com/sport<\guid>' ) ),
-    1,
+ok(
+    ! Rss::Match::BbcSports->match( Mojo::DOM->new( '<guid>espn.com/sport<\guid>' ) ),
     'does not match item whose guid does not contain a BBC URL'
 );
 

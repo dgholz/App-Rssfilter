@@ -15,15 +15,13 @@ throws_ok(
     'throws error when given more than one item to match'
 );
 
-is(
+ok(
     Rss::Match::AbcPreviews->match( Mojo::DOM->new( '<guid>I am a preview<\guid>' ) ),
-    1,
     'match item whose guid contains "preview"'
 );
 
-isnt(
-    Rss::Match::AbcPreviews->match( Mojo::DOM->new( '<guid>I am a human being<\guid>' ) ),
-    1,
+ok(
+    ! Rss::Match::AbcPreviews->match( Mojo::DOM->new( '<guid>I am a human being<\guid>' ) ),
     'does not match item whose guid does not contain "preview"'
 );
 

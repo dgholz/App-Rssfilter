@@ -15,15 +15,14 @@ throws_ok(
     'throws error when given more than one argument'
 );
 
-is(
+
+ok(
     Rss::Match::AbcSport->match( Mojo::DOM->new( '<category>Sport</category>' ) ),
-    1,
     'match item categorised as "Sport"'
 );
 
-isnt(
-    Rss::Match::AbcSport->match( Mojo::DOM->new( '<category>Entertainment</category>' ) ),
-    1,
+ok(
+    ! Rss::Match::AbcSport->match( Mojo::DOM->new( '<category>Entertainment</category>' ) ),
     'does not match item which is not categorised as "Sport"'
 );
 

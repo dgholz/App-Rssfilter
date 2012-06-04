@@ -19,45 +19,38 @@ ok(
     'does not match item when no categories specified'
 );
 
-is(
+ok(
     Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Stationary' ),
-    1,
     'match item categorised as the specified catergory'
 );
 
-is(
+ok(
     Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary:Pen</category>' ), 'Stationary' ),
-    1,
     'disregard subcategory when considering categories'
 );
 
-is(
+ok(
     Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category><category>Refinery</category>' ), 'Refinery' ),
-    1,
     'match specified category to item with multiple categories'
 );
 
-is(
+ok(
     Rss::Match::Category->match( Mojo::DOM->new( '<category>Refinery</category>' ), 'Stationary', 'Refinery' ),
-    1,
     'match item categorised as any of multiple specified categories'
 );
 
-isnt(
-    Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Refinery' ),
-    1,
+ok(
+    ! Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Refinery' ),
     'does not match item not categorised as the specified catergory'
 );
 
-isnt(
-    Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Refinery', 'Lottery' ),
-    1,
-    'does not match item not categorised as any of the multiple specified catergories'
+ok(
+    ! Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Refinery', 'Lottery' ),
+    'does not match item not categorised as any of multiple specified catergories'
 );
 
-isnt(
-    Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary:Pen</category>' ), 'Pen' ),
-    1,
+ok(
+    ! Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary:Pen</category>' ), 'Pen' ),
     'does not match item whose subcategory matches the specified catergory'
 );
 
