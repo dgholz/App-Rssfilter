@@ -9,6 +9,16 @@ throws_ok(
     'throws error when not given an item to match'
 );
 
+lives_ok(
+    sub { Rss::Match::Category->match( Mojo::DOM->new( '<category>Sport</category>' ) ) },
+    'no error thrown when given an item to match and no categories'
+);
+
+ok(
+    ! Rss::Match::Category->match( Mojo::DOM->new( '<category>Sport</category>' ) ),
+    'does not match item when no categories specified'
+);
+
 is(
     Rss::Match::Category->match( Mojo::DOM->new( '<category>Stationary</category>' ), 'Stationary' ),
     1,
