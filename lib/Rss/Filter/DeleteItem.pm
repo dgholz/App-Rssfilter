@@ -4,7 +4,7 @@ use feature qw( :5.14 );
 
 package Rss::Filter::DeleteItem {
     use Method::Signatures;
-    method filter ( $item, $matcher ) {
+    func filter ( $item, $matcher ) {
         $item->replace(q{});
     }
 }

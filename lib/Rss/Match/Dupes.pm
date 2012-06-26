@@ -4,7 +4,7 @@ use feature qw( :5.14 );
 
 package Rss::Match::Dupes {
     use Method::Signatures;
-    method match ( $item ) {
+    func match ( $item ) {
         state %prev;
         my $link = $item->guid->text;
         my $url  = $item->link->text =~ s/ [?] .* \z//xmsr;

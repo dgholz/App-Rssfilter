@@ -5,8 +5,8 @@ use Rss::Match::Category;
 
 package Rss::Match::AbcSport {
     use Method::Signatures;
-    method match ( $item ) {
-        return Rss::Match::Category->match( $item, 'Sport' );
+    func match ( $item ) {
+        return Rss::Match::Category::match( $item, 'Sport' );
     }
 
 }
