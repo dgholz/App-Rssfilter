@@ -17,8 +17,9 @@ sub run {
         @requested_groups = @ARGV;
     }
 
+    my $rf = Rss::Filter->new( config => $config );
     for my $group ( requested_groups_or_everything( $config, @requested_groups ) ) {
-        Rss::Filter::update_group( $config, $group );
+        $rf->update_group( $group );
     }
 }
 
