@@ -24,11 +24,7 @@ throws_ok(
 is(
     Rss::Filter::MarkTitle->filter( Mojo::DOM->new( '<title>Man Bites Dog</title>' ), 'SensationalHeadline' ),
     '<title>SENSATIONALHEADLINE - Man Bites Dog</title>',
-<<<<<<< Updated upstream
-    'prefixes item\'s title with uppercase name of matcher'
-=======
     q{prefixes item's title with uppercase name of matcher}
->>>>>>> Stashed changes
 );
 
 done_testing;
