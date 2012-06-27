@@ -14,8 +14,14 @@ package Rss::Filter {
     use Try::Tiny;
     use Carp::Always;
     use Carp;
-    use Module::Pluggable search_path => 'Rss::Match',  sub_name => 'matchers', require => 1;
-    use Module::Pluggable search_path => 'Rss::Filter', sub_name => 'filters',  require => 1;
+    use Module::Pluggable
+        search_path => 'Rss::Match',
+        sub_name    => 'matchers',
+        require     => 1;
+    use Module::Pluggable
+        search_path => 'Rss::Filter',
+        sub_name    => 'filters',
+        require     => 1;
 
     Log::Log4perl->easy_init( { level => $DEBUG } );
 
