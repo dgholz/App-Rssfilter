@@ -9,6 +9,7 @@ package Rss::Filter {
     use List::Util qw( first );
     use Log::Log4perl qw( :easy );
     use DateTime::Format::Strptime;
+    use Method::Signatures;
     use Try::Tiny;
     use Carp::Always;
     use Carp;
@@ -24,8 +25,7 @@ package Rss::Filter {
 
     Log::Log4perl->easy_init( { level => $DEBUG } );
 
-    sub filter_items {
-        my ( $feed_dom, $filter, @matchers ) = @_;
+    method filter_items( $feed_dom, $filter, @matchers ) {
         my %memo;
         @memo{ __PACKAGE__->matchers } = map { $_->can( 'match' ) } __PACKAGE__->matchers;
         @matchers = grep { defined $memo{ $_ } } @matchers;
@@ -41,19 +41,17 @@ package Rss::Filter {
         return $feed_dom;
     }
 
-    sub to_http_date {
-        my ( $datetime_str ) = @_;
+    method to_http_date( $datetime_str ) {
         my $datetime;
-    try {
-            $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %z")->parse_datetime( $datetime_str );
-    } catch {
-            $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %Z")->parse_datetime( $datetime_str );
-    };
+        try {
+                $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %z")->parse_datetime( $datetime_str );
+        } catch {
+                $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %Z")->parse_datetime( $datetime_str );
+        };
         return $datetime->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T %Z" );
     }
 
-    sub update_group {
-        my ( $config, $group ) = @_;
+    method update_group( $config, $group ) {
         my $group_name = $group->{group};
         DEBUG( "filtering feeds in $group_name" );
         my @matchers = map { s/^/Rss::Match::/r } map { @{ $_->{match} // [] } } $group, $config;
@@ -63,12 +61,11 @@ package Rss::Filter {
         my $filter = first { defined $memo{ $_ } } map { s/^/Rss::Filter::/r } grep { defined } map { $_->{ifMatched} } $group, $config;
         $filter //= q{Rss::Filter::MarkTitle};
         foreach my $feed ( @{ $group->{feeds} } ) {
-            update_feed( $group, $feed, $filter, @matchers );
+            $self->update_feed( $group, $feed, $filter, @matchers );
         }
     }
 
-    sub update_feed {
-        my ( $group, $feed, $filter, @matchers ) = @_;
+    method update_feed( $group, $feed, $filter, @matchers ) = @_;
         my ( $feed_name, $feed_url ) = each $feed;
         my $stored_feed = Feed::Storage->new(
             group_name => $group->{group},
@@ -84,7 +81,7 @@ package Rss::Filter {
         if ( $new->code == 200 ) {
             DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             DEBUG( "filtering $feed_name" );
-            $new = filter_items( $new->dom, $filter, @matchers );
+            $new = $self->filter_items( $new->dom, $filter, @matchers );
             DEBUG( "collecting guids from old feed" );
             $stored_feed->save_feed( $new );
         }
