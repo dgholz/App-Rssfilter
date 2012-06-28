@@ -14,14 +14,19 @@ package Rss::Filter {
     use Carp;
     use Module::Pluggable
         search_path => 'Rss::Match',
-        sub_name    => 'matchers',
+        sub_name    => '_matchers',
         require     => 1;
     use Module::Pluggable
         search_path => 'Rss::Filter',
-        sub_name    => 'filters',
+        sub_name    => '_filters',
         require     => 1;
     use Feed::Storage;
     use Moo;
+
+    has config => (
+        is       => 'rw',
+        required => 1,
+    );
 
     has logger => (
         is => 'lazy',
@@ -33,16 +38,40 @@ package Rss::Filter {
         Log::Log4perl->get_logger( ref $self );
     }
 
+    has filters => (
+        is => 'lazy',
+    );
+
+    method _build_filters {
+        return { prep_plugins( 'filter', $self->_filters ) };
+    }
+
+    has matchers => (
+        is => 'lazy',
+    );
+
+    method _build_matchers {
+        return { prep_plugins( 'match', $self->_matchers ) };
+    }
+
+    func prep_plugins( $method, @plugins ) {
+        return  map { @$_ }
+               grep { defined $_->[1] }
+                map { [ $_, $_->can( $method ) ] } @plugins;
+    }
+
     method filter_items( $feed_dom, $filter, @matchers ) {
-        my %memo;
-        @memo{ __PACKAGE__->matchers } = map { $_->can( 'match' ) } __PACKAGE__->matchers;
-        @matchers = grep { defined $memo{ $_ } } @matchers;
+        @matchers = grep { exists $self->matchers->{ $_ } }
+                     map { /::/ ? $_ : s/^/Rss::Match::/r } @matchers;
+        $filter = first  { exists $self->filters->{ $_ } }
+                     map { /::/ ? $_ : s/^/Rss::Filter::/r } $filter;
+        return $feed_dom unless @matchers and $filter;
         $feed_dom->find('item')->each(
             sub {
                 my ($item) = @_;
-                if ( my $matcher = first { $_->match($item) } @matchers ) {
+                if ( my $matcher = first { $self->matchers->{ $_ }->($item) } @matchers ) {
                     $self->logger->debug( "applying $filter since $matcher matched ", $item->at('guid')// 'an item with no guid' );
-                    $filter->filter( $item, $matcher );
+                    $self->filters->{ $filter }->( $item, $matcher );
                 }
             }
         );
@@ -59,21 +88,14 @@ package Rss::Filter {
         return $datetime->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T %Z" );
     }
 
-    method update_group( $config, $group ) {
-        my $group_name = $group->{group};
+    method update_group( $group ) {
         $self->logger->debug( "filtering feeds in ". $group->{group} );
-        my @matchers = map { s/^/Rss::Match::/r } map { @{ $_->{match} // [] } } $group, $config;
-        push @matchers, q{Rss::Match::Dupes};
-        my %memo;
-        @memo{ __PACKAGE__->filters } = map { $_->can( 'filter' ) } __PACKAGE__->filters;
-        my $filter = first { defined $memo{ $_ } } map { s/^/Rss::Filter::/r } grep { defined } map { $_->{ifMatched} } $group, $config;
-        $filter //= q{Rss::Filter::MarkTitle};
         foreach my $feed ( @{ $group->{feeds} } ) {
-            $self->update_feed( $group, $feed, $filter, @matchers );
+            $self->update_feed( $group, $feed );
         }
     }
 
-    method update_feed( $group, $feed, $filter, @matchers ) = @_;
+    method update_feed( $group, $feed ) {
         my ( $feed_name, $feed_url ) = each $feed;
         my $stored_feed = Feed::Storage->new(
             group_name => $group->{group},
@@ -89,7 +111,7 @@ package Rss::Filter {
         if ( $new->code == 200 ) {
             $self->logger->debug( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             $self->logger->debug( "filtering $feed_name" );
-            $new = $self->filter_items( $new->dom, $filter, @matchers );
+            $new = $self->filter_items( $new->dom, $group->{ifMatched}, @{ $group->{match} } );
             $self->logger->debug( "collecting guids from old feed" );
             $stored_feed->save_feed( $new );
         }
