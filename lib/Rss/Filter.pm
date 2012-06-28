@@ -7,7 +7,6 @@ use feature qw( :5.14 );
 package Rss::Filter {
     use Mojo::UserAgent;
     use List::Util qw( first );
-    use Log::Log4perl qw( :easy );
     use DateTime::Format::Strptime;
     use Method::Signatures;
     use Try::Tiny;
@@ -22,8 +21,17 @@ package Rss::Filter {
         sub_name    => 'filters',
         require     => 1;
     use Feed::Storage;
+    use Moo;
 
-    Log::Log4perl->easy_init( { level => $DEBUG } );
+    has logger => (
+        is => 'lazy',
+    );
+
+    method _build_logger {
+        use Log::Log4perl qw< :levels >;
+        Log::Log4perl->easy_init( { level => $DEBUG } );
+        Log::Log4perl->get_logger( ref $self );
+    }
 
     method filter_items( $feed_dom, $filter, @matchers ) {
         my %memo;
@@ -33,7 +41,7 @@ package Rss::Filter {
             sub {
                 my ($item) = @_;
                 if ( my $matcher = first { $_->match($item) } @matchers ) {
-                    DEBUG( "will $filter since $matcher matched ", $item->guid->text );
+                    $self->logger->debug( "applying $filter since $matcher matched ", $item->at('guid')// 'an item with no guid' );
                     $filter->filter( $item, $matcher );
                 }
             }
@@ -53,7 +61,7 @@ package Rss::Filter {
 
     method update_group( $config, $group ) {
         my $group_name = $group->{group};
-        DEBUG( "filtering feeds in $group_name" );
+        $self->logger->debug( "filtering feeds in ". $group->{group} );
         my @matchers = map { s/^/Rss::Match::/r } map { @{ $_->{match} // [] } } $group, $config;
         push @matchers, q{Rss::Match::Dupes};
         my %memo;
@@ -76,13 +84,13 @@ package Rss::Filter {
         if ( my $last_update = try { $old->at( 'rss > channel > lastBuildDate, pubDate' ) } ) {
             $last_modified = $last_update->text || $last_modified;
         }
-        DEBUG( 'last update was ', $last_modified );
+        $self->logger->debug( 'last update was ', $last_modified );
         my $new = Mojo::UserAgent->new->get( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
         if ( $new->code == 200 ) {
-            DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
-            DEBUG( "filtering $feed_name" );
+            $self->logger->debug( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
+            $self->logger->debug( "filtering $feed_name" );
             $new = $self->filter_items( $new->dom, $filter, @matchers );
-            DEBUG( "collecting guids from old feed" );
+            $self->logger->debug( "collecting guids from old feed" );
             $stored_feed->save_feed( $new );
         }
     }
