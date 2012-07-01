@@ -121,7 +121,10 @@ package Rss::Filter {
             $self->logger->debug( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             $self->logger->debug( "filtering $feed_name" );
             $new = $self->filter_items( $new->dom, $group->{ifMatched}, @{ $group->{match} } );
+            # now run filters over previous version of the feed,
+            # so old stories in this feed will be recognised as dupes in subsequent feeds
             $self->logger->debug( "collecting guids from old feed" );
+            $self->filter_items( $old, $group->{ifMatched}, @{ $group->{match} } );
             $stored_feed->save_feed( $new );
         }
     }
