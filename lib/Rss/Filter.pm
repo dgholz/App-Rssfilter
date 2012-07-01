@@ -20,7 +20,6 @@ package Rss::Filter {
         search_path => 'Rss::Filter',
         sub_name    => '_filters',
         require     => 1;
-    use Feed::Storage;
     use Moo;
 
     has config => (
@@ -37,6 +36,16 @@ package Rss::Filter {
         Log::Log4perl->easy_init( { level => $DEBUG } );
         Log::Log4perl->get_logger( ref $self );
     }
+
+    has storage => (
+        is => 'ro',
+        default => sub { use Feed::Storage; 'Feed::Storage' },
+    );
+
+    has ua => (
+        is => 'ro',
+        default => sub { use Mojo::UserAgent; 'Mojo::UserAgent' },
+    );
 
     has filters => (
         is => 'lazy',
@@ -97,7 +106,7 @@ package Rss::Filter {
 
     method update_feed( $group, $feed ) {
         my ( $feed_name, $feed_url ) = each $feed;
-        my $stored_feed = Feed::Storage->new(
+        my $stored_feed = $self->storage->new(
             group_name => $group->{group},
             feed_name  => $feed_name,
         );
@@ -107,7 +116,7 @@ package Rss::Filter {
             $last_modified = $last_update->text || $last_modified;
         }
         $self->logger->debug( 'last update was ', $last_modified );
-        my $new = Mojo::UserAgent->new->get( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
+        my $new = $self->ua->new->get( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
         if ( $new->code == 200 ) {
             $self->logger->debug( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             $self->logger->debug( "filtering $feed_name" );
