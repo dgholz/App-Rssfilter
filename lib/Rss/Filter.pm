@@ -5,7 +5,7 @@ use warnings;
 use feature qw( :5.14 );
 
 package Rss::Filter {
-    use ojo;
+    use Mojo::UserAgent;
     use List::Util qw( first );
     use Log::Log4perl qw( :easy );
     use DateTime::Format::Strptime;
@@ -80,7 +80,7 @@ package Rss::Filter {
             $last_modified = $last_update->text || $last_modified;
         }
         DEBUG( 'last update was ', $last_modified );
-        my $new = g( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
+        my $new = Mojo::UserAgent->new->get( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
         if ( $new->code == 200 ) {
             DEBUG( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             DEBUG( "filtering $feed_name" );
