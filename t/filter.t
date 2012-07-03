@@ -83,4 +83,42 @@ is(
     'do nothing when no matchers given'
 );
 
+is(
+    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'Rss::Filter::test', 'Rss::Match::I_Do_Not_Exist'),
+    '<item>hi</item>',
+    'does not match when given non-existent matchers'
+);
+
+is(
+    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'Rss::Filter::I_Do_Not_Exist', 'Rss::Match::AlwaysMatch'),
+    '<item>hi</item>',
+    'does not filter when given non-existent filter'
+);
+
+for my $meth ( map { "update_$_" } qw< group feed > ) {
+    throws_ok(
+        sub { $rf->$meth },
+        qr/missing required argument/,
+        "$meth throws error when not given a group to update"
+    );
+}
+
+throws_ok(
+    sub { $rf->update_group( qw< one two > ) },
+    qr/too many arguments/,
+    'update_group throws error when given more than a single group to update'
+);
+
+throws_ok(
+    sub { $rf->update_feed( qw< one > ) },
+    qr/missing required argument/,
+    'update_feed throws error when given only a group and no feed to update'
+);
+
+throws_ok(
+    sub { $rf->update_feed( qw< one two three > ) },
+    qr/too many arguments/,
+    'update_feed throws error when given more than a single feed in a group to update'
+);
+
 done_testing;
