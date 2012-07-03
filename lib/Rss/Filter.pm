@@ -21,6 +21,7 @@ package Rss::Filter {
         sub_name    => '_filters',
         require     => 1;
     use Moo;
+    use Http::Date;
 
     has config => (
         is       => 'rw',
@@ -87,16 +88,6 @@ package Rss::Filter {
         return $feed_dom;
     }
 
-    method to_http_date( $datetime_str ) {
-        my $datetime;
-        try {
-                $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %z")->parse_datetime( $datetime_str );
-        } catch {
-                $datetime = DateTime::Format::Strptime->new( on_error => 'croak', pattern => "%a, %d %b %Y %T %Z")->parse_datetime( $datetime_str );
-        };
-        return $datetime->set_time_zone("GMT")->strftime( "%a, %d %b %Y %T %Z" );
-    }
-
     method update_group( $group ) {
         $self->logger->debug( "filtering feeds in ". $group->{group} );
         foreach my $feed ( @{ $group->{feeds} } ) {
@@ -111,10 +102,11 @@ package Rss::Filter {
             feed_name  => $feed_name,
         );
         my $old = $stored_feed->load_existing;
-        my $last_modified = 'Thu, 01 Jan 1970 00:00:00 +0000';
-        if ( my $last_update = try { $old->at( 'rss > channel > lastBuildDate, pubDate' ) } ) {
+        my $last_modified = 'Thu, 01 Jan 1970 00:00:00 GMT';
+        if ( my $last_update = $old->at( 'rss > channel > lastBuildDate, pubDate' ) ) {
             $last_modified = $last_update->text || $last_modified;
         }
+        $last_modified = time2str str2time $last_modified;
         $self->logger->debug( 'last update was ', $last_modified );
         my $new = $self->ua->new->get( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
         if ( $new->code == 200 ) {
