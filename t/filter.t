@@ -2,9 +2,15 @@ use Test::Most;
 
 use Rss::Filter;
 
-package Rss::Match::test {
+package Rss::Match::AlwaysMatch {
     sub match {
-        1;
+        !!1;
+    }
+};
+
+package Rss::Match::NeverMatch {
+    sub match {
+        !!0;
     }
 };
 
@@ -21,10 +27,54 @@ my $rf = Rss::Filter->new( config => { } );
 use Log::Log4perl qw< :levels >;
 $rf->logger->level( $OFF );
 
+for my $meth ( map { "_build_$_" } qw< logger filters matchers > ) {
+    throws_ok(
+        sub { $rf->$meth( qw< one > ) },
+        qr/too many arguments/,
+        "$meth does not accept any arguments"
+    );
+}
+
+throws_ok(
+    sub { Rss::Filter::prep_plugins },
+    qr/missing required argument/,
+    'throws error when not given a method name to check that plugins can perform'
+);
+
+throws_ok(
+    sub { $rf->filter_items },
+    qr/missing required argument/,
+    'throws error when not given a feed to filter'
+);
+
+throws_ok(
+    sub { $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ) ) },
+    qr/missing required argument/,
+    'throws error when not given a filter to apply to matching items'
+);
+
 is(
-    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'Rss::Filter::test', 'Rss::Match::test'),
+    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'Rss::Filter::test', 'Rss::Match::AlwaysMatch'),
     '<item>hello</item>',
-    'it lives it\'s alive'
+    'filters matching items'
+);
+
+is(
+    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'Rss::Filter::test', 'Rss::Match::NeverMatch'),
+    '<item>hi</item>',
+    'does not filter items which are not matched'
+);
+
+is(
+    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'test', 'Rss::Match::AlwaysMatch'),
+    '<item>hello</item>',
+    'assumes Rss::Filter namespace if no explicit namespace given for filter'
+);
+
+is(
+    $rf->filter_items( Mojo::DOM->new( '<item>hi</item>' ), 'Rss::Filter::test', 'AlwaysMatch'),
+    '<item>hello</item>',
+    'assumes Rss::Match namespace if no explicit namespace given for matchers'
 );
 
 is(
