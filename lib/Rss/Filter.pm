@@ -45,7 +45,7 @@ package Rss::Filter {
 
     has ua => (
         is => 'ro',
-        default => sub { use Mojo::UserAgent; 'Mojo::UserAgent' },
+        default => sub { use Mojo::UserAgent; Mojo::UserAgent->new },
     );
 
     has filters => (
@@ -108,7 +108,7 @@ package Rss::Filter {
         }
         $last_modified = time2str str2time $last_modified;
         $self->logger->debug( 'last update was ', $last_modified );
-        my $new = $self->ua->new->get( $feed_url, { 'If-Modified-Since' => $self->to_http_date( $last_modified ) } )->res;
+        my $new = $self->ua->get( $feed_url, { 'If-Modified-Since' => $last_modified } )->res;
         if ( $new->code == 200 ) {
             $self->logger->debug( "found a newer feed! ", $new->dom->at('rss > channel > lastBuildDate, pubDate')->text );
             $self->logger->debug( "filtering $feed_name" );
