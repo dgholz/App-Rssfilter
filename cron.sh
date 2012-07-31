@@ -1,7 +1,10 @@
 #!/bin/bash
 
+export PERLBREW_ROOT=$HOME/perl5/perlbrew
+export PERLBREW_HOME=$HOME/.perlbrew
 source ~/perl5/perlbrew/etc/bashrc
 
+perlbrew use perl-5.14.2@rss-dedupe
 RSS_DEDUPE_DIR=`dirname "$( readlink -f "$BASH_SOURCE" )"`
 mkdir -p "$RSS_DEDUPE_DIR/www"
 cd "$RSS_DEDUPE_DIR/www"
