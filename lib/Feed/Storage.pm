@@ -4,7 +4,6 @@ use feature qw( :5.14 );
 
 package Feed::Storage {
 
-    use File::Slurp;
     use Method::Signatures;
     use Moo;
     use Mojo::DOM;
@@ -35,24 +34,25 @@ package Feed::Storage {
     );
 
     method _build_filename {
-        Path::Class::File->new( $self->group_name, $self->feed_name .'.rss' ) =~ tr/ /_/sr ;
+        Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
     }
 
     method load_existing {
         $self->logger->debug( 'loading '. $self->filename );
-        if( ! -e $self->filename ) {
+        if( not defined $self->filename->stat ) {
             return Mojo::DOM->new;
         }
-        return Mojo::DOM->new( scalar read_file( $self->filename ) );
+        return Mojo::DOM->new( $self->filename->slurp );
     }
 
     method save_feed( $feed ) {
         $self->logger->debug( 'writing out new filtered feed to '. $self->filename );
-        if( not -d $self->group_name ) {
-            $self->logger->debug( 'no '. $self->group_name .' directory! making one' );
-            mkdir $self->group_name;
+        my $target_dir = $self->filename->dir;
+        if( not defined $target_dir->stat ) {
+            $self->logger->debug( "no $target_dir directory! making one" );
+            $target_dir->mkpath;
         }
-        write_file( $self->filename, $feed->to_xml )
+        $self->filename->spew( $feed->to_xml );
     }
 };
 
