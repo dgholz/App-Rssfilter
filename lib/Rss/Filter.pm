@@ -21,7 +21,7 @@ package Rss::Filter {
         sub_name    => '_filters',
         require     => 1;
     use Moo;
-    use Http::Date;
+    use HTTP::Date;
 
     has config => (
         is       => 'rw',
