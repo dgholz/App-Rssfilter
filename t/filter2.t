@@ -30,13 +30,15 @@ $message_res->parse(<<"EOM");
 HTTP/1.0 200 OK
 Content-Type: text/html
 
-<rss><channel><pubDate>HEYO</pubDate></channel></rss>
+<rss><channel><pubDate>HEYO</pubDate><item>hi</item></channel></rss>
 EOM
 
 my $mock_ua = Test::MockObject->new;
 $mock_ua->set_always( 'get', Mojo::Transaction->new->res( $message_res ) );
 
 my $rf = Rss::Filter->new( ua => $mock_ua, storage => 'Mock::Feed::Storage' );
+use Log::Log4perl qw< :levels >;
+$rf->logger->level( $OFF );
 
 my $fake_group = {
     group => 'BoneyM',
