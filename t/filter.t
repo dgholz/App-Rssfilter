@@ -23,7 +23,7 @@ package Rss::Filter::test {
 
 package main;
 
-my $rf = Rss::Filter->new( config => { } );
+my $rf = Rss::Filter->new;
 use Log::Log4perl qw< :levels >;
 $rf->logger->level( $OFF );
 

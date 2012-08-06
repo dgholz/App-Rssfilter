@@ -36,7 +36,7 @@ EOM
 my $mock_ua = Test::MockObject->new;
 $mock_ua->set_always( 'get', Mojo::Transaction->new->res( $message_res ) );
 
-my $rf = Rss::Filter->new( config => { }, ua => $mock_ua, storage => 'Mock::Feed::Storage' );
+my $rf = Rss::Filter->new( ua => $mock_ua, storage => 'Mock::Feed::Storage' );
 
 my $fake_group = {
     group => 'BoneyM',

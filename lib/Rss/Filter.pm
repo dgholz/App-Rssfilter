@@ -23,11 +23,6 @@ package Rss::Filter {
     use Moo;
     use HTTP::Date;
 
-    has config => (
-        is       => 'rw',
-        required => 1,
-    );
-
     has logger => (
         is => 'lazy',
     );
