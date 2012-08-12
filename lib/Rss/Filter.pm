@@ -74,7 +74,7 @@ package Rss::Filter {
                 my ($item) = @_;
                 my $matcher = first { $self->matchers->{ $_ }->($item) } @matchers;
                 if ( $matcher ) {
-                    $self->logger->debug( "applying $filter since $matcher matched ", $item->at('guid')// 'an item with no guid' );
+                    $self->logger->debug( "applying $filter since $matcher matched ", $item->at('guid') // 'an item with no guid' );
                     $self->filters->{ $filter }->( $item, $matcher );
                 }
             }
