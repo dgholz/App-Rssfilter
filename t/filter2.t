@@ -23,12 +23,13 @@ my $mock_storage = Test::MockObject->new;
 $mock_storage->fake_module( 'Mock::Feed::Storage', new => sub { shift; $mock_storage->ctor( @_ ); } );
 $mock_storage->set_always( 'ctor', $mock_storage );
 $mock_storage->set_always( 'load_existing', Mojo::DOM->new('<call>the doctor</call>' ) );
+$mock_storage->set_always( 'last_modified', 'Thu, 01 Jan 1970 00:00:00 GMT' );
 $mock_storage->set_true( 'save_feed' );
 
 my $message_res = Mojo::Message::Response->new;
 $message_res->parse(<<"EOM");
 HTTP/1.0 200 OK
-Content-Type: text/html
+Content-Type: text/xml
 
 <rss><channel><pubDate>HEYO</pubDate><item>hi</item></channel></rss>
 EOM
@@ -59,7 +60,7 @@ my ($name, $args);
 is(
     $name,
     'ctor',
-    'a new stored feed was created ...'
+    'a new feed storage object was created ...'
 );
 
 shift $args; # discard package name
@@ -73,7 +74,14 @@ is_deeply(
 is(
     $name,
     'load_existing',
-    'update_feed loads the previously-saved RSS feed ...'
+    'update_feed attemts to loads the previously-saved RSS feed'
+);
+
+($name, $args) = $mock_storage->next_call;
+is(
+    $name,
+    'last_modified',
+    'update_feed asks for the last modified time of the previous feed'
 );
 
 ($name, $args) = $mock_ua->next_call;

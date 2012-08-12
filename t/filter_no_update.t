@@ -25,6 +25,7 @@ $mock_storage->fake_new(    'Mock::Feed::Storage' );
 $mock_storage->set_always( 'load_existing', Mojo::DOM->new(<<"EOM") );
 <rss><channel><pubDate>Mon, 06 Aug 2012 00:06:00 GMT</pubDate><item>hi</item></channel></rss>
 EOM
+$mock_storage->set_always( 'last_modified', 'Mon, 06 Aug 2012 00:06:00 GMT' );
 
 my $message_res = Mojo::Message::Response->new;
 $message_res->parse(<<"EOM");

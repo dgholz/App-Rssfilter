@@ -7,7 +7,6 @@ use feature qw( :5.14 );
 package Rss::Filter {
     use Mojo::UserAgent;
     use List::Util qw( first );
-    use DateTime::Format::Strptime;
     use Method::Signatures;
     use Try::Tiny;
     use Carp::Always;
@@ -21,7 +20,6 @@ package Rss::Filter {
         sub_name    => '_filters',
         require     => 1;
     use Moo;
-    use HTTP::Date;
 
     has logger => (
         is => 'lazy',
@@ -98,15 +96,11 @@ package Rss::Filter {
             feed_name  => $feed_name,
         );
         my $old = $stored_feed->load_existing;
-        my $last_modified = 'Thu, 01 Jan 1970 00:00:00 GMT';
-        if ( my $last_update = $old->at( 'rss > channel > lastbuilddate, pubdate' ) ) {
-            $last_modified = $last_update->text || $last_modified;
-        }
-        $last_modified = time2str str2time $last_modified;
+        my $last_modified = $stored_feed->last_modified;
         $self->logger->debug( 'last update was ', $last_modified );
         my $new = $self->ua->get( $feed_url, { 'If-Modified-Since' => $last_modified } )->res;
         if ( $new->code == 200 ) {
-            $self->logger->debug( "found a newer feed! ", $new->dom->at('rss > channel > lastbuilddate, pubdate')->text );
+            $self->logger->debug( "found a newer feed!" );
             $self->logger->debug( "filtering $feed_name" );
             $new = $self->filter_items( $new->dom, $group->{ifMatched}, @{ $group->{match} } );
             # now run filters over previous version of the feed,

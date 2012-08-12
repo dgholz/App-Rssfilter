@@ -8,6 +8,7 @@ package Feed::Storage {
     use Moo;
     use Mojo::DOM;
     use Path::Class::File;
+    use HTTP::Date;
 
     has logger => (
         is => 'lazy',
@@ -33,16 +34,23 @@ package Feed::Storage {
         is => 'lazy',
     );
 
+    has last_modified => (
+        is => 'rwp',
+        default => sub { time2str 0 },
+    );
+
     method _build_filename {
         Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
     }
 
     method load_existing {
         $self->logger->debug( 'loading '. $self->filename );
-        if( not defined $self->filename->stat ) {
-            return Mojo::DOM->new;
-        }
-        return Mojo::DOM->new( $self->filename->slurp );
+        my $stat = $self->filename->stat;
+
+        return Mojo::DOM->new if not defined $stat;
+
+        $self->_set_last_modified( time2str $stat->mtime );
+        return Mojo::DOM->new( scalar $self->filename->slurp );
     }
 
     method save_feed( $feed ) {
@@ -54,6 +62,7 @@ package Feed::Storage {
         }
         $self->filename->spew( $feed->to_xml );
     }
+
 };
 
 1;
