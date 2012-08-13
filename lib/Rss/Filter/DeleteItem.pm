@@ -2,53 +2,59 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: removes a Mojo::DOM element from its parent element
+# ABSTRACT: remove a Mojo::DOM element from its parent element
 
 =head1 SYNOPSIS
 
-  use App::rssfilter;
-  use YAML::XS;
+    use App::Rssfilter;
+    use YAML::XS;
 
-  App::Rssfilter->run( Load(<<"End_of_Config") );
-  groups:
-  - group: YoyoDyne
-    match:
-    - Duplicates
-    ifMatched: Rss::Filter::DeleteItem
-    feeds:
-    - YoyoDyne News:    http://yoyodyne.com/news.rss
-    - YoyoDyne Stories: http://yoyodyne.com/stories.rss
-  End_of_Config
+    App::Rssfilter->run( Load(<<"End_of_Config") );
+    groups:
+    - group: YoyoDyne
+      match:
+      - Duplicates
+      ifMatched: DeleteItem
+      feeds:
+      - YoyoDyne News:    http://yoyodyne.com/news.rss
+      - YoyoDyne Stories: http://yoyodyne.com/stories.rss
+    End_of_Config
 
-  # or manually
+    # or manually
 
-  use Mojo::DOM;
-  use Rss::Filter::DeleteItem;
+    use Mojo::DOM;
+    use Rss::Filter::DeleteItem;
 
-  my $rss = Mojo::DOM->new( <<"End_of_RSS" );
-  <rss>
-    <channel>
-      <item>hi</item>
-      <item>hello</item>
-    </channel>
-  </rss>
-  End_of_RSS
+    my $rss = Mojo::DOM->new( <<"End_of_RSS" );
+    <rss>
+      <channel>
+        <item>hi</item>
+        <item>hello</item>
+      </channel>
+    </rss>
+    End_of_RSS
 
-  $rss->find( 'item' )->each(
-      sub {
-        my $item = shift;
-        if( $item =~ /hello/ ) {
-          Rss::Filter::DeleteItem::filter( $item, 'manual match' );
+    $rss->find( 'item' )->each(
+        sub {
+          my $item = shift;
+          if( $item =~ /hello/ ) {
+            Rss::Filter::DeleteItem::filter( $item, 'manual match' );
+          }
         }
-      }
-  );
+    );
 
-  print $rss;
-  # "<rss><channel><item>hi</item></channel></rss>"
+    print $rss;
+    #  <rss>
+    #    <channel>
+    #      <item>hi</item>
+    #    </channel>
+    #  </rss>
 
 =head1 DESCRIPTION
 
-L<Rss::Filter::DeleteItem> will remove an element from its parent element. You should specify this module in your configuration passed to L<App::Rssfilter>.
+L<Rss::Filter::DeleteItem> will remove a L<Mojo::DOM> element from its parent element.
+
+You should use this module by specifying it as a group's 'ifMatched' action in your L<App::Rssfilter> configuration.
 
 =head1 SEE ALSO
 
@@ -61,11 +67,12 @@ L<Rss::Filter::DeleteItem> will remove an element from its parent element. You s
 package Rss::Filter::DeleteItem {
     use Method::Signatures;
 
-=func filter
+=func filter( $item, $matcher )
 
-Removes element from its parent. The second arguemnt specifies what caused the item to be removed, and is ignored.
+Removes $item from its parent. The second argument specifies what causes $item to be removed, and is ignored.
 
 =cut
+
     func filter ( $item, $matcher ) {
         $item->replace(q{});
     }
