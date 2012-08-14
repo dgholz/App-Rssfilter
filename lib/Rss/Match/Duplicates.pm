@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-package Rss::Match::Dupes {
+package Rss::Match::Duplicates {
     use Method::Signatures;
     func match ( $item ) {
         state %prev;

@@ -14,7 +14,7 @@ groups:
   match:
   - AbcSport
   - AbcPreviews
-  - Dupes
+  - Duplicates
   ifMatched: DeleteItem
   feeds:
   - Bega 2550:      http://www.abc.net.au/news/feed/8706/rss.xml
@@ -25,7 +25,7 @@ groups:
 - group: BBC
   match:
   - BbcSports
-  - Dupes
+  - Duplicates
   ifMatched: DeleteItem
   feeds:
   - Edinburgh East and Fife: http://feeds.bbci.co.uk/news/scotland/edinburgh_east_and_fife/rss.xml
