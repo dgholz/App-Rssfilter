@@ -25,4 +25,9 @@ ok(
     'does not match item whose guid does not contain "preview"'
 );
 
+ok(
+    ! Rss::Match::AbcPreviews::match( Mojo::DOM->new( '<title>sneak peek preview season</title><guid>http://hoop.de.doo/sneak-preview</guid>' ) ),
+    'does not match item whose title and guid contain "preview"'
+);
+
 done_testing;
