@@ -103,7 +103,10 @@ package Rss::Filter {
             $self->logger->debug( "found a newer feed!" );
             $self->logger->debug( "filtering $feed_name" );
             $new = $self->filter_items( $new->dom, $group->{ifMatched}, @{ $group->{match} } );
-            $stored_feed->save_feed( $new );
+            if( 0 < $new->find( 'item' )->size ) {
+                $self->logger->debug( 'some items left in feed after filtering! saving it!');
+                $stored_feed->save_feed( $new );
+            }
         }
         # now run filters over previous version of the feed,
         # so old stories in this feed will be recognised as dupes in subsequent feeds
