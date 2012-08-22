@@ -29,11 +29,11 @@ use feature qw( :5.14 );
 <rss>
   <channel>
     <item>
-      <title>Jumping jackrabbit smashes long jump record</title>
+      <title>Jumping jackrabbit shames long jump record</title>
       <category>Sport</category>
     </item>
     <item>
-      <title>Online poll shows programmers cool, successful</title>
+      <title>Online poll proves programmers cool, successful</title>
       <category>Internet</category>
     </item>
   </channel>

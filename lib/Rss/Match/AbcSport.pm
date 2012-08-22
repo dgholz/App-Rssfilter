@@ -26,18 +26,19 @@ use Rss::Match::Category;
     use Rss::Match::AbcSport;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
-    <rss>
-      <channel>
-        <item>
-          <title>Jumping jackrabbit smash long jump record</title>
-          <category>Sport</category>
-        </item>
-        <item>
-          <title>Online poll proves programmers cool, successful</title>
-          <category>Internet</category>
-        </item>
-      </channel>
-    </rss>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss>
+  <channel>
+    <item>
+      <title>Jumping jackrabbit smash long jump record</title>
+      <category>Sport</category>
+    </item>
+    <item>
+      <title>Online poll proves programmers cool, successful</title>
+      <category>Internet</category>
+    </item>
+  </channel>
+</rss>
     End_of_RSS
 
     $rss->find( 'item' )->each(

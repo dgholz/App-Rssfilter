@@ -26,12 +26,13 @@ use feature qw( :5.14 );
     use Rss::Filter::DeleteItem;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
-    <rss>
-      <channel>
-        <item>hi</item>
-        <item>hello</item>
-      </channel>
-    </rss>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss>
+  <channel>
+    <item>hi</item>
+    <item>hello</item>
+  </channel>
+</rss>
     End_of_RSS
 
     $rss->find( 'item' )->each(
@@ -44,6 +45,7 @@ use feature qw( :5.14 );
     );
 
     print $rss;
+    # <?xml version="1.0" encoding="UTF-8"?>
     #  <rss>
     #    <channel>
     #      <item>hi</item>

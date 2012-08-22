@@ -26,12 +26,13 @@ use feature qw( :5.14 );
     use Rss::Filter::MarkTitle;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
-    <rss>
-      <channel>
-        <item><title>it's hi time</title>hi</item>
-        <item><title>here we are again</title>hello</item>
-      </channel>
-    </rss>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss>
+  <channel>
+    <item><title>it's hi time</title>hi</item>
+    <item><title>here we are again</title>hello</item>
+  </channel>
+</rss>
     End_of_RSS
 
     $rss->find( 'item' )->each(
@@ -44,6 +45,7 @@ use feature qw( :5.14 );
     );
 
     print $rss;
+    # <?xml version="1.0" encoding="UTF-8"?>
     # <rss>
     #   <channel>
     #     <item><title>it's hi time</title>hi</item>

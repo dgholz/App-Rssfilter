@@ -25,18 +25,19 @@ use feature qw( :5.14 );
     use Rss::Match::AbcPreviews;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
-    <rss>
-      <channel>
-        <item>
-          <guid>http://www.abc.net.au/preview/some_article</guid>
-          <description>here is an article which is in preview mode</description>
-        </item>
-        <item>
-          <guid>http://www.abc.net.au/entertainment/new-preview-of-movie</guid>
-          <description>here is an article about a preview of a movie</description>
-        </item>
-      </channel>
-    </rss>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss>
+  <channel>
+    <item>
+      <guid>http://www.abc.net.au/preview/some_article</guid>
+      <description>here is an article which is in preview mode</description>
+    </item>
+    <item>
+      <guid>http://www.abc.net.au/entertainment/new-preview-of-movie</guid>
+      <description>here is an article about a preview of a movie</description>
+    </item>
+  </channel>
+</rss>
     End_of_RSS
 
     $rss->find( 'item' )->each(
