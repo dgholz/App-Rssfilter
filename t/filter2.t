@@ -31,6 +31,7 @@ $message_res->parse(<<"EOM");
 HTTP/1.0 200 OK
 Content-Type: text/xml
 
+<?xml version="1.0" encoding="UTF-8"?>
 <rss><channel><pubDate>HEYO</pubDate><item>hi</item></channel></rss>
 EOM
 
@@ -120,6 +121,7 @@ is(
 is(
     $args->[1],
     Mojo::DOM->new(<<"EOM"),
+<?xml version="1.0" encoding="UTF-8"?>
 <rss><channel><pubDate>HEYO</pubDate><item>hello</item></channel></rss>
 EOM
     '... with the result of filtering the feed fetched from the URL'
