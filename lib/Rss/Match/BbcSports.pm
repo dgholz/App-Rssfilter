@@ -63,7 +63,6 @@ You should use this module by specifying it under a group's 'match' section in y
 =for :list
 * L<App::Rssfilter>
 * L<Rss::Match::AbcPreviews>
-* L<Rss::Match::AbcSport>
 * L<Rss::Match::Category>
 * L<Rss::Match::Duplicates>
 

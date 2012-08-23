@@ -12,8 +12,8 @@ my $config = Load(<<"End_Of_Config");
 groups:
 - group: ABC
   match:
-  - AbcSport
-  - AbcPreviews
+  - AbcPreview
+  - Category[Sport]
   - Duplicates
   ifMatched: DeleteItem
   feeds:
