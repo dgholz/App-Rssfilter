@@ -63,19 +63,40 @@ package Rss::Filter {
                 map { [ $_, $_->can( $method ) ] } @plugins;
     }
 
+    method prep_config_matchers( @matchers ) {
+        my @fin;
+        foreach my $matcher ( @matchers ) {
+            my ( $name, $args ) = $matcher =~ / ( [^\[]+ ) (?: \[ ( [^\]]+ ) \] )? /xms;
+            my @args;
+            if ( $name !~ /::/ ) {
+                $name = 'Rss::Match::' . $name;
+            }
+            if( defined $args ) {
+                @args = split / [ ]* , [ ]* /xms, $args;
+            }
+
+            if( exists $self->matchers->{ $name } ) {
+                push @fin, {
+                    match => sub { $self->matchers->{ $name }->( @_, @args ); },
+                    name => $matcher,
+                };
+            }
+        }
+        return @fin;
+    }
+
     method filter_items( $feed_dom, $filter, @matchers ) {
-        @matchers = grep { exists $self->matchers->{ $_ } }
-                     map { /::/ ? $_ : s/^/Rss::Match::/r } @matchers;
+        @matchers = $self->prep_config_matchers( @matchers );
         $filter = first  { exists $self->filters->{ $_ } }
                      map { /::/ ? $_ : s/^/Rss::Filter::/r } $filter;
         return $feed_dom unless @matchers and $filter;
         $feed_dom->find('item')->each(
             sub {
                 my ($item) = @_;
-                my $matcher = first { $self->matchers->{ $_ }->($item) } @matchers;
+                my $matcher = first { $_->{match}->($item) } @matchers;
                 if ( $matcher ) {
-                    $self->logger->debug( "applying $filter since $matcher matched ", $item->at('guid') // 'an item with no guid' );
-                    $self->filters->{ $filter }->( $item, $matcher );
+                    $self->logger->debug( "applying $filter since ", $matcher->{name}, " matched ", $item->at('guid') // 'an item with no guid' );
+                    $self->filters->{ $filter }->( $item, $matcher->{name} );
                 }
             }
         );
