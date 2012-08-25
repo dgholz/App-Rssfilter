@@ -25,7 +25,7 @@ ok(
 );
 
 ok(
-    Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:Pen</category>' ), 'Stationary' ),
+    Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:pen</category>' ), 'Stationary' ),
     'disregard subcategory when considering categories'
 );
 
@@ -50,8 +50,28 @@ ok(
 );
 
 ok(
-    ! Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:Pen</category>' ), 'Pen' ),
+    ! Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:pen</category>' ), 'pen' ),
     'does not match item whose subcategory matches the specified catergory'
+);
+
+ok(
+    Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:pen</category>' ), ':pen' ),
+    'disregard category when considering subcategories'
+);
+
+ok(
+    ! Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:pen</category>' ), ':Stationary' ),
+    'does not match item whose category matches the specified subcatergory'
+);
+
+ok(
+    ! Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:pen</category>' ), 'Stationary:pencil' ),
+    'does not match item whose category:subcategory does not match the specified category:subcatergory'
+);
+
+ok(
+    Rss::Match::Category::match( Mojo::DOM->new( '<category>Stationary:pencil</category>' ), 'Stationary:pencil' ),
+    'match item whose category:subcategory matches the specified category:subcatergory'
 );
 
 done_testing;
