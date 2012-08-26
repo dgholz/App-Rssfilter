@@ -2,3 +2,5 @@
 .*.swp
 log
 www
+.build
+App-Rssfilter*
