@@ -36,9 +36,16 @@ package Feed::Storage {
     );
 
     has last_modified => (
-        is => 'rwp',
-        default => sub { time2str 0 },
+        is => 'lazy',
+        clearer => '_clear_last_modified',
     );
+
+    method _build_last_modified {
+        if ( my $stat = $self->_file_path->stat ) {
+            return time2str $stat->mtime;
+        }
+        return time2str 0;
+    }
 
     method _build__file_path {
         Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
@@ -50,7 +57,7 @@ package Feed::Storage {
 
         return Mojo::DOM->new if not defined $stat;
 
-        $self->_set_last_modified( time2str $stat->mtime );
+        $self->_clear_last_modified;
         return Mojo::DOM->new( scalar $self->_file_path->slurp );
     }
 
@@ -62,6 +69,7 @@ package Feed::Storage {
             $target_dir->mkpath;
         }
         $self->_file_path->spew( $feed->to_xml );
+        $self->_clear_last_modified;
     }
 
 };

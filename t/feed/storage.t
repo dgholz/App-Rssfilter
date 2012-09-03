@@ -25,6 +25,12 @@ throws_ok(
 );
 
 is(
+    $feed->last_modified,
+    'Thu, 01 Jan 1970 00:00:00 GMT',
+    'last_modified is set UNIX epoch time if underlying file does not exist'
+);
+
+is(
     $feed->load_existing,
     Mojo::DOM->new,
     'returns empty DOM if underlying file does not exist'
@@ -39,6 +45,14 @@ $feed = Feed::Storage->new(
 );
 $feed->logger->level( $OFF );
 $tmp->spew('<surprise>your favourite bean</surprise>');
+
+my $timestamp = $tmp->stat->mtime;
+use HTTP::Date;
+is(
+    str2time( $feed->last_modified ),
+    $timestamp,
+    'last_modified is set to the last modified time of the underlying file'
+);
 
 is(
     $feed->load_existing,
@@ -64,6 +78,32 @@ is(
     '<well>I guess this is it</well>',
     'save_feed writes passed DOM to underlying file'
 );
+
+my $updated_timestamp = time + 100;
+utime 0, $updated_timestamp, $tmp;
+
+is(
+    str2time( $feed->last_modified ),
+    $updated_timestamp,
+    'last_modified is cleared when content is saved'
+);
+
+utime 0, $updated_timestamp + 100, $tmp;
+
+is(
+    str2time( $feed->last_modified ),
+    $updated_timestamp,
+    'last_modified does not change when content has not been saved or loaded'
+);
+
+$feed->load_existing;
+
+is(
+    str2time( $feed->last_modified ),
+    $updated_timestamp + 100,
+    'last_modified is cleared when conent is loaded'
+);
+
 
 $tmp->dir->rmtree;
 $feed->save_feed( Mojo::DOM->new( '<make>noise, a phone call</make>' ) );
