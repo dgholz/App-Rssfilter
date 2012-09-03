@@ -13,28 +13,10 @@ use Log::Log4perl qw< :levels >;
 my $feed;
 
 $feed = Feed::Storage->new(
-    group_name => 'hi',
-    feed_name  => 'hello',
-);
-$feed->logger->level( $OFF );
-
-is(
-    $feed->filename,
-    Path::Class::File->new( 'hi', 'hello.rss' ),
-    'sets filename from group & feed name'
-);
-
-$feed = Feed::Storage->new(
     group_name => 'a bean',
     feed_name  => 'lima bean',
 );
 $feed->logger->level( $OFF );
-
-is(
-    $feed->filename,
-    Path::Class::File->new( 'a_bean', 'lima_bean.rss' ),
-    'replaces spaces with underscores'
-);
 
 throws_ok(
     sub { $feed->load_existing( qw< one > ) },
@@ -45,16 +27,15 @@ throws_ok(
 is(
     $feed->load_existing,
     Mojo::DOM->new,
-    'returns empty DOM if filename referes to a non-existant file'
+    'returns empty DOM if underlying file does not exist'
 );
 
 my $tmp_dir = File::Temp->newdir;
-my ($fh, $filename) = tempfile( DIR => $tmp_dir );
+my ($fh, $filename) = tempfile( DIR => $tmp_dir, SUFFIX => '.rss' );
 my $tmp = Path::Class::File->new( $filename );
 $feed = Feed::Storage->new(
-    group_name => undef,
-    feed_name  => undef,
-    filename   => $tmp,
+    group_name => $tmp_dir,
+    feed_name  => $tmp->basename =~ s/ [.] rss \z //xmsr,
 );
 $feed->logger->level( $OFF );
 $tmp->spew('<surprise>your favourite bean</surprise>');
@@ -81,7 +62,7 @@ $feed->save_feed( Mojo::DOM->new( '<well>I guess this is it</well>' ) );
 is(
     $tmp->slurp,
     '<well>I guess this is it</well>',
-    'save_feed writes passed DOM to file referred to by filename'
+    'save_feed writes passed DOM to underlying file'
 );
 
 $tmp->dir->rmtree;
