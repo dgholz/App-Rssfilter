@@ -182,16 +182,17 @@ package App::Rssfilter::Rule {
 
                 # return a wrapper
                 if( my $method = $invocant->can( $option_name ) ) {
-                    return sub {
-                        if( $invocant eq $namespace ) {
-                            push @_, @additional_args;
-                        }
-                        else
-                        {
-                            unshift @_, $invocant;
-                        }
-                        goto &$method;
-                    };
+                    if( $invocant eq $namespace ) {
+                        return sub {
+                            $method->( @_, @additional_args) ;
+                        };
+                    }
+                    else
+                    {
+                        return sub {
+                            $invocant->$option_name( @_ );
+                        };
+                    }
                 }
                 else
                 {
@@ -200,7 +201,7 @@ package App::Rssfilter::Rule {
             }
             default {
                 if( my $method = $value->can( $option_name ) ) {
-                    return sub { unshift @_, $value; goto &$method; }
+                    return sub { $value->$option_name( @_ ); }
                 }
                 else
                 {
