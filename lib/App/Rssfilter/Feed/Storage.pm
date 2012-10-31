@@ -6,14 +6,17 @@ use feature qw( :5.14 );
 
 =head1 SYNOPSIS
 
-    use Feed::Storage;
+    use App::Rssfilter::Feed::Storage;
 
-    my $fs = Feed::Storage->new( group_name => 'BBC', feed_name => 'London' );
+    my $fs = App::Rssfilter::Feed::Storage->new(
+        group_name => 'BBC',
+        feed_name => 'London',
+    );
 
     print 'last update of feed was ', $fs->last_modified, "\n";
     print 'what we got last time: ', $fs->load_existing, "\n";
 
-    $fs->save_feed( Mojo::DOM->new("<hi><hello/></hi>");
+    $fs->save_feed( Mojo::DOM->new( "<hi><hello/></hi>" ) );
     print 'now it is: ', $fs->load_existing, "\n";
 
 =head1 DESCRIPTION
@@ -22,7 +25,7 @@ This module saves and loads RSS feeds to and from files, where the file name is 
 
 =cut
 
-package Feed::Storage {
+package App::Rssfilter::Feed::Storage {
 
     use Method::Signatures;
     use Moo;
@@ -32,21 +35,14 @@ package Feed::Storage {
 
 =method new
 
-    my $fs = Feed::Storage->new( group_name => 'BBC', feed_name => 'London' );
+    my $fs = App::Rssfilter::Feed::Storage->new(
+        group_name => 'BBC',
+        feed_name => 'London',
+    );
 
 The constructer has two required named parameters: a name for the group the feed belongs to, and the name for the feed. These are used as the directory and filename (respectively) for the feed.
 
 =cut
-
-    has logger => (
-        is => 'lazy',
-    );
-
-    method _build_logger {
-        use Log::Log4perl qw< :levels >;
-        Log::Log4perl->easy_init( { level => $DEBUG } );
-        Log::Log4perl->get_logger( ref $self );
-    }
 
 =method group_name
 
@@ -79,6 +75,10 @@ Returns the name of the feed, as passed to the constructor.
         init_arg => undef,
     );
 
+    method _build__file_path {
+        Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
+    }
+
 =method last_modified
 
     print $fs->last_modified, "\n";
@@ -99,11 +99,6 @@ Returns the time of the last modification as a HTTP date string suitable for use
         return time2str 0;
     }
 
-    method _build__file_path {
-        Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
-    }
-
-
 =method load_existing
 
     print $fs->load_existing;
@@ -113,7 +108,6 @@ Returns a L<Mojo::DOM> object initialised with the content of the previously-sav
 =cut
 
     method load_existing {
-        $self->logger->debug( 'loading '. $self->_file_path );
         my $stat = $self->_file_path->stat;
 
         return Mojo::DOM->new if not defined $stat;
@@ -131,10 +125,8 @@ Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method). C<last_modifi
 =cut
 
     method save_feed( $feed ) {
-        $self->logger->debug( 'writing out new filtered feed to '. $self->_file_path );
         my $target_dir = $self->_file_path->dir;
         if( not defined $target_dir->stat ) {
-            $self->logger->debug( "no $target_dir directory! making one" );
             $target_dir->mkpath;
         }
         $self->_file_path->spew( $feed->to_xml );
