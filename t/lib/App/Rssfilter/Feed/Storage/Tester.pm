@@ -24,7 +24,7 @@ package App::Rssfilter::Feed::Storage::Tester {
     );
 
     has group_name => (
-        is => 'ro',
+        is => 'lazy',
         default => sub {
             my ( $self ) = @_;
             $self->tempdir;
@@ -32,7 +32,7 @@ package App::Rssfilter::Feed::Storage::Tester {
     );
 
     has feed_name => (
-        is => 'ro',
+        is => 'lazy',
         default => sub {
             my ( $self ) = @_;
             $self->tempfile->basename =~ s/ [.] rss \z //xmsr;
@@ -47,7 +47,7 @@ package App::Rssfilter::Feed::Storage::Tester {
     );
 
     has tempfile => (
-        is => 'ro',
+        is => 'lazy',
         default => sub {
             my ( $self ) = @_;
             my ($fh, $filename) = File::Temp::tempfile( DIR => $self->tempdir, SUFFIX => '.rss' );
