@@ -16,8 +16,8 @@ package App::Rssfilter::Feed::Storage::Test::LastModifiedComesFromFile {
 
         use HTTP::Date;
         is(
-            str2time( $self->feed_storage->last_modified ),
-            $self->tempfile->stat->mtime,
+            $self->feed_storage->last_modified,
+            time2str( $self->tempfile->stat->mtime ),
             'last_modified returns the last time the underlying file was modified'
         );
     };
