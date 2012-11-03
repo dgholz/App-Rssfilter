@@ -50,10 +50,14 @@ package App::Rssfilter::Feed::Storage::Tester {
         is => 'lazy',
         default => sub {
             my ( $self ) = @_;
-            my ($fh, $filename) = File::Temp::tempfile( DIR => $self->tempdir, SUFFIX => '.rss' );
-            Path::Class::File->new( $filename );
+            File::Temp->new( DIR => $self->tempdir, SUFFIX => '.rss' );
         },
     );
+
+    around tempfile => sub {
+        my ( $orig, @args ) = @_;
+        Path::Class::File->new( $orig->( @args )->filename );
+    };
 
 =begin
 
