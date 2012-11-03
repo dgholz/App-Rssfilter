@@ -59,9 +59,9 @@ sub run {
 
 sub requested_groups_or_everything {
     my ( $config, @request ) = @_;
-    my @groups = @{ $config->{groups} };
+    my @groups = @{ ${ $config }{groups} };
     return @groups if not @request;
-    my %groups_I_know_about = map { $_->{ group } => $_ } @groups;
+    my %groups_I_know_about = map { ${ $_ }{ group } => $_ } @groups;
     if ( my @unknown_groups  = grep { not exists $groups_I_know_about{ $_ } } @request ) {
         croak "don't know how to get groups: ". join(q{, }, @unknown_groups );
     }
