@@ -1,0 +1,28 @@
+use strict;
+use warnings;
+use feature qw< :5.14 >;
+
+package App::Rssfilter::Feed::Storage::Test::LoadExistingTakesContentFromFile {
+
+    use Test::Routine;
+    use Test::More;
+    use Mojo::DOM;
+    use namespace::autoclean;
+
+    requires 'feed_storage';
+    requires 'tempfile';
+
+    test load_existing_takes_content_from_file => sub {
+        my ( $self ) = @_;
+        $self->tempfile->spew('<surprise>your favourite bean</surprise>');
+
+        is(
+            $self->feed_storage->load_existing,
+            Mojo::DOM->new('<surprise>your favourite bean</surprise>'),
+            'load_existing returns DOM representation of existing content if filname refers to a existing file'
+        );
+    };
+
+}
+
+1;

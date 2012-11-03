@@ -61,14 +61,6 @@ package App::Rssfilter::Feed::Storage::Tester {
 
 =begin
 
-    $tmp->spew('<surprise>your favourite bean</surprise>');
-
-    is(
-        $feed->load_existing,
-        Mojo::DOM->new( '<surprise>your favourite bean</surprise>'),
-        'load_existing returns DOM representation of existing content if filname refers to a existing file'
-    );
-
     throws_ok(
         sub { $feed->save_feed },
         qr/missing required argument/,
