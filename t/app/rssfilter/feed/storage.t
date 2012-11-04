@@ -7,7 +7,7 @@ use Test::Most;
 use lib qw< t/lib >;
 
 run_tests(
-    'last_modified get value from underlying file',
+    'load_existing, save_feed, & last_modified',
     [
         'App::Rssfilter::Feed::Storage::Tester',
         'App::Rssfilter::Feed::Storage::Test::LastModifiedComesFromFile',
