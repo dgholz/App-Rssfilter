@@ -98,15 +98,6 @@ package App::Rssfilter::Feed::Storage::Tester {
         'last_modified is cleared when conent is loaded'
     );
 
-
-    $tmp->dir->rmtree;
-    $feed->save_feed( Mojo::DOM->new( '<make>noise, a phone call</make>' ) );
-    is(
-        $tmp->slurp,
-        '<make>noise, a phone call</make>',
-        'save_feed creates a directory if it doesn\'t exist'
-    );
-
 =cut
 
 }

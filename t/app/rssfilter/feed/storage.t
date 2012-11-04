@@ -13,6 +13,7 @@ run_tests(
         'App::Rssfilter::Feed::Storage::Test::LastModifiedComesFromFile',
         'App::Rssfilter::Feed::Storage::Test::LoadExistingTakesContentFromFile',
         'App::Rssfilter::Feed::Storage::Test::SaveFeedPutsContentToFile',
+        'App::Rssfilter::Feed::Storage::Test::FetchersBehaveSensibleWhenUnderlyingFileNotPresent',
     ],
 );
 
