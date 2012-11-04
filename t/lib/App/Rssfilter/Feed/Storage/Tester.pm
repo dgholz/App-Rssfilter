@@ -73,13 +73,6 @@ package App::Rssfilter::Feed::Storage::Tester {
         'throws error when given more than one feed to save'
     );
 
-    $feed->save_feed( Mojo::DOM->new( '<well>I guess this is it</well>' ) );
-    is(
-        $tmp->slurp,
-        '<well>I guess this is it</well>',
-        'save_feed writes passed DOM to underlying file'
-    );
-
     my $updated_timestamp = time + 100;
     utime 0, $updated_timestamp, $tmp;
 

@@ -12,6 +12,7 @@ run_tests(
         'App::Rssfilter::Feed::Storage::Tester',
         'App::Rssfilter::Feed::Storage::Test::LastModifiedComesFromFile',
         'App::Rssfilter::Feed::Storage::Test::LoadExistingTakesContentFromFile',
+        'App::Rssfilter::Feed::Storage::Test::SaveFeedPutsContentToFile',
     ],
 );
 
