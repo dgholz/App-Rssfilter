@@ -61,18 +61,6 @@ package App::Rssfilter::Feed::Storage::Tester {
 
 =begin
 
-    throws_ok(
-        sub { $feed->save_feed },
-        qr/missing required argument/,
-        'throws error when not given a feed to save'
-    );
-
-    throws_ok(
-        sub { $feed->save_feed( qw< one two > ) },
-        qr/too many arguments/,
-        'throws error when given more than one feed to save'
-    );
-
     my $updated_timestamp = time + 100;
     utime 0, $updated_timestamp, $tmp;
 
