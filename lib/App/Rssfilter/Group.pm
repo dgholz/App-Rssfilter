@@ -31,6 +31,23 @@ package App::Rssfilter::Group {
     use Moo;
     use Method::Signatures;
 
+=method name()
+
+Returns the name passed to the constructor, or '.' if no name passed.
+
+=cut
+
+    has name => (
+        is => 'ro',
+        default => sub { '.' },
+    );
+
+=method rules()
+
+Returns an array reference to the list of rules which will be applied to the feeds in this group (and subgroups).
+
+=cut
+
     has rules => (
         is => 'ro',
         default => sub { [] },
@@ -53,13 +70,6 @@ Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule in
         push $self->rules, $rule;
         return $self;
     }
-
-=method rules()
-
-Returns an array reference to the list of rules which will be applied to the feeds in this group (and subgroups).
-
-=cut
-
 
 }
 

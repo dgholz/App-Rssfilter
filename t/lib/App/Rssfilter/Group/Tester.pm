@@ -7,7 +7,9 @@ package App::Rssfilter::Group::Tester {
         is => 'lazy',
         default => sub {
             my ( $self ) = @_;
-            App::Rssfilter::Group->new;
+            App::Rssfilter::Group->new(
+                name => $self->group_name,
+            );
         },
     );
 
@@ -18,6 +20,11 @@ package App::Rssfilter::Group::Tester {
             $mock_rule->set_isa( 'App::Rssfilter::Rule' );
             return $mock_rule;
         },
+    );
+
+    has group_name => (
+        is => 'ro',
+        defaults => sub { undef; }, # same as if no default
     );
 }
 
