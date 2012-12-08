@@ -1,5 +1,5 @@
 .syntax.err
-.*.swp
+.*.sw?
 log
 www
 .build
