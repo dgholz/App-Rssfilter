@@ -31,6 +31,17 @@ package App::Rssfilter::Group {
     use Moo;
     use Method::Signatures;
 
+    method BUILDARGS( @options ) {
+        if( 1 == @options ) {
+            unshift @options, 'name';
+        }
+        return { @options };
+    }
+
+=method new( %options )
+
+=cut
+
 =method name()
 
 Returns the name passed to the constructor, or '.' if no name passed.
