@@ -17,7 +17,7 @@ package App::Rssfilter::Group::Test::GroupsCanBeNested {
         my $new_feed  = $new_group->add_feed( 'welp' => 'http://we.lp/news.rss' );
 
         is(
-            $new_feed->feed_storage->group_name,
+            $new_feed->storage->group_name,
             join( '/', $self->group->name, 'hiiii' ),
             q{nested groups include their parent's name in the group_name passed to add_feed}
         );
