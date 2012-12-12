@@ -2,22 +2,22 @@
 
 =head1 SYNOPSIS
 
-    use App::RssFilter;
+    use App::RssFilter::Group;
 
-    my $rssfilter = App::RssFilter->new;
-    $rssfilter->add_group( 'hi' );
-    my $hello_group = $rssfilter->add_group( 'hello' );
+    my $new_group = App::RssFilter::Group->new( name => 'news' );
+    $news_group->add_group( 'USA' );
+    my $uk_news_group = $news_group->add_group( 'UK' );
 
-    my $dupe_rule = $rssfilter->group( 'hi' )->add_rule( Duplicate => 'DeleteItem' );
-    $hello_group->add_rule( condition => 'Category[Politics]', action => 'MarkTitle' );
-    $hello_group->add_rule( $dupe_rule );
+    my $dupe_rule = $news_group->group( 'USA' )->add_rule( Duplicate => 'DeleteItem' );
+    $uk_news_group->add_rule( match => 'Category[Politics]', filter => 'MarkTitle' );
+    $uk_news_group->add_rule( $dupe_rule );
 
-    $rssfilter->group( 'hi' )->add_feed( WashPost => 'http://feeds.washingtonpost.com/rss/national' );
-    $rssfilter->group( 'hi' )->add_feed( name => 'Pravda', url => 'http://english.pravda.ru/russia/export.xml' );
+    $news_group->group( 'USA' )->add_feed( WashPost => 'http://feeds.washingtonpost.com/rss/national' );
+    $news_group->group( 'USA' )->add_feed( name => 'NYTimes', url => 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml' );
 
-    $hello_group->add_feed( $rssfilter->group( 'hi' )->feed( 'WashPost' ) );
+    $uk_news_group->add_feed( $news_group->group( 'USA' )->feed( 'WashPost' ) );
 
-    $rssfilter->run;
+    $news_group->update;
 
 =head1 DESCRIPTION
 
