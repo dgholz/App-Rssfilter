@@ -71,6 +71,35 @@ Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule in
         return $self;
     }
 
+=method feeds()
+
+Returns an array reference to the list of feeds within this group.
+
+=cut
+
+    has feeds => (
+        is => 'ro',
+        default => sub { [] },
+    );
+
+=method add_feed( $feed | %feed_options )
+
+Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilter::Feed instance from the passed parameters) and adds it to the group.
+
+=cut
+
+    method add_feed( $feed, @feed_options ) {
+        use Scalar::Util qw< blessed >;
+        if ( ! blessed( $feed ) or ! $feed->isa( 'App::Rssfilter::Feed' ) ) {
+            unshift @feed_options, $feed; # restore original @_
+            use App::Rssfilter::Feed;
+            $feed = App::Rssfilter::Feed->new( @feed_options );
+        }
+
+        push $self->feeds, $feed;
+        return $feed;
+    }
+
 }
 
 1;
