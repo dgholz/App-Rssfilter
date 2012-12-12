@@ -22,6 +22,17 @@ package App::Rssfilter::Group::Tester {
         },
     );
 
+    has mock_feed => (
+        is => 'ro',
+        default => sub {
+            my $mock_feed = Test::MockObject->new;
+            $mock_feed->set_isa( 'App::Rssfilter::Feed' );
+            $mock_feed->set_always( 'name', 'Mock Feed' );
+            $mock_feed->set_always( 'url',  'http://example.com/mock.rss' );
+            return $mock_feed;
+        },
+    );
+
     has group_name => (
         is => 'ro',
         default => sub { undef; }, # same as if no default
