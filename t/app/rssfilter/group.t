@@ -12,6 +12,7 @@ run_tests(
         'App::Rssfilter::Group::Tester',
         'App::Rssfilter::Group::Test::AddedRule',
         'App::Rssfilter::Group::Test::AddedFeed',
+        'App::Rssfilter::Group::Test::GroupsCanBeNested',
     ],
 );
 
