@@ -24,7 +24,7 @@ package App::Rssfilter::Group::Tester {
 
     has group_name => (
         is => 'ro',
-        defaults => sub { undef; }, # same as if no default
+        default => sub { undef; }, # same as if no default
     );
 }
 

@@ -70,7 +70,7 @@ package App::Rssfilter::Feed {
 
     has storage => (
         is => 'lazy',
-        defaults => method {
+        default => method {
             use App::Rssfilter::Feed::Storage;
             App::Rssfilter::Feed::Storage->new(
                 feed_name  => $self->name,
