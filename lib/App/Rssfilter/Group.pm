@@ -53,6 +53,34 @@ Returns the name passed to the constructor, or '.' if no name passed.
         default => sub { '.' },
     );
 
+=method groups()
+
+Returns an array reference to the list of subgroups.
+
+=cut
+
+    has groups => (
+        is => 'ro',
+        default => sub { [] },
+    );
+
+=method add_group( $group | %group_options )
+
+Adds the L<App::Rssfilter::group> $group (or creates a new App::RssFilter::group instance from the passed parameters) to the groups.
+
+=cut
+
+    method add_group( $group, @group_options ) {
+        use Scalar::Util qw< blessed >;
+        if ( ! blessed( $group ) or ! $group->isa( 'App::Rssfilter::Group' ) ) {
+            unshift @group_options, $group; # restore original @_
+            $group = App::Rssfilter::Group->new( @group_options );
+        }
+
+        push $self->groups, $group;
+        return $self;
+    }
+
 =method rules()
 
 Returns an array reference to the list of rules which will be applied to the feeds in this group (and subgroups).
