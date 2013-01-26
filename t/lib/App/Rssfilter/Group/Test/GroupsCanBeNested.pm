@@ -8,18 +8,23 @@ package App::Rssfilter::Group::Test::GroupsCanBeNested {
     use Test::More;
     use namespace::autoclean;
 
-    requires 'group';
+    requires 'mock_group';
+    requires 'group_name';
 
     test nested_group => sub {
         my ( $self ) = @_;
 
-        my $new_group = $self->group->add_group( 'hiiii' );
-        my $new_feed  = $new_group->add_feed( 'welp' => 'http://we.lp/news.rss' );
+        my $new_group = $self->group->add_group( $self->mock_group );
 
-        is(
-            $new_feed->storage->group_name,
-            join( '/', $self->group->name, 'hiiii' ),
-            q{nested groups include their parent's name in the group_name passed to add_feed}
+        $self->group->update;
+
+        $self->mock_group->called_ok( 'update', 'called update on nested group ...');
+
+        $self->mock_group->called_args_pos_is(
+               0,
+               0,
+               [ $self->group_name ],
+               q{... and passed group name to nested group when updating}
         );
     };
 
