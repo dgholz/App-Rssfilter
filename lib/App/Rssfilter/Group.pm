@@ -53,6 +53,17 @@ Returns the name passed to the constructor, or '.' if no name passed.
         default => sub { '.' },
     );
 
+=method storage()
+
+Returns the L<App::Rssfilter::Feed::Storage> instance passed to the constructor, or a suitable default.
+
+=cut
+
+    has storage => (
+        is => 'ro',
+        default => method { App::Rssfilter::Feed::Storage->new( groups => [ $self->name ] ) },
+    );
+
 =method groups()
 
 Returns an array reference to the list of subgroups.
@@ -137,6 +148,19 @@ Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilte
 
         push $self->feeds, $feed;
         return $feed;
+    }
+
+=method update( storage => $storage )
+
+Recursively calls update() on the feeds and groups attatched to this group. C<$storage> is a L<App::Rssfilter::Feed::Storage> for children to use when loading or saving feeds. If it is not specified, it is set to the storage argument passed to the constructor.
+
+=cut
+
+    method update( :$storage = undef ) {
+        $storage //= $self->storage;
+        my $child_storage = $storage->nest( $self->group_name );
+        $_->update( storage => $child_storage ) for @{ $self->groups };
+        $_->update( storage => $child_storage->nest( $_->name ) ) for @{ $self->feeds };
     }
 
 }
