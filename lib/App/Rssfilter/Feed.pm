@@ -135,7 +135,7 @@ As a convenience, the constructor will interpret being called with a single key-
 
 =cut
 
-=method add_rule( $rule | %rule_options )
+=method add_rule( $rule | %rule_parameters )
 
 Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule instance from the passed parameters) to the rules.
 
@@ -173,7 +173,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
 
 =cut
 
-    method update() {
+    method update( ArrayRef :$groups = [] ) {
 
         my $old = $self->load;
 
@@ -192,7 +192,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
             for my $rule ( @{ $self->rules } ) {
                 $rule->constrain( $new );
             }
-            $self->save( $new );
+            $self->save( $new, groups => $groups );
         }
 
         if ( defined $old ) {
