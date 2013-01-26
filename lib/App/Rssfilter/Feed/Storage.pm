@@ -9,8 +9,8 @@ use feature qw( :5.14 );
     use App::Rssfilter::Feed::Storage;
 
     my $fs = App::Rssfilter::Feed::Storage->new(
-        group_name => 'BBC',
-        feed_name => 'London',
+        path => 'BBC',
+        name => 'London',
     );
 
     print 'last update of feed was ', $fs->last_modified, "\n";
@@ -31,41 +31,51 @@ package App::Rssfilter::Feed::Storage {
     use Moo;
     use Mojo::DOM;
     use Path::Class::File;
+    use Path::Class::Dir;
     use HTTP::Date;
 
 =method new
 
     my $fs = App::Rssfilter::Feed::Storage->new(
-        group_name => 'BBC',
-        feed_name => 'London',
+        path => 'BBC',
+        name => 'London',
     );
 
-The constructer has two required named parameters: a name for the group the feed belongs to, and the name for the feed. These are used as the directory and filename (respectively) for the feed.
+The constructer has two required named parameters: a path specifying where the feed should be located, and the name for the feed. These are used as the directory path and filename (respectively) for the feed.
+
+The path parameter may be a string specifying an absolute or relative directory path, or an array ref of directory names which will be joined to form a directory path.
 
 =cut
 
-=method group_name
+=method path
 
-    print $fs->group_name, "\n";
+    print $fs->path, "\n";
 
-Returns the group name of the feed, as passed to the constructor.
+Returns the path to feed, as passed to the constructor.
 
 =cut
 
-    has group_name => (
+    has path => (
          is => 'ro',
-         required => 1,
+         default => sub { Path::Class::Dir->new() },
+         coerce => sub {
+             return $_[0] if 'Path::Class::Dir' eq ref $_[0];
+             if ( 1 == @_  && 'Array' eq ref $_[0] ) {
+                 @_ = @{ $_[0] };
+             }
+             Path::Class::Dir->new( @_ )
+         },
     );
 
-=method feed_name
+=method name
 
-    print $fs->feed_name, "\n";
+    print $fs->name, "\n";
 
 Returns the name of the feed, as passed to the constructor.
 
 =cut
 
-    has feed_name => (
+    has name => (
          is => 'ro',
     );
 
@@ -75,8 +85,9 @@ Returns the name of the feed, as passed to the constructor.
     );
 
     method _build__file_path {
-        die "no feed_name" if not defined $self->feed_name;
-        Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
+        die "no name" if not defined $self->name;
+        die "no path" if not defined $self->path;
+        $self->path->file( $self->name .'.rss' );
     }
 
 =method last_modified
