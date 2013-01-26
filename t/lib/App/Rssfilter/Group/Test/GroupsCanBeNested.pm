@@ -14,15 +14,16 @@ package App::Rssfilter::Group::Test::GroupsCanBeNested {
     test nested_group => sub {
         my ( $self ) = @_;
 
-        my $new_group = $self->group->add_group( $self->mock_group );
+        $self->group->add_group( $self->mock_group );
+        my %update_args;
+        $self->mock_group->mock( update => sub { shift; %update_args = @_ } );
 
         $self->group->update;
 
         $self->mock_group->called_ok( 'update', 'called update on nested group ...');
 
-        $self->mock_group->called_args_pos_is(
-               0,
-               0,
+        is_deeply(
+               $update_args{groups},
                [ $self->group_name ],
                q{... and passed group name to nested group when updating}
         );
