@@ -67,7 +67,6 @@ Returns the name of the feed, as passed to the constructor.
 
     has feed_name => (
          is => 'ro',
-         required => 1,
     );
 
     has _file_path => (
@@ -76,6 +75,7 @@ Returns the name of the feed, as passed to the constructor.
     );
 
     method _build__file_path {
+        die "no feed_name" if not defined $self->feed_name;
         Path::Class::File->new( map { tr/ /_/sr } $self->group_name, $self->feed_name .'.rss' );
     }
 
