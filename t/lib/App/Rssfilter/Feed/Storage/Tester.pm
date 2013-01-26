@@ -17,8 +17,8 @@ package App::Rssfilter::Feed::Storage::Tester {
         default => sub {
             my ( $self ) = @_;
             App::Rssfilter::Feed::Storage->new(
-                group_name => $self->group_name,
-                feed_name  => $self->feed_name,
+                path => $self->group_name,
+                name  => $self->feed_name,
             );
         },
     );
