@@ -159,7 +159,7 @@ Returns an array reference to the list of rules which will be applied to the fee
 
 =cut
 
-=method update()
+=method update( storage => $storage )
 
 This method will:
 
@@ -173,12 +173,12 @@ The old feed has rules applied to it so that any group-wide rules will always se
 
 =cut
 
-    method update( ArrayRef :$groups = [] ) {
+    method update( :$storage = $self->storage ) {
 
-        my $old = $self->load;
+        my $old = $storage->load;
 
         my $headers = {};
-        if( defined( my $last_modified = $self->last_modified ) ) {
+        if( defined( my $last_modified = $storage->last_modified ) ) {
             ${ $headers }{ 'If-Modified-Since' } = $last_modified;
         }
 
@@ -192,7 +192,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
             for my $rule ( @{ $self->rules } ) {
                 $rule->constrain( $new );
             }
-            $self->save( $new, groups => $groups );
+            $storage->save( $new );
         }
 
         if ( defined $old ) {
