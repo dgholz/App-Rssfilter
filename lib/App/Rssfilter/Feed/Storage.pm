@@ -67,6 +67,21 @@ Returns the path to feed, as passed to the constructor.
          },
     );
 
+=method path_push( @paths )
+
+    my $new_fs = $fs->path_push( 'list', 'of', 'paths' )
+
+Returns a new App::Rssfilter::Feed::Storage object whose path has had C<@paths> appended to it.
+
+=cut
+
+    method path_push( @_ ) {
+        return App::Rssfilter::Feed::Storage->new(
+            path => $self->path->subdir( @_ ),
+            name => $self->name,
+        );
+    }
+
 =method name
 
     print $fs->name, "\n";
