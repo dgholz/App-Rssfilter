@@ -162,19 +162,18 @@ Recursively calls update() on the feeds and groups attatched to this group. C<$s
         $_->update( storage => $child_storage ) for @{ $self->feeds };
     }
 
-}
-
 =method nest_storage( $storage )
 
 Returns a modified version of C<$storage> with C<$self->name> added to the path used for loading/saving.
 
 =cut
-
     method nest_storage( App::Rssfilter::Feed::Storage $storage ) {
         App::Rssfilter::Feed::Storage->new(
             path => [ @{ $storage->path }, $self->name ],
         );
     }
+
+}
 
 1;
 
