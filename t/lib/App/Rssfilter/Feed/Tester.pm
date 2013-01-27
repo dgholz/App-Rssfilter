@@ -50,14 +50,21 @@ package App::Rssfilter::Feed::Tester {
         default => sub { undef },
     );
 
+    has path => (
+        is => 'ro',
+        default => sub { undef },
+    );
+
     has mock_storage => (
         is => 'lazy',
         default => sub {
             my ( $self ) = @_;
             my $mock_storage = Test::MockObject->new;
+            $mock_storage->set_isa( 'App::Rssfilter::Feed::Storage' );
             $mock_storage->set_always( 'last_modified', $self->last_modified );
-            $mock_storage->set_always( 'load', $self->old_feed );
-            $mock_storage->set_always( 'save', undef );
+            $mock_storage->set_always( 'load_existing', $self->old_feed );
+            $mock_storage->set_always( 'save_feed', undef );
+            $mock_storage->set_always( 'path', $self->path );
             return $mock_storage;
         },
     );
