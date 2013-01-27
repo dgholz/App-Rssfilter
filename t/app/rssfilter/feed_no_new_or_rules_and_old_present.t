@@ -16,7 +16,7 @@ run_tests(
         'App::Rssfilter::Feed::Test::RulesNotRun',
     ],
     {
-        fetch_headers => <<'EOM',
+        fetched_headers => <<'EOM',
 HTTP/1.0 304 Not Modified
 Date: Thu, 01 Jan 1970 00:00:00 GMT
 EOM
