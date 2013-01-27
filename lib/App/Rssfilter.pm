@@ -43,7 +43,6 @@ use feature qw( :5.14 );
 package App::Rssfilter;
 
 use Carp;
-use Rss::Filter;
 
 sub run {
     my ( $class, $config, @requested_groups ) = @_;
