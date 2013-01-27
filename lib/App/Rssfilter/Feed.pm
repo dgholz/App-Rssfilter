@@ -73,10 +73,9 @@ package App::Rssfilter::Feed {
         default => method {
             use App::Rssfilter::Feed::Storage;
             App::Rssfilter::Feed::Storage->new(
-                feed_name  => $self->name,
+                name  => $self->name,
             );
         },
-        handles => [ qw< save load last_modified > ],
     );
 
     method BUILDARGS( %options ) {
@@ -127,7 +126,7 @@ Defaults to a new instance of L<Mojo::UserAgent>.
 
 =item * storage
 
-Defaults to a new instance of L<App::Rssfilter::Feed::Storage>. Handles the methods C<load>, C<save>, and C<last_modified>.
+Object to use when loading/saving the feed. Defaults to a new instance of L<App::Rssfilter::Feed::Storage>.
 
 =back
 
@@ -176,7 +175,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
     method update( :$storage = $self->storage ) {
 
         $storage = $self->nest_storage( $storage );
-        my $old = $storage->load;
+        my $old = $storage->load_existing;
 
         my $headers = {};
         if( defined( my $last_modified = $storage->last_modified ) ) {
@@ -193,7 +192,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
             for my $rule ( @{ $self->rules } ) {
                 $rule->constrain( $new );
             }
-            $storage->save( $new );
+            $storage->save_feed( $new );
         }
 
         if ( defined $old ) {
@@ -218,27 +217,6 @@ Returns a modified version of C<$storage> with C<$self->name> added to the path 
             name => $self->name,
         );
     }
-
-
-=method load()
-
-Loads the most recently-saved version of the feed, and returns it as a string. Returns undef if a previously-saved version of the feed is not available.
-
-Handled by C<storage>. See L<App::Rssfilter::Feed::Storage> for the default implementation.
-
-=method save( $rss_xml )
-
-Saves C<$rss_xml> string as the most recently-fetched version of the feed. The C<last_modified> time is updated to the current time.
-
-Handled by C<storage>. See L<App::Rssfilter::Feed::Storage> for the default implementation.
-
-=method last_modified()
-
-Returns the last time the feed was saved, or undef if a previously-saved version of the feed is not available.
-
-Handled by C<storage>. See L<App::Rssfilter::Feed::Storage> for the default implementation.
-
-=cut
 
 }
 

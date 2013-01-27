@@ -15,7 +15,7 @@ package App::Rssfilter::Feed::Test::ChecksOldFeed {
         my ( $name, $args );
 
         ( $name, $args ) = $self->mock_storage->next_call;
-        is( $name, 'load', 'loaded old feed' );
+        is( $name, 'load_existing', 'loaded old feed' );
 
         ( $name, $args ) = $self->mock_storage->next_call;
         is( $name, 'last_modified', 'found last time old feed was modified' );

@@ -14,7 +14,7 @@ package App::Rssfilter::Feed::Test::SavesNewFeed {
     test saves_new_feed => sub {
         my ( $self ) = @_;
         my ( $name, $args ) = $self->mock_storage->next_call;
-        is( $name, 'save',               'attempted to save ...' );
+        is( $name, 'save_feed',          'attempted to save ...' );
         is( $args->[1], $self->new_feed, '... the new feed' );
     };
 
