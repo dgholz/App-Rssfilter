@@ -141,17 +141,17 @@ Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule in
 
 =cut
 
-method add_rule( $rule, @rule_options ) {
-    use Scalar::Util qw< blessed >;
-    if ( ! blessed( $rule ) or ! $rule->isa( 'App::Rssfilter::Rule' ) ) {
-        unshift @rule_options, $rule; # restore original @_
-        use App::Rssfilter::Rule;
-        $rule = App::Rssfilter::Rule->new( @rule_options );
-    }
+    method add_rule( $rule, @rule_options ) {
+        use Scalar::Util qw< blessed >;
+        if ( ! blessed( $rule ) or ! $rule->isa( 'App::Rssfilter::Rule' ) ) {
+            unshift @rule_options, $rule; # restore original @_
+            use App::Rssfilter::Rule;
+            $rule = App::Rssfilter::Rule->new( @rule_options );
+        }
 
-    push $self->rules, $rule;
-    return $self;
-}
+        push $self->rules, $rule;
+        return $self;
+    }
 
 =method rules()
 
