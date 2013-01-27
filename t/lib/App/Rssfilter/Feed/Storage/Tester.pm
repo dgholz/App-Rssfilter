@@ -59,35 +59,6 @@ package App::Rssfilter::Feed::Storage::Tester {
         Path::Class::File->new( $orig->( @args )->filename );
     };
 
-=begin
-
-    my $updated_timestamp = time + 100;
-    utime 0, $updated_timestamp, $tmp;
-
-    is(
-        str2time( $feed->last_modified ),
-        $updated_timestamp,
-        'last_modified is cleared when content is saved'
-    );
-
-    utime 0, $updated_timestamp + 100, $tmp;
-
-    is(
-        str2time( $feed->last_modified ),
-        $updated_timestamp,
-        'last_modified does not change when content has not been saved or loaded'
-    );
-
-    $feed->load_existing;
-
-    is(
-        str2time( $feed->last_modified ),
-        $updated_timestamp + 100,
-        'last_modified is cleared when conent is loaded'
-    );
-
-=cut
-
 }
 
 1;
