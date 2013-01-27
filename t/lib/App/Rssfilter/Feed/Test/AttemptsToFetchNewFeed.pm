@@ -12,6 +12,8 @@ package App::Rssfilter::Feed::Test::AttemptsToFetchNewFeed {
     requires 'feed_url';
     requires 'mock_ua';
     requires 'last_modified';
+    requires 'mock_storage';
+    requires 'feed_name';
 
     test attempts_to_fetch_new_feed => sub {
         my ( $self ) = @_;
@@ -28,6 +30,13 @@ package App::Rssfilter::Feed::Test::AttemptsToFetchNewFeed {
             );
         }
     };
+
+    test updates_storage_with_name => sub {
+        my ( $self ) = @_;
+        my ( $name, $args ) = $self->mock_storage->next_call;
+        is( $name, 'set_name',            'attempts to set the name of its storage ... ' );
+        is( $args->[1], $self->feed_name, ' ... to the name of feed' );
+    }
 
 }
 

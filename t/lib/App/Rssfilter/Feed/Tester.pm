@@ -70,6 +70,7 @@ package App::Rssfilter::Feed::Tester {
             $mock_storage->set_always( 'load_existing', $self->old_feed );
             $mock_storage->set_always( 'save_feed', undef );
             $mock_storage->set_always( 'path', $self->path );
+            $mock_storage->set_always( 'set_name', $mock_storage );
             return $mock_storage;
         },
     );
