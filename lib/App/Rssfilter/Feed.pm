@@ -173,8 +173,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
 =cut
 
     method update( :$storage = $self->storage ) {
-
-        $storage = $self->nest_storage( $storage );
+        $storage = $storage->set_name( $self->name );
         my $old = $storage->load_existing;
 
         my $headers = {};
@@ -201,21 +200,6 @@ The old feed has rules applied to it so that any group-wide rules will always se
                 $rule->constrain( $old );
             }
         }
-
-    }
-
-
-=method nest_storage( $storage )
-
-Returns a modified version of C<$storage> with C<$self->name> added to the path used for loading/saving.
-
-=cut
-
-    method nest_storage( App::Rssfilter::Feed::Storage $storage ) {
-        App::Rssfilter::Feed::Storage->new(
-            path => $storage->path,
-            name => $self->name,
-        );
     }
 
 }
