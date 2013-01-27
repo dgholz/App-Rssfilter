@@ -11,10 +11,15 @@ package App::Rssfilter::Feed::Tester {
                 storage    => $self->mock_storage,
                 user_agent => $self->mock_ua,
                 rules      => $self->rules,
-                name       => "Totally Cool Tester",
+                name       => $self->feed_name,
                 url        => $self->feed_url,
             );
         },
+    );
+
+    has feed_name => (
+        is => 'ro',
+        default => sub { 'Totally Cool Tester'; },
     );
 
     has rules => (
