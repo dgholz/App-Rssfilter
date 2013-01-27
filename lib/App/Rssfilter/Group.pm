@@ -156,8 +156,7 @@ Recursively calls update() on the feeds and groups attatched to this group. C<$s
 
 =cut
 
-    method update( :$storage = undef ) {
-        $storage //= $self->storage;
+    method update( :$storage = $self->storage ) {
         my $child_storage = $self->nest_storage( $storage );
         $_->update( storage => $child_storage ) for @{ $self->groups };
         $_->update( storage => $child_storage ) for @{ $self->feeds };
