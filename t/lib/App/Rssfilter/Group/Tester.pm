@@ -29,6 +29,7 @@ package App::Rssfilter::Group::Tester {
             $mock_feed->set_isa( 'App::Rssfilter::Feed' );
             $mock_feed->set_always( 'name', 'Mock Feed' );
             $mock_feed->set_always( 'url',  'http://example.com/mock.rss' );
+            $mock_feed->set_true( 'update' );
             return $mock_feed;
         },
     );
