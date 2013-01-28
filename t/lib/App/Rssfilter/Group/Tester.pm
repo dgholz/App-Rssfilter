@@ -55,7 +55,7 @@ package App::Rssfilter::Group::Tester {
 
     has group_name => (
         is => 'ro',
-        default => sub { undef; }, # same as if no default
+        default => sub { 'killer bee'; },
     );
 }
 
