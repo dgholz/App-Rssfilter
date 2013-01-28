@@ -9,7 +9,17 @@ package App::Rssfilter::Group::Tester {
             my ( $self ) = @_;
             App::Rssfilter::Group->new(
                 name => $self->group_name,
+                storage => $self->mock_storage,
             );
+        },
+    );
+
+    has mock_storage => (
+        is => 'ro',
+        default => sub {
+            my $mock_storage = Test::MockObject->new;
+            $mock_storage->set_isa( 'App::Rssfilter::Feed::Storage' );
+            return $mock_storage;
         },
     );
 
