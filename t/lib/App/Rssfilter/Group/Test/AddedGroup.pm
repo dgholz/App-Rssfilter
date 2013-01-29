@@ -34,6 +34,12 @@ package App::Rssfilter::Group::Test::AddedGroup {
         );
     };
 
+    test created_and_added_group => method {
+        $self->group->add_group( 'gouranga' );
+        my $created_group = $self->group->groups->[-1];
+        is( $created_group->name, 'gouranga', 'add_group passed options to A::R::G->new()');
+    };
+
 }
 
 1;
