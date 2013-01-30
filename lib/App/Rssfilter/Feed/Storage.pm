@@ -104,7 +104,7 @@ Returns this object if its name is already C<$new_name>, else returns a clone of
 
     method set_name( $new_name ) {
         return $self if $self->name eq $new_name;
-        return App::Rssfilter::Storage::Feed->new(
+        return App::Rssfilter::Feed::Storage->new(
             name => $new_name,
             path => $self->path,
         );
