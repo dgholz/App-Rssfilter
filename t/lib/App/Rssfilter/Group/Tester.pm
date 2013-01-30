@@ -19,6 +19,7 @@ package App::Rssfilter::Group::Tester {
         default => sub {
             my $mock_storage = Test::MockObject->new;
             $mock_storage->set_isa( 'App::Rssfilter::Feed::Storage' );
+            $mock_storage->set_true( 'path_push' );
             return $mock_storage;
         },
     );
@@ -49,6 +50,7 @@ package App::Rssfilter::Group::Tester {
         default => sub {
             my $mock_group = Test::MockObject->new;
             $mock_group->set_isa( 'App::Rssfilter::Group' );
+            $mock_group->set_true( 'update' );
             return $mock_group;
         },
     );
