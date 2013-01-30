@@ -14,6 +14,7 @@ run_tests(
         'App::Rssfilter::Feed::Storage::Test::LoadExistingTakesContentFromFile',
         'App::Rssfilter::Feed::Storage::Test::SaveFeedPutsContentToFile',
         'App::Rssfilter::Feed::Storage::Test::FetchersBehaveSensibleWhenUnderlyingFileNotPresent',
+        'App::Rssfilter::Feed::Storage::Test::PathPush',
     ],
 );
 
