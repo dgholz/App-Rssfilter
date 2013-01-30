@@ -24,6 +24,14 @@ package App::Rssfilter::Group::Tester {
         },
     );
 
+    has path_pushed_storage => (
+        is => 'ro',
+        default => sub {
+            my $pps = Test::MockObject->new;
+            $pps->set_isa( 'App::Rssfilter::Feed::Storage' );
+        },
+    );
+
     has mock_rule => (
         is => 'ro',
         default => sub {
