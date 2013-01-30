@@ -15,6 +15,7 @@ run_tests(
         'App::Rssfilter::Feed::Storage::Test::SaveFeedPutsContentToFile',
         'App::Rssfilter::Feed::Storage::Test::FetchersBehaveSensibleWhenUnderlyingFileNotPresent',
         'App::Rssfilter::Feed::Storage::Test::PathPush',
+        'App::Rssfilter::Feed::Storage::Test::SetName',
     ],
 );
 
