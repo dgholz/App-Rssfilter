@@ -17,6 +17,7 @@ package App::Rssfilter::Feed::Test::UpdateWithRule {
             sub { $self->feed->update( rules => [ $self->mock_rule ] ); },
             'passed rules as parameter to update'
         );
+        push @{ $self->feed->rules }, $self->mock_rule;
     };
 
 }

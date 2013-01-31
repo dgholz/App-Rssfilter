@@ -9,13 +9,16 @@ package App::Rssfilter::Feed::Test::RulesRanOverOldFeed {
     use namespace::autoclean;
     use Method::Signatures;
 
-    requires 'mock_rule';
+    requires 'feed';
     requires 'old_feed';
 
     test rules_ran_over_old_feed => method {
-        my ( $name, $args ) = $self->mock_rule->next_call;
-        is( $name, 'constrain',          'rules were called ... ' );
-        is( $args->[1], $self->old_feed, ' ... with the old feed' );
+        for my $rule ( @{ $self->feed->rules } ) {
+            next if ! $rule->can( 'next_call' ); # mocks only
+            my ( $name, $args ) = $rule->next_call;
+            is( $name, 'constrain',          'rule was called ... ' );
+            is( $args->[1], $self->old_feed, ' ... with the old feed' );
+        }
     };
 
 }
