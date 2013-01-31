@@ -8,12 +8,12 @@ package App::Rssfilter::Feed::Storage::Test::LoadExistingTakesContentFromFile {
     use Test::More;
     use Mojo::DOM;
     use namespace::autoclean;
+    use Method::Signatures;
 
     requires 'feed_storage';
     requires 'tempfile';
 
-    test load_existing_takes_content_from_file => sub {
-        my ( $self ) = @_;
+    test load_existing_takes_content_from_file => method {
         $self->tempfile->spew('<surprise>your favourite bean</surprise>');
 
         is(

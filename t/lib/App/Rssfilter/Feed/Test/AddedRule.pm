@@ -7,12 +7,12 @@ package App::Rssfilter::Feed::Test::AddedRule {
     use Test::Routine;
     use Test::More;
     use namespace::autoclean;
+    use Method::Signatures;
 
     requires 'mock_rule';
     requires 'feed';
 
-    test added_rule => sub {
-        my ( $self ) = @_;
+    test added_rule => method {
         my $pre_add_mock_rule_count =
             grep { $self->mock_rule eq $_ } @{ $self->feed->rules };
 
@@ -31,8 +31,7 @@ package App::Rssfilter::Feed::Test::AddedRule {
         );
     };
 
-    test created_and_added_rule => sub {
-        my ( $self ) = @_;
+    test created_and_added_rule => method {
         my $match  = sub {};
         my $filter = sub {};
         $self->feed->add_rule( match => $match, filter => $filter );

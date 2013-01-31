@@ -8,13 +8,13 @@ package App::Rssfilter::Feed::Storage::Test::FetchersBehaveSensibleWhenUnderlyin
     use Test::More;
     use Mojo::DOM;
     use namespace::autoclean;
+    use Method::Signatures;
 
     requires 'feed_storage';
     requires 'tempfile';
     requires 'tempdir';
 
-    test fetchers_behave_sensible_when_underlying_file_not_present => sub {
-        my ( $self ) = @_;
+    test fetchers_behave_sensible_when_underlying_file_not_present => method {
         $self->tempfile->remove;
 
         is(

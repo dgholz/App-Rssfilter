@@ -7,12 +7,12 @@ package App::Rssfilter::Feed::Storage::Test::LastModifiedComesFromFile {
     use Test::Routine;
     use Test::More;
     use namespace::autoclean;
+    use Method::Signatures;
 
     requires 'feed_storage';
     requires 'tempfile';
 
-    test last_modified_comes_from_file => sub {
-        my ( $self ) = @_;
+    test last_modified_comes_from_file => method {
 
         use HTTP::Date;
         is(
