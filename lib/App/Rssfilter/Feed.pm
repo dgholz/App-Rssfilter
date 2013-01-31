@@ -158,7 +158,7 @@ Returns an array reference to the list of rules which will be applied to the fee
 
 =cut
 
-=method update( storage => $storage )
+=method update( rules => $rules, storage => $storage )
 
 This method will:
 
@@ -170,9 +170,11 @@ This method will:
 
 The old feed has rules applied to it so that any group-wide rules will always see all of the latest items, even if a feed does not have a newer version available. 
 
+The parameters are optional. If C<rules> is specified, they will be added to the feed's rules for this update only. If C<storage> is specified, it will used instead of the feed's storage to load/save feed content.
+
 =cut
 
-    method update( :$storage = $self->storage ) {
+    method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
         $storage = $storage->set_name( $self->name );
         my $old = $storage->load_existing;
 
@@ -186,9 +188,12 @@ The old feed has rules applied to it so that any group-wide rules will always se
             $headers
         );
 
+        my @rules = @{ $rules };
+        push @rules, @{ $self->rules };
+
         if ( 200 == $latest->res->code ) {
             my $new = $latest->res->dom;
-            for my $rule ( @{ $self->rules } ) {
+            for my $rule ( @rules ) {
                 $rule->constrain( $new );
             }
             $storage->save_feed( $new );
@@ -196,7 +201,7 @@ The old feed has rules applied to it so that any group-wide rules will always se
 
         if ( defined $old ) {
             $old = Mojo::DOM->new( $old );
-            for my $rule ( @{ $self->rules } ) {
+            for my $rule ( @rules ) {
                 $rule->constrain( $old );
             }
         }
