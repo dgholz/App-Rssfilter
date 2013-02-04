@@ -27,6 +27,12 @@ package App::Rssfilter::Group::Test::UpdatedGroup {
                $self->path_pushed_storage,
                '... and passed path_push storage to nested group when updating'
         );
+
+        is_deeply(
+               $group_update_args{rules},
+               $self->group->rules,
+               '... and passed its rules to nested feed when updating'
+        );
     };
 
 }

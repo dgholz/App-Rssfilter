@@ -150,16 +150,22 @@ Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilte
         return $feed;
     }
 
-=method update( storage => $storage )
+=method update( rules => $rules, storage => $storage )
 
-Recursively calls update() on the feeds and groups attatched to this group. C<$storage> is a L<App::Rssfilter::Feed::Storage> for children to use when loading or saving feeds. If it is not specified, it is set to the storage argument passed to the constructor.
+Recursively calls update() on the feeds and groups attatched to this group.
+
+C<$rules> is an optional arrayref of  rules to constrain the feed and groups, in addition to the group's current list of rules.
+
+C<$storage> is an optional L<App::Rssfilter::Feed::Storage> for children to use when loading or saving feeds. If it is not specified, the storage argument passed to the constructor is used instead.
 
 =cut
 
-    method update( :$storage = $self->storage ) {
+    method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
         my $child_storage = $self->storage->path_push( $self->name );
-        $_->update( storage => $child_storage ) for @{ $self->groups };
-        $_->update( storage => $child_storage ) for @{ $self->feeds };
+        my @rules = @{ $rules };
+        push @rules, $self->rules;
+        $_->update( rules => @rules, storage => $child_storage ) for @{ $self->groups };
+        $_->update( rules => @rules, storage => $child_storage ) for @{ $self->feeds };
     }
 
 }
