@@ -67,6 +67,12 @@ package App::Rssfilter::Group::Tester {
         is => 'ro',
         default => sub { 'killer bee'; },
     );
+
+
+    has rules_for_update => (
+        is => 'ro',
+        default => sub { [] },
+    );
 }
 
 1;

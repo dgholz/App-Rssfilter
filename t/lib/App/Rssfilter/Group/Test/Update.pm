@@ -12,10 +12,11 @@ package App::Rssfilter::Group::Test::Update {
     requires 'group';
     requires 'group_name';
     requires 'mock_storage';
+    requires 'rules_for_update';
 
     method do_update( $group ) {
         $self->mock_storage->set_always( path_push => $self->path_pushed_storage );
-        $group->update;
+        $group->update( rules => $self->rules_for_update );
     }
 
     test update => method {
