@@ -12,6 +12,7 @@ package App::Rssfilter::Group::Test::UpdatedFeed {
     requires 'do_update';
     requires 'mock_feed';
     requires 'path_pushed_storage';
+    requires 'rules_for_update';
 
     before 'do_update' => method( $group ) {
         $group->add_feed( $self->mock_feed );
@@ -28,9 +29,10 @@ package App::Rssfilter::Group::Test::UpdatedFeed {
                '... and passed path_push storage to nested feed when updating'
         );
 
+        my @rules_to_check = map { @{ $_ } } $self->rules_for_update, $self->group->rules;
         is_deeply(
                $feed_update_args{rules},
-               $self->group->rules,
+               \@rules_to_check,
                '... and passed its rules to nested feed when updating'
         );
     };

@@ -10,8 +10,10 @@ package App::Rssfilter::Group::Test::UpdatedGroup {
     use Method::Signatures;
 
     requires 'do_update';
+    requires 'group';
     requires 'mock_group';
     requires 'path_pushed_storage';
+    requires 'rules_for_update';
 
     before 'do_update' => method( $group ) {
         $group->add_group( $self->mock_group );
@@ -28,9 +30,10 @@ package App::Rssfilter::Group::Test::UpdatedGroup {
                '... and passed path_push storage to nested group when updating'
         );
 
+        my @rules_to_check = map { @{ $_ } } $self->rules_for_update, $self->group->rules;
         is_deeply(
                $group_update_args{rules},
-               $self->group->rules,
+               \@rules_to_check,
                '... and passed its rules to nested feed when updating'
         );
     };
