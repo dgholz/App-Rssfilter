@@ -162,10 +162,9 @@ C<$storage> is an optional L<App::Rssfilter::Feed::Storage> for children to use 
 
     method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
         my $child_storage = $self->storage->path_push( $self->name );
-        my @rules = @{ $rules };
-        push @rules, $self->rules;
-        $_->update( rules => @rules, storage => $child_storage ) for @{ $self->groups };
-        $_->update( rules => @rules, storage => $child_storage ) for @{ $self->feeds };
+        my @rules = map { @{ $_ } } $rules, $self->rules;
+        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->groups };
+        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->feeds };
     }
 
 }
