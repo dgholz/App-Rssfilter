@@ -103,8 +103,6 @@ Returns this object if its name is already C<$new_name>, else returns a clone of
 =cut
 
     method set_name( $new_name ) {
-        no warnings 'uninitialized';
-        print "$new_name ". $self->name, "\n";
         return $self if defined($self->name) && defined($new_name) ? $self->name eq $new_name : ! defined($self->name) && ! defined($new_name);
         return App::Rssfilter::Feed::Storage->new(
             name => $new_name,
