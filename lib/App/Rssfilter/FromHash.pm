@@ -86,13 +86,13 @@ The hash may have four elements:
     }
 
     method _from_hash( %config ) {
-        my $group = App::Rssfilter::Group->new( name => $config{group} );
+        my $group = $self->new( name => $config{group} );
 
         map { $group->add_feed( $_ ) } $self->convert_to( 'App::Rssfilter::Feed', @{ $config{feeds} } );
         map { $group->add_rule( $_ ) } $self->convert_to( 'App::Rssfilter::Rule', @{ $config{rules} } );
 
         for my $subgroup ( @{ $config{groups} } ) {
-            $group->add_group( $self->create_group( %{ $subgroup } ) );
+            $group->add_group( $self->_from_hash( %{ $subgroup } ) );
         }
 
         return $group;
