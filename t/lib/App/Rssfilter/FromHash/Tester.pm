@@ -1,17 +1,9 @@
 package App::Rssfilter::FromHash::Tester {
 
     use Moose;
+    extends 'App::Rssfilter::Group';
     with 'App::Rssfilter::FromHash';
     use Method::Signatures;
-
-    method add_feed( @_ ) {
-    }
-
-    method add_rule( @_ ) {
-    }
-
-    method add_group( @_ ) {
-    }
 
     has fake_class_name => (
         is => 'ro',
