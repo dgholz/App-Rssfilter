@@ -2,17 +2,17 @@ use strict;
 use warnings;
 use feature qw< :5.14 >;
 
-package App::Rssfilter::FromHash::Test::ConvertToWithObject {
+package App::Rssfilter::FromHash::Test::SplitForCtorWithObject {
 
     use Test::Routine;
     use Test::More;
     use namespace::autoclean;
     use Method::Signatures;
 
-    requires 'convert_to';
+    requires 'split_for_ctor';
     requires 'fake_class';
     requires 'fake_class_name';
-    requires 'results_of_convert_to';
+    requires 'results_of_split_for_ctor';
 
     has mock_object => (
         is => 'ro',
@@ -23,16 +23,15 @@ package App::Rssfilter::FromHash::Test::ConvertToWithObject {
         },
     );
 
-    around 'convert_to' => func( $orig, $self, $class_name, @args ) {
-        my @results = $orig->( $self, $class_name, $self->mock_object, @args );
-        return @results;
+    around 'split_for_ctor' => func( $orig, $self, @args ) {
+        $orig->( $self, $self->mock_object, @args );
     };
 
-    test convert_to_with_object => method {
+    test split_for_ctor_with_object => method {
         is_deeply(
-            [ $self->results_of_convert_to->[0] ],
+            shift $self->results_of_split_for_ctor,
             [ $self->mock_object ],
-            'returned the already-constructed object',
+            'returns the already-constructed object',
         );
     };
 

@@ -8,13 +8,13 @@ use lib qw< t/lib >;
 
 use Carp::Always;
 run_tests(
-    'converts lists of scalars, hashrefs, objects to certain type of objects',
+    'splits lists of scalars, hashrefs, objects into params suitable for ctors',
     [
         'App::Rssfilter::FromHash::Tester',
-        'App::Rssfilter::FromHash::Test::ConvertTo',
-        'App::Rssfilter::FromHash::Test::ConvertToWithTwoScalars',
-        'App::Rssfilter::FromHash::Test::ConvertToWithHashref',
-        'App::Rssfilter::FromHash::Test::ConvertToWithObject',
+        'App::Rssfilter::FromHash::Test::SplitForCtor',
+        'App::Rssfilter::FromHash::Test::SplitForCtorWithTwoScalars',
+        'App::Rssfilter::FromHash::Test::SplitForCtorWithHashref',
+        'App::Rssfilter::FromHash::Test::SplitForCtorWithObject',
     ],
 );
 

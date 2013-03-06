@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use feature qw< :5.14 >;
 
-package App::Rssfilter::FromHash::Test::ConvertToWithTwoScalars {
+package App::Rssfilter::FromHash::Test::SplitForCtorWithTwoScalars {
 
     use Test::Routine;
     use Test::More;
@@ -10,28 +10,18 @@ package App::Rssfilter::FromHash::Test::ConvertToWithTwoScalars {
     use Method::Signatures;
     use Test::MockObject;
 
-    requires 'convert_to';
-    requires 'fake_class';
-    requires 'results_of_convert_to';
+    requires 'split_for_ctor';
+    requires 'results_of_split_for_ctor';
 
-    around 'convert_to' => func( $orig, $self, $class_name, @args ) {
-        my @results = $orig->( $self, $class_name, lol => 'wut', @args );
-        shift @results;
-        return @results;
+    around 'split_for_ctor' => func( $orig, $self, @args ) {
+        $orig->( $self, lol => 'wut', @args );
     };
 
-    test convert_to_with_two_scalars => method {
-        my ( $name, $args ) = $self->fake_class->next_call;
-        is(
-            $name,
-            'ctor',
-            'ctor called ...'
-        );
-
+    test split_for_ctor_with_two_scalars => method {
         is_deeply(
-            [ @{ $args }[1,2] ],
+            shift $self->results_of_split_for_ctor,
             [ qw< lol wut > ],
-            '... with the first two values passed to convert_to'
+            'returns two scalars as a array ref containing the same two scalars'
         );
     };
 

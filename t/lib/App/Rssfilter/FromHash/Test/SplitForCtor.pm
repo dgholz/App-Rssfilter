@@ -2,24 +2,23 @@ use strict;
 use warnings;
 use feature qw< :5.14 >;
 
-package App::Rssfilter::FromHash::Test::ConvertTo {
+package App::Rssfilter::FromHash::Test::SplitForCtor {
 
     use Test::Routine;
     use Test::Exception;
     use namespace::autoclean;
     use Method::Signatures;
 
-    requires 'convert_to';
-    requires 'fake_class_name';
-    requires 'results_of_convert_to';
+    requires 'split_for_ctor';
+    requires 'results_of_split_for_ctor';
 
-    test call_convert_to => method {
+    test call_split_for_ctor => method {
         lives_ok(
             sub {
-                my @results = $self->convert_to( $self->fake_class_name );
-                push $self->results_of_convert_to, @results;
+                my @results = $self->split_for_ctor;
+                push $self->results_of_split_for_ctor, @results;
             },
-            'can call convert_to without calamity'
+            'can call split_for_ctor without calamity'
         );
     };
 

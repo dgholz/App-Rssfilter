@@ -21,7 +21,7 @@ package App::Rssfilter::FromHash::Tester {
         },
     );
 
-    has results_of_convert_to => (
+    has results_of_split_for_ctor => (
         is => 'rw',
         default => sub { [ ] },
     );

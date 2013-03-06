@@ -2,35 +2,26 @@ use strict;
 use warnings;
 use feature qw< :5.14 >;
 
-package App::Rssfilter::FromHash::Test::ConvertToWithHashref {
+package App::Rssfilter::FromHash::Test::SplitForCtorWithHashref {
 
     use Test::Routine;
     use Test::More;
     use namespace::autoclean;
     use Method::Signatures;
 
-    requires 'convert_to';
+    requires 'split_for_ctor';
     requires 'fake_class';
-    requires 'results_of_convert_to';
+    requires 'results_of_split_for_ctor';
 
-    around 'convert_to' => func( $orig, $self, $class_name, @args ) {
-        my @results = $orig->( $self, $class_name, { castor => 'pollux', ajax => 'achilles' }, @args );
-        shift @results;
-        return @results;
+    around 'split_for_ctor' => func( $orig, $self, @args ) {
+        $orig->( $self, { castor => 'pollux', ajax => 'achilles' }, @args );
     };
 
-    test convert_to_with_hashref => method {
-        my ( $name, $args ) = $self->fake_class->next_call;
-        is(
-            $name,
-            'ctor',
-            'ctor called ...'
-        );
-
+    test split_for_ctor_with_hashref => method {
         is_deeply(
-            { @{ $args }[1..$#$args] },
+            { @{ shift $self->results_of_split_for_ctor } },
             { castor => 'pollux', ajax => 'achilles' },
-            '... with the flattened hash reference passed to convert_to'
+            'returns the flattened hash reference'
         );
     };
 
