@@ -88,8 +88,8 @@ The hash may have four elements:
     method _from_hash( %config ) {
         my $group = $self->new( name => $config{group} );
 
-        map { $group->add_feed( $_ ) } $self->convert_to( 'App::Rssfilter::Feed', @{ $config{feeds} } );
-        map { $group->add_rule( $_ ) } $self->convert_to( 'App::Rssfilter::Rule', @{ $config{rules} } );
+        map { $group->add_feed( @{ $_ } ) } $self->split_for_ctor( @{ $config{feeds} } );
+        map { $group->add_rule( @{ $_ } ) } $self->split_for_ctor( @{ $config{rules} } );
 
         for my $subgroup ( @{ $config{groups} } ) {
             $group->add_group( $self->_from_hash( %{ $subgroup } ) );
@@ -98,18 +98,21 @@ The hash may have four elements:
         return $group;
     }
 
-    method convert_to( $class, @list ) {
+    method split_for_ctor( @list ) {
         my @results;
         while( @list ) {
             push @results, do {
                 given( shift @list ) {
-                    $_                     when blessed $_ and $_->isa( $class );
-                    $class->new( %{ $_ } ) when 'HASH' eq ref $_;
-                    default { $class->new( $_ => shift @list ) };
+                    [ %{ $_ } ] when 'HASH'  eq ref $_;
+                    [ @{ $_ } ] when 'ARRAY' eq ref $_;
+                    # squash 'Argument "foo" isn't numeric in smart match'
+                    [ $_ ]      when '' ne ref $_;
+                    default { [ $_ => shift @list ] };
                 }
             };
         }
-        return @results; }
+        return @results;
+    }
 
 };
 
