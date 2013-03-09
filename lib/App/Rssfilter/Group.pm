@@ -29,6 +29,7 @@ use feature qw< :5.14 >;
 
 package App::Rssfilter::Group {
     use Moo;
+    with 'App::Rssfilter::FromHash';
     use Method::Signatures;
 
     method BUILDARGS( @options ) {

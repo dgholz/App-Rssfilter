@@ -38,7 +38,8 @@ package App::Rssfilter::Cmd::RunFromConfig {
 
     method execute( $opt, $args ) {
         my $yaml_config = Path::Class::file( $opt->{'config-file'} // $self->find_config );
-        App::Rssfilter::Group->from_hash( Load( scalar $yaml_config->slurp ) )->update();
+        my $rssfilter = Role::Tiny->create_class_with_roles( 'App::Rssfilter::Group', 'App::Rssfilter::FromHash');
+        $rssfilter->from_hash( Load( scalar $yaml_config->slurp ) )->update();
     }
 };
 
