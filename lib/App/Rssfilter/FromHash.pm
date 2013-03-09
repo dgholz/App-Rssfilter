@@ -56,8 +56,8 @@ use feature qw( :5.14 );
 
 package App::Rssfilter::FromHash {
 
-    use Method::Signatures;
     use Moo::Role;
+    use Method::Signatures;
     use Scalar::Util qw< blessed >;
 
     requires 'add_feed';
