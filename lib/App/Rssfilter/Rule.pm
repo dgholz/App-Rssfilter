@@ -16,6 +16,7 @@
     # write modules and use them to match and filter
     {
         package MyMatcher::LevelOfInterest;
+        
         sub new {
             my ( $class, @additional_args_in_brackets) = @_;
             if ( 'BORING' eq $additional_args_in_brackets[0] ) {
@@ -24,11 +25,11 @@
             }
             ...
         }
+        
         sub match {
             my ( $self, $mojo_dom ) = @_;
             ...
         }
-        1;
     }
     {
         package MyFilter::MakeMoreInteresting;
@@ -37,8 +38,7 @@
                  $matched_mojo_dom,
                  @additional_args_in_brackets ) = @_;
             ...
-        };
-        1;
+        }
     }
     $rssfilter->add_rule(
         'MyMatcher::LevelOfInterest[BORING]'
@@ -54,7 +54,7 @@
     $rssfilter->add_rule(
         match => sub {
             my ( $item_to_match ) = @_;
-            return %item_to_match->title->text =~ / \b space \b /ixms;
+            return $item_to_match->title->text =~ / \b space \b /ixms;
         },
         filter => sub {
             my ( $reason_for_match, $matched_item ) = @_;
