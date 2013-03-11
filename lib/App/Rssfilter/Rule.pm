@@ -165,7 +165,7 @@ package App::Rssfilter::Rule {
                     /xms;
                 my @additional_args = split q{,}, $additional_args // q{};
                 if( $namespace !~ /::/xms ) {
-                    $namespace = join q{::}, 'Rss', ucfirst( $option_name ), $namespace;
+                    $namespace = join q{::}, qw< App Rssfilter >, ucfirst( $option_name ), $namespace;
                 }
 
                 $namespace =~ s/\A :: //xms; # '::anything'->can() will die
