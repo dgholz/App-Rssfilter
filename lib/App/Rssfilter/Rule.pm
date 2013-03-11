@@ -10,7 +10,7 @@
     # shorthand for
     $rssfilter->add_rule(
         match  => 'App::Rssfilter::Match::Duplicate',
-        filter => 'Rss::Filter::DeleteItem',
+        filter => 'App::Rssfilter::Filter::DeleteItem',
     );
 
     # write modules and use them to match and filter
@@ -98,8 +98,8 @@ This module will find all the C<item> elements in a L<Mojo::DOM> object and pass
 * L<App::Rssfilter::Match::BbcSports>
 * L<App::Rssfilter::Match::Category>
 * L<App::Rssfilter::Match::Duplicates>
-* L<Rss::Filter::MarkTitle>
-* L<Rss::Filter::DeleteItem>
+* L<App::Rssfilter::Filter::MarkTitle>
+* L<App::Rssfilter::Filter::DeleteItem>
 * L<App::RssFilter::Group>
 * L<App::RssFilter::Feed>
 * L<App::RssFilter>

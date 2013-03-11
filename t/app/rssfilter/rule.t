@@ -105,7 +105,7 @@ package App::Rssfilter::Match::Everything {
   }
 };
 
-package Rss::Filter::MoreCowbell {
+package App::Rssfilter::Filter::MoreCowbell {
     sub filter {
       my( $item, $match_name ) = @_;
       $item->description->replace_content('cowbell');
