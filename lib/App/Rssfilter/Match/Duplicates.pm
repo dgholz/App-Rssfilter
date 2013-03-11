@@ -23,7 +23,7 @@ use feature qw( :5.14 );
     # or manually
 
     use Mojo::DOM;
-    use Rss::Match::Duplicates;
+    use App::Rssfilter::Match::Duplicates;
 
     my $first_rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
@@ -60,7 +60,7 @@ use feature qw( :5.14 );
     $first_rss->find( 'item' )->each(
         sub {
           my $item = shift;
-          if( Rss::Match::Duplicates::match( $item ) ) {
+          if( App::Rssfilter::Match::Duplicates::match( $item ) ) {
             say $item->link->text, " is a duplicate article";
           }
         }
@@ -69,7 +69,7 @@ use feature qw( :5.14 );
     $second_rss->find( 'item' )->each(
         sub {
           my $item = shift;
-          if( Rss::Match::Duplicates::match( $item ) ) {
+          if( App::Rssfilter::Match::Duplicates::match( $item ) ) {
             say $item->link->text, " is a duplicate article";
           }
         }
@@ -80,7 +80,7 @@ use feature qw( :5.14 );
 
 =head1 DESCRIPTION
 
-L<Rss::Match::Duplicates> will record the GUID and link of a Mojo::DOM element, and then match the element if either the GUID or link have previously been recorded.
+L<App::Rssfilter::Match::Duplicates> will record the GUID and link of a Mojo::DOM element, and then match the element if either the GUID or link have previously been recorded.
 
 You should use this module by specifying it under a group's 'match' section in your L<App::Rssfilter> configuration.
 
@@ -88,13 +88,13 @@ You should use this module by specifying it under a group's 'match' section in y
 
 =for :list
 * L<App::Rssfilter>
-* L<Rss::Match::AbcPreviews>
-* L<Rss::Match::BbcSports>
-* L<Rss::Match::Category>
+* L<App::Rssfilter::Match::AbcPreviews>
+* L<App::Rssfilter::Match::BbcSports>
+* L<App::Rssfilter::Match::Category>
 
 =cut
 
-package Rss::Match::Duplicates {
+package App::Rssfilter::Match::Duplicates {
     use Method::Signatures;
     use Try::Tiny;
 

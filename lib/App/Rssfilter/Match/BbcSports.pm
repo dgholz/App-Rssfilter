@@ -22,7 +22,7 @@ use feature qw( :5.14 );
     # or manually
 
     use Mojo::DOM;
-    use Rss::Match::BbcSports;
+    use App::Rssfilter::Match::BbcSports;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
@@ -43,7 +43,7 @@ use feature qw( :5.14 );
     $rss->find( 'item' )->each(
         sub {
           my $item = shift;
-          if( Rss::Match::BbcSports::match( $item ) ) {
+          if( App::Rssfilter::Match::BbcSports::match( $item ) ) {
             say $item->title->text, " is a sport article";
           }
         }
@@ -54,7 +54,7 @@ use feature qw( :5.14 );
 
 =head1 DESCRIPTION
 
-L<Rss::Match::BBcSports> will match an item if it is tagged as belonging to the 'Sport' category.
+L<App::Rssfilter::Match::BBcSports> will match an item if it is tagged as belonging to the 'Sport' category.
 
 You should use this module by specifying it under a group's 'match' section in your L<App::Rssfilter> configuration.
 
@@ -62,13 +62,13 @@ You should use this module by specifying it under a group's 'match' section in y
 
 =for :list
 * L<App::Rssfilter>
-* L<Rss::Match::AbcPreviews>
-* L<Rss::Match::Category>
-* L<Rss::Match::Duplicates>
+* L<App::Rssfilter::Match::AbcPreviews>
+* L<App::Rssfilter::Match::Category>
+* L<App::Rssfilter::Match::Duplicates>
 
 =cut
 
-package Rss::Match::BbcSports {
+package App::Rssfilter::Match::BbcSports {
     use Method::Signatures;
 
 =func match( $item )

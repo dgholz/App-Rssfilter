@@ -22,7 +22,7 @@ use feature qw( :5.14 );
     # or manually
 
     use Mojo::DOM;
-    use Rss::Match::AbcPreviews;
+    use App::Rssfilter::Match::AbcPreviews;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
@@ -43,7 +43,7 @@ use feature qw( :5.14 );
     $rss->find( 'item' )->each(
         sub {
           my $item = shift;
-          if( Rss::Match::AbcPreviews::match( $item ) ) {
+          if( App::Rssfilter::Match::AbcPreviews::match( $item ) ) {
             say $item->guid->text, " is a preview article";
           }
         }
@@ -54,7 +54,7 @@ use feature qw( :5.14 );
 
 =head1 DESCRIPTION
 
-L<Rss::Match::AbcPreviews> will match a Mojo::DOM element if its GUID contains 'preview' (unless it is also in the title of the item). The Australian Broadcasting Corporation occasionally include links to preview articles in their feeds, which link to non-existent pages.
+L<App::Rssfilter::Match::AbcPreviews> will match a Mojo::DOM element if its GUID contains 'preview' (unless it is also in the title of the item). The Australian Broadcasting Corporation occasionally include links to preview articles in their feeds, which link to non-existent pages.
 
 You should use this module by specifying it under a group's 'match' section in your L<App::Rssfilter> configuration.
 
@@ -62,13 +62,13 @@ You should use this module by specifying it under a group's 'match' section in y
 
 =for :list
 * L<App::Rssfilter>
-* L<Rss::Match::BbcSports>
-* L<Rss::Match::Category>
-* L<Rss::Match::Duplicates>
+* L<App::Rssfilter::Match::BbcSports>
+* L<App::Rssfilter::Match::Category>
+* L<App::Rssfilter::Match::Duplicates>
 
 =cut
 
-package Rss::Match::AbcPreviews {
+package App::Rssfilter::Match::AbcPreviews {
     use Method::Signatures;
 
 =func match( $item )

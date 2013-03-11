@@ -22,7 +22,7 @@ use feature qw( :5.14 );
     # or manually
 
     use Mojo::DOM;
-    use Rss::Match::Category;
+    use App::Rssfilter::Match::Category;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
@@ -43,7 +43,7 @@ use feature qw( :5.14 );
     $rss->find( 'item' )->each(
         sub {
           my $item = shift;
-          if( Rss::Match::Category::match( $item, 'Sport' ) ) {
+          if( App::Rssfilter::Match::Category::match( $item, 'Sport' ) ) {
             say $item->title->text, " is a sport article";
           }
         }
@@ -54,20 +54,20 @@ use feature qw( :5.14 );
 
 =head1 DESCRIPTION
 
-L<Rss::Match::Category> will match a Mojo::DOM element if it has a category which matches one of the specified categories.
+L<App::Rssfilter::Match::Category> will match a Mojo::DOM element if it has a category which matches one of the specified categories.
 
 You should use this module by specifying it under a group's 'match' section in your L<App::R-
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<Rss::Match::AbcPreviews>
-* L<Rss::Match::BbcSports>
-* L<Rss::Match::Duplicates>
+* L<App::Rssfilter::Match::AbcPreviews>
+* L<App::Rssfilter::Match::BbcSports>
+* L<App::Rssfilter::Match::Duplicates>
 
 =cut
 
-package Rss::Match::Category {
+package App::Rssfilter::Match::Category {
     use Method::Signatures;
     use List::MoreUtils qw( any );
 

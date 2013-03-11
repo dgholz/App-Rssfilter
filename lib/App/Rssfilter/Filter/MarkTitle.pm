@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: remove a Mojo::DOM element from its parent element
+# ABSTRACT: add some text to the title element of an RSS item
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ use feature qw( :5.14 );
     - group: YoyoDyne
       match:
       - Duplicates
-      ifMatched: DeleteItem
+      ifMatched: MarkTitle
       feeds:
       - YoyoDyne News:    http://yoyodyne.com/news.rss
       - YoyoDyne Stories: http://yoyodyne.com/stories.rss
@@ -23,14 +23,14 @@ use feature qw( :5.14 );
     # or manually
 
     use Mojo::DOM;
-    use Rss::Filter::DeleteItem;
+    use App::Rssfilter::Filter::MarkTitle;
 
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
 <rss>
   <channel>
-    <item>hi</item>
-    <item>hello</item>
+    <item><title>it's hi time</title>hi</item>
+    <item><title>here we are again</title>hello</item>
   </channel>
 </rss>
     End_of_RSS
@@ -39,22 +39,23 @@ use feature qw( :5.14 );
         sub {
           my $item = shift;
           if( $item =~ /hello/ ) {
-            Rss::Filter::DeleteItem::filter( $item, 'manual match' );
+            App::Rssfilter::Filter::MarkTitle::filter( $item, 'manual match' );
           }
         }
     );
 
     print $rss;
     # <?xml version="1.0" encoding="UTF-8"?>
-    #  <rss>
-    #    <channel>
-    #      <item>hi</item>
-    #    </channel>
-    #  </rss>
+    # <rss>
+    #   <channel>
+    #     <item><title>it's hi time</title>hi</item>
+    #     <item><title>MANUAL MATCH - here we are again</title>hello</item>
+    #   </channel>
+    # </rss>
 
 =head1 DESCRIPTION
 
-L<Rss::Filter::DeleteItem> will remove a L<Mojo::DOM> element from its parent element.
+L<App::Rssfilter::Filter::MarkTitle> will add some uppercase text to the title of a L<Mojo::DOM> element. Use this module instead of L<App::Rssfilter::Filter::DeleteItem> when you wish to verify that your matchers are working correctly, as MarkTitle will simply mark the title of matched items with the name of the matching module.
 
 You should use this module by specifying it as a group's 'ifMatched' action in your L<App::Rssfilter> configuration.
 
@@ -62,21 +63,21 @@ You should use this module by specifying it as a group's 'ifMatched' action in y
 
 =for :list
 * L<App::Rssfilter>
-* L<Rss::Filter::MarkTitle>
+* L<App::Rssfilter::Filter::DeleteItem>
 
 =cut
 
-package Rss::Filter::DeleteItem {
+package App::Rssfilter::Filter::MarkTitle {
     use Method::Signatures;
 
 =func filter( $item, $matcher )
 
-Removes $item from its parent. The second argument specifies what causes $item to be removed, and is ignored.
+Prefixes $item's title with $matcher in uppercase.
 
 =cut
 
     func filter ( $item, $matcher ) {
-        $item->replace(q{});
+        $item->title->replace_content(uc($matcher) ." - ".$item->title->content_xml);
     }
 }
 
