@@ -18,7 +18,7 @@ package App::Rssfilter::Cmd::RunFromConfig {
      
     method opt_spec( $app ) {
         return (
-            [ 'config-file|f',  'config file for App::Rssfilter (searches for RssFilter.yaml if not set)', ],
+            [ 'config-file|f:s',  'config file for App::Rssfilter (searches for RssFilter.yaml if not set)', ],
         );
     }
      
@@ -37,7 +37,7 @@ package App::Rssfilter::Cmd::RunFromConfig {
     }
 
     method execute( $opt, $args ) {
-        my $yaml_config = Path::Class::file( $opt->{'config-file'} // $self->find_config );
+        my $yaml_config = Path::Class::file( $opt->config_file // $self->find_config );
         my $rssfilter = Role::Tiny->create_class_with_roles( 'App::Rssfilter::Group', 'App::Rssfilter::FromHash');
         $rssfilter->from_hash( Load( scalar $yaml_config->slurp ) )->update();
     }
