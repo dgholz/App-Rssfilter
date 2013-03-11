@@ -9,7 +9,7 @@
     $rssfilter->add_rule( Duplicate => 'DeleteItem' );
     # shorthand for
     $rssfilter->add_rule(
-        match  => 'Rss::Match::Duplicate',
+        match  => 'App::Rssfilter::Match::Duplicate',
         filter => 'Rss::Filter::DeleteItem',
     );
 
@@ -94,10 +94,10 @@ This module will find all the C<item> elements in a L<Mojo::DOM> object and pass
 =head1 SEE ALSO
 
 =for :list
-* L<Rss::Match::AbcPreviews>
-* L<Rss::Match::BbcSports>
-* L<Rss::Match::Category>
-* L<Rss::Match::Duplicates>
+* L<App::Rssfilter::Match::AbcPreviews>
+* L<App::Rssfilter::Match::BbcSports>
+* L<App::Rssfilter::Match::Category>
+* L<App::Rssfilter::Match::Duplicates>
 * L<Rss::Filter::MarkTitle>
 * L<Rss::Filter::DeleteItem>
 * L<App::RssFilter::Group>
@@ -226,7 +226,7 @@ As a convenience, the constructor will interpret being called with a single key-
 
 The C<match> option can be specified as a string, subref, or object.
 
-If the C<match> option is specified as a string, then it wil be treated as a namespace. If the string is not a fully-specified namespace, it will be changed to 'Rss::Match::<string>'; if you really want to use C<&TopLevelNamespace::match>, specify C<match> as '::TopLevelNamespace'.
+If the C<match> option is specified as a string, then it wil be treated as a namespace. If the string is not a fully-specified namespace, it will be changed to 'App::Rssfilter::Match::<string>'; if you really want to use C<&TopLevelNamespace::match>, specify C<match> as '::TopLevelNamespace'.
 You can specify additional arguments to be passed to the matcher by joining them with commas, surrounding them with square brackets, and appending them to the namespace string.
 The matcher will then be set to a wrapper:
 

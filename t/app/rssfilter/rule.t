@@ -99,7 +99,7 @@ END_OF_ITEM
     );
 };
 
-package Rss::Match::Everything {
+package App::Rssfilter::Match::Everything {
   sub match {
       1;
   }
@@ -127,7 +127,7 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
     is(
         $relative_module_rss->find( 'item' )->first->description->text,
         'cowbell',
-        'fully qualifies match option into the Rss::Match:: namespace (likewise for filter)'
+        'fully qualifies match option into the App::Rssfilter::Match:: namespace (likewise for filter)'
     );
 };
 
@@ -164,7 +164,7 @@ END_OF_ITEM
     is(
         $fully_qualified_module_rss->find( 'item' )->[1]->description->text,
         'Short Name is all',
-        'a fully qualified match option is not assumed to be in the Rss::Match:: namespace (likewise for filter)'
+        'a fully qualified match option is not assumed to be in the App::Rssfilter::Match:: namespace (likewise for filter)'
     );
 };
 
