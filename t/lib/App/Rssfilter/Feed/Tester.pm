@@ -98,6 +98,8 @@ package App::Rssfilter::Feed::Tester {
         default => sub {
             my $mock_rule = Test::MockObject->new;
             $mock_rule->set_always( 'constrain', 1 );
+            $mock_rule->set_always( 'match_name', 'redhead' );
+            $mock_rule->set_always( 'filter_name', 'swan' );
             $mock_rule->set_isa( 'App::Rssfilter::Rule' );
             return $mock_rule;
         },
