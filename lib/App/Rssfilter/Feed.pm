@@ -46,6 +46,7 @@ use feature qw< :5.14 >;
 
 package App::Rssfilter::Feed {
     use Moo;
+    with 'App::Rssfilter::Logger';
     use Method::Signatures;
 
     has name => (
@@ -180,6 +181,7 @@ The parameters are optional. If C<rules> is specified, they will be added to the
 
         my $headers = {};
         if( defined( my $last_modified = $storage->last_modified ) ) {
+            $self->logger->debug( "last update was $last_modified" );
             ${ $headers }{ 'If-Modified-Since' } = $last_modified;
         }
 
@@ -192,8 +194,11 @@ The parameters are optional. If C<rules> is specified, they will be added to the
         push @rules, @{ $self->rules };
 
         if ( 200 == $latest->res->code ) {
+            $self->logger->debug( 'found a newer feed!' );
+            $self->logger->debug( 'filtering '. $self->name );
             my $new = $latest->res->dom;
             for my $rule ( @rules ) {
+                $self->logger->debugf( 'applying %s => %s to new feed', $rule->match_name, $rule->filter_name );
                 $rule->constrain( $new );
             }
             $storage->save_feed( $new );
@@ -201,6 +206,7 @@ The parameters are optional. If C<rules> is specified, they will be added to the
 
         if ( defined $old ) {
             $old = Mojo::DOM->new( $old );
+            $self->logger->debug( 'collecting guids from old feed' );
             for my $rule ( @rules ) {
                 $rule->constrain( $old );
             }
