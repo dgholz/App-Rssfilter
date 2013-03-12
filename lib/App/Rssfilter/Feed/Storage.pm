@@ -29,6 +29,7 @@ package App::Rssfilter::Feed::Storage {
 
     use Method::Signatures;
     use Moo;
+    with 'App::Rssfilter::Logger';
     use Mojo::DOM;
     use Path::Class::File;
     use Path::Class::Dir;
@@ -150,6 +151,7 @@ Returns a L<Mojo::DOM> object initialised with the content of the previously-sav
 =cut
 
     method load_existing {
+        $self->logger->debugf( 'loading '. $self->_file_path );
         my $stat = $self->_file_path->stat;
 
         return Mojo::DOM->new if not defined $stat;
@@ -167,8 +169,10 @@ Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method). C<last_modifi
 =cut
 
     method save_feed( $feed ) {
+        $self->logger->debugf( 'writing out new filtered feed to '. $self->_file_path );
         my $target_dir = $self->_file_path->dir;
         if( not defined $target_dir->stat ) {
+            $self->logger->debug( "no $target_dir directory! making one" );
             $target_dir->mkpath;
         }
         $self->_file_path->spew( $feed->to_xml );
