@@ -135,14 +135,17 @@ package App::Rssfilter::Rule {
             @args{'match','filter'} = each %args;
             delete $args{ $args{ match } };
         }
-        my $match_name = do {
-            given( ref $args{ match } ) {
-                when( 'CODE' ) { 'unnamed RSS matcher'; }
-                when( q{}    ) { $args{ match } }
-                default        { $_ }
-            }
-        };
-        return { match_name => $match_name, %args };
+        my %nice_names;
+        for my $name ( qw< match filter > ) {
+            $nice_names{"${name}_name"} = do {
+                given( ref $args{ $name } ) {
+                    when( 'CODE' ) { "unnamed RSS ${name}er"; }
+                    when( q{}    ) { $args{ $name } }
+                    default        { $_ }
+                }
+            };
+        }
+        return { %nice_names, %args };
     }
 
     func coerce_match_or_filter_to_sub( $option_name, $value ) {
@@ -265,9 +268,20 @@ Passes C<$item> to the filter set in the constructor.
         return $self->_filter->( $item, $self->match_name );
     }
 
+=method filter_name()
+
+Returns a nice name for the filter. Will default to the class of the filter, or its value if it is a simple scalar.
+
+=cut
+
+    has filter_name => (
+        is => 'ro',
+        required => 1,
+    );
+
 =method match_name()
 
-Returns a nice name for the matcher. C<match_name> will be passed as the second argument to the filter.
+Returns a nice name for the matcher. C<match_name> will be passed as the second argument to the filter. Will default to the class of the matcher, or its value if it is a simple scalar.
 
 =cut
 
