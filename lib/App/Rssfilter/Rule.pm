@@ -115,6 +115,7 @@ package App::Rssfilter::Rule {
     use Method::Signatures;
     use Module::Runtime qw<>;
     use Class::Inspector qw<>;
+    with 'App::Rssfilter::Logger';
 
     has _match => (
         is       => 'ro',
@@ -265,6 +266,7 @@ Passes C<$item> to the filter set in the constructor.
 =cut
 
     method filter( $item ) {
+        $self->logger->debugf( 'applying %s since %s matched %s', $self->filter_name, $self->match_name, $item->at('guid')->text );
         return $self->_filter->( $item, $self->match_name );
     }
 
