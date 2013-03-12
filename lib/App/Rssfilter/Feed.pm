@@ -205,7 +205,6 @@ The parameters are optional. If C<rules> is specified, they will be added to the
         }
 
         if ( defined $old ) {
-            $old = Mojo::DOM->new( $old );
             $self->logger->debug( 'collecting guids from old feed' );
             for my $rule ( @rules ) {
                 $rule->constrain( $old );
