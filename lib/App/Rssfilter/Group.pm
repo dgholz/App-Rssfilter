@@ -30,6 +30,7 @@ use feature qw< :5.14 >;
 package App::Rssfilter::Group {
     use Moo;
     with 'App::Rssfilter::FromHash';
+    with 'App::Rssfilter::Logger';
     use Method::Signatures;
 
     method BUILDARGS( @options ) {
@@ -164,6 +165,7 @@ C<$storage> is an optional L<App::Rssfilter::Feed::Storage> for children to use 
     method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
         my $child_storage = $storage->path_push( $self->name );
         my @rules = map { @{ $_ } } $rules, $self->rules;
+        $self->logger->debugf( 'filtering feeds in %s', $self->name );
         $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->groups };
         $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->feeds };
     }
