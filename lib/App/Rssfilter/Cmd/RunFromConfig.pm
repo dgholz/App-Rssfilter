@@ -11,6 +11,7 @@ package App::Rssfilter::Cmd::RunFromConfig {
     use Method::Signatures;
     use Cwd;
     use Path::Class qw<>;
+    use Log::Any::Adapter;
 
     method usage_desc( $app ) {
         return $app->arg0 . ' %o';
@@ -19,6 +20,7 @@ package App::Rssfilter::Cmd::RunFromConfig {
     method opt_spec( $app ) {
         return (
             [ 'config-file|f:s',  'config file for App::Rssfilter (searches for RssFilter.yaml if not set)', ],
+            [ 'log|v',  'turn logging on' ],
         );
     }
      
@@ -38,6 +40,7 @@ package App::Rssfilter::Cmd::RunFromConfig {
 
     method execute( $opt, $args ) {
         my $yaml_config = Path::Class::file( $opt->config_file // $self->find_config );
+        Log::Any::Adapter->set( 'Stdout' ) if $opt->log;
         my $rssfilter = Role::Tiny->create_class_with_roles( 'App::Rssfilter::Group', 'App::Rssfilter::FromHash');
         $rssfilter->from_hash( Load( scalar $yaml_config->slurp ) )->update();
     }
