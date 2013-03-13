@@ -298,7 +298,7 @@ Finds all C<item> child elements in C<$Mojo_DOM>, gathers those with are matched
 
 =cut
 
-    method constrain( $Mojo_DOM ) {
+    method constrain( Mojo::DOM $Mojo_DOM ) {
         my $count = 0;
         $Mojo_DOM->find( 'item' )->grep( sub { $self->match( shift ) } )->each( sub { $self->filter( shift ); ++$count; } );
         return $count;
