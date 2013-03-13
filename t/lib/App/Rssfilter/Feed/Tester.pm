@@ -104,6 +104,14 @@ package App::Rssfilter::Feed::Tester {
             return $mock_rule;
         },
     );
+
+    sub BUILDARGS {
+        my ( %opts ) = @_;
+        for my $feed ( qw< new_feed old_feed > ) {
+            $opts{ $feed } = Mojo::DOM->new( $opts{ $feed } // q{} );
+        }
+        return \%opts;
+    }
 }
 
 1;
