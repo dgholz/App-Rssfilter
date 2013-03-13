@@ -13,7 +13,7 @@ run_tests(
         'App::Rssfilter::FromHash::Tester',
         'App::Rssfilter::FromHash::Test::SplitForCtor',
         'App::Rssfilter::FromHash::Test::SplitForCtorWithTwoScalars',
-        'App::Rssfilter::FromHash::Test::SplitForCtorWithHashref',
+        'App::Rssfilter::FromHash::Test::SplitForCtorWithHashRef',
         'App::Rssfilter::FromHash::Test::SplitForCtorWithObject',
     ],
 );
