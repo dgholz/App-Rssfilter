@@ -2,6 +2,8 @@
 
 App::Rssfilter - download RSS feeds and remove duplicate items
 
+See how the development is progressing at L<the Trello board|https://trello.com/b/lwcjbqlt>
+
 =head1 HOW TO INSTALL
 
 =head2 Set up your Perl environment
