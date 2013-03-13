@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use feature qw< :5.14 >;
 
-package App::Rssfilter::FromHash::Test::SplitForCtorWithHashref {
+package App::Rssfilter::FromHash::Test::SplitForCtorWithHashRef {
 
     use Test::Routine;
     use Test::More;
