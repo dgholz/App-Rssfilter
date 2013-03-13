@@ -106,7 +106,7 @@ Returns true if $item has a guid or link which matches a guid of link of an item
 
     func match ( $item ) {
         state %prev;
-        my $link = try { $item->guid->text } || "";
+        my $link = try { $item->guid->text =~ s/ [?] .* \z //xmsr } || "";
         my $url  = try { $item->link->text =~ s/ [?] .* \z //xmsr } || "";
         my @matchables = grep { $_ ne "" } $link, $url;
         my $res  = grep { defined } @prev{ @matchables };
