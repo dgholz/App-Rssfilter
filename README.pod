@@ -1,0 +1,70 @@
+=head1 NAME
+
+App::Rssfilter - download RSS feeds and remove duplicate items
+
+=head1 HOW TO INSTALL
+
+=head2 Set up your Perl environment
+
+=over
+
+=item *
+
+Windows
+
+=over
+
+=item 1.
+
+Install L<Strawberry Perl|http://strawberryperl.com/> (version 5.14 or higher)
+
+=item 2.
+
+Install cpanm with C<cpan App::cpanminus>
+
+=back
+
+=item *
+
+Mac/Linux
+
+=over
+
+=item 1.
+
+Use L<perlbrew|http://perlbrew.pl/> to install version 5.14 or higher. Don't forget to run C<perlbrew switch <version\>>
+
+=item 2.
+
+Install cpanm with C<perlbrew install-cpanm>
+
+=item 3.
+
+Set up a separate perl library with C<perlbrew lib create app-rssfilter; perlbrew use @app-rssfilter>
+
+=back
+
+=back
+
+=head2 Set up developement environment
+
+C<cpanm dzil; dzil authordeps | cpanm>
+
+=head2 Install App::Rssfilter
+
+C<dzil listdeps | cpanm; dzil install>
+
+=head2 Create a simple configuration file
+
+in Rssfilter.yaml:
+
+    group: Test
+    rules:
+    - Duplicates: DeleteItem
+    feeds:
+    - Top News:   http://feeds.reuters.com/reuters/topNews
+    - Technology: http://feeds.reuters.com/reuters/technologyNews
+
+=head2 Run App::Rssfilter
+
+C<rssfilter runfromconfig -f Rssfilter.yaml --log>
