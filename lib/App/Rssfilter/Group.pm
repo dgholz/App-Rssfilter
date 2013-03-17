@@ -24,7 +24,7 @@
 A group runs the same rules over many feeds. Use a group when:
 
 =for :list
-* you have a rule which keeps track of items seen (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) and you wish it to retain state over muplitple feeds
+* you have a rule which keeps track of items seen (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) and you wish it to retain state over multiple feeds
 * you wish to apply the same rules configuration to multiple feeds
 
 =cut
@@ -58,7 +58,7 @@ This is the name of the group. Group names are used when storing a feed so that 
 
 =attr storage
 
-This is the an instance of a feed storage implementation for feeds to use when they are updated. The default value is a freshly-instance of L<App::Rssfilter::Feed::Storage>. The default is not used when updating subgroups; see L<update > for more details.
+This is the an instance of a feed storage implementation for feeds to use when they are updated. The default value is a freshly-instance of L<App::Rssfilter::Feed::Storage>. The default is not used when updating subgroups; see L</update> for more details.
 
 =cut
 
@@ -78,20 +78,22 @@ This is an arrayref of subgroups attatched to this group.
         default => sub { [] },
     );
 
-=method add_group( $group | %group_options )
+=method add_group
 
-Adds the L<App::Rssfilter::group> $group (or creates a new App::RssFilter::group instance from the passed parameters) to the list of subgroups for this group.
+    $group = $group->add_group( $app_rssfilter_group | %group_options );
+
+Adds $app_rssfilter_group (or creates a new App::RssFilter::Group instance from the C<%group_options>) to the list of subgroups for this group. Returns this group (for chaining).
 
 =cut
 
-    method add_group( $group, @group_options ) {
+    method add_group( $app_rssfilter_group, @group_options ) {
         use Scalar::Util qw< blessed >;
-        if ( ! blessed( $group ) or ! $group->isa( 'App::Rssfilter::Group' ) ) {
-            unshift @group_options, $group; # restore original @_
-            $group = App::Rssfilter::Group->new( @group_options );
+        if ( ! blessed( $app_rssfilter_group ) or ! $app_rssfilter_group->isa( 'App::Rssfilter::Group' ) ) {
+            unshift @group_options, $app_rssfilter_group; # restore original @_
+            $app_rssfilter_group = App::Rssfilter::Group->new( @group_options );
         }
 
-        push $self->groups, $group;
+        push $self->groups, $app_rssfilter_group;
         return $self;
     }
 
@@ -106,21 +108,23 @@ This is an arrayref of rules to apply to the feeds in this group (and subgroups)
         default => sub { [] },
     );
 
-=method add_rule( $rule | %rule_options )
+=method add_rule
 
-Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule instance from the passed parameters) to the rules for this group.
+    $group = $group->add_rule( $app_rssfilter_rule | %rule_options )
+
+Adds $app_rssfilter_rule (or creates a new App::RssFilter::Rule instance from the C<%rule_options>) to the list of rules for this group. Returns this group (for chaining). 
 
 =cut
 
-    method add_rule( $rule, @rule_options ) {
+    method add_rule( $app_rssfilter_rule, @rule_options ) {
         use Scalar::Util qw< blessed >;
-        if ( ! blessed( $rule ) or ! $rule->isa( 'App::Rssfilter::Rule' ) ) {
-            unshift @rule_options, $rule; # restore original @_
+        if ( ! blessed( $app_rssfilter_rule ) or ! $app_rssfilter_rule->isa( 'App::Rssfilter::Rule' ) ) {
+            unshift @rule_options, $app_rssfilter_rule; # restore original @_
             use App::Rssfilter::Rule;
-            $rule = App::Rssfilter::Rule->new( @rule_options );
+            $app_rssfilter_rule = App::Rssfilter::Rule->new( @rule_options );
         }
 
-        push $self->rules, $rule;
+        push $self->rules, $app_rssfilter_rule;
         return $self;
     }
 
@@ -135,25 +139,29 @@ This is an arrayref of feeds.
         default => sub { [] },
     );
 
-=method add_feed( $feed | %feed_options )
+=method add_feed
 
-Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilter::Feed instance from the passed parameters) and adds it to the feeds for this group.
+    $group = $group->add_feed( $app_rssfilter_feed | %feed_options );
+
+Adds $app_rssfilter_feed (or creates a new App::RssFilter::Feed instance from the C<%feed_options>) to the list of feeds for this group. Returns this group (for chaining).
 
 =cut
 
-    method add_feed( $feed, @feed_options ) {
+    method add_feed( $app_rssfilter_feed, @feed_options ) {
         use Scalar::Util qw< blessed >;
-        if ( ! blessed( $feed ) or ! $feed->isa( 'App::Rssfilter::Feed' ) ) {
-            unshift @feed_options, $feed; # restore original @_
+        if ( ! blessed( $app_rssfilter_feed ) or ! $app_rssfilter_feed->isa( 'App::Rssfilter::Feed' ) ) {
+            unshift @feed_options, $app_rssfilter_feed; # restore original @_
             use App::Rssfilter::Feed;
-            $feed = App::Rssfilter::Feed->new( @feed_options );
+            $app_rssfilter_feed = App::Rssfilter::Feed->new( @feed_options );
         }
 
-        push $self->feeds, $feed;
-        return $feed;
+        push $self->feeds, $app_rssfilter_feed;
+        return $app_rssfilter_feed;
     }
 
-=method update( rules => $rules, storage => $storage )
+=method update
+
+    $group->update( rules => $rules, storage => $storage );
 
 Recursively calls C<update> on the feeds and subgroups of this group.
 
