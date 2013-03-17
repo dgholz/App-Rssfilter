@@ -2,13 +2,14 @@
 
 =head1 SYNOPSIS
 
-    use App::RssFilter;
+    use App::RssFilter::Rule;
+    use App::RssFilter::Feed;
 
-    my $rssfilter = App::RssFilter->new;
+    my $feed = App::RssFilter::Feed->new( 'examples' => 'http://example.org/e.g.rss' );
 
-    $rssfilter->add_rule( Duplicate => 'DeleteItem' );
+    $feed->add_rule( Duplicate => 'DeleteItem' );
     # shorthand for
-    $rssfilter->add_rule(
+    $feed->add_rule(
         match  => 'App::Rssfilter::Match::Duplicate',
         filter => 'App::Rssfilter::Filter::DeleteItem',
     );
@@ -18,8 +19,8 @@
         package MyMatcher::LevelOfInterest;
         
         sub new {
-            my ( $class, @additional_args_in_brackets) = @_;
-            if ( 'BORING' eq $additional_args_in_brackets[0] ) {
+            my ( $class, @bracketed_args) = @_;
+            if ( 'BORING' eq $bracket_args[0] ) {
                 # turn on boredom detection circuits
                 ...
             }
@@ -31,27 +32,30 @@
             ...
         }
     }
+
     {
         package MyFilter::MakeMoreInteresting;
         sub filter {
             my ( $reason_for_match,
                  $matched_mojo_dom,
-                 @additional_args_in_brackets ) = @_;
+                 @bracketed_args ) = @_;
             ...
         }
     }
-    $rssfilter->add_rule(
+
+    $feed->add_rule(
         'MyMatcher::LevelOfInterest[BORING]'
             => 'MyFilter::MakeMoreInteresting[glitter,lasers]'
     );
-    $rssfilter->add_rule(
+
+    $feed->add_rule(
         match      => MyMatcher::LevelOfInterest->new('OUT_OF_SIGHT'),
-        match_name => 'ReallyInteresting',
-        filter     => 'MyFilter::MakeMoreInteresting[ascii_art]'
+        match_name => 'ReallyInteresting', # instead of plain 'MyMatcher::LevelOfInterest'
+        filter     => 'MyFilter::MakeMoreInteresting[ascii_art]',
     );
 
     # or use anonymous subs
-    $rssfilter->add_rule(
+    $feed->add_rule(
         match => sub {
             my ( $item_to_match ) = @_;
             return $item_to_match->title->text =~ / \b space \b /ixms;
@@ -61,7 +65,7 @@
             my @to_check = ( $matched_item->tree );
             my %seen;
             while( my $elem = pop @to_check ) {
-                next if ref $elem ne 'ARRAY' or $seen{ $elem }++;
+                next if 'ARRAY' ne ref $elem or $seen{ $elem }++;
                 if( $elem->[0] eq 'text' ) {
                     $elem->[1] =~ s/ \b space \b /\& (the final frontier)/xmsig;
                 }
@@ -73,9 +77,7 @@
         },
     );
 
-    # add groups, feeds, etc.
-
-    $rssfilter->run;
+    $feed->update;
 
     ### or standalone
 
@@ -84,9 +86,9 @@
     use My::Filter;
     use Mojo::DOM;
 
-    my $feed = Mojo::DOM->new( 'an RSS document' );
+    my $rss = Mojo::DOM->new( 'an RSS document' );
     my $rule = App::Rssfilter::Rule->new( 'My::Matcher' => 'My::Filter' );
-    $rule->constrain( $feed );
+    $rule->constrain( $rss );
 
 =head1 DESCRIPTION
 
