@@ -93,6 +93,7 @@
 =head1 DESCRIPTION
 
 This module will find all the C<item> elements in a L<Mojo::DOM> object and passes each one to a matcher. If the matcher returns true, the element will be passed to a filter.
+
 =head1 SEE ALSO
 
 =for :list
@@ -218,6 +219,7 @@ package App::Rssfilter::Rule {
     }
 
 =method new( %options )
+
     my $rule = App::RssFilter::Rule->new(
         'My::Rss::Matcher' => 'My::Rss::Filter[with,some,arguments]'
     );
@@ -251,7 +253,9 @@ The C<match_name> option let you specify a string which will be passed to C<filt
 
 =cut
 
-=method match( $item )
+=method match
+
+    my $did_match = $self->match( $item_element_from_Mojo_DOM );
 
 Returns true if the matcher set in the constructor matches C<$item>.
 
@@ -261,7 +265,9 @@ Returns true if the matcher set in the constructor matches C<$item>.
         return $self->_match->( $item );
     }
 
-=method filter( $item )
+=method filter
+
+    $self->filter( $item_element_from_Mojo_DOM );
 
 Passes C<$item> to the filter set in the constructor.
 
@@ -272,9 +278,9 @@ Passes C<$item> to the filter set in the constructor.
         return $self->_filter->( $item, $self->match_name );
     }
 
-=method filter_name()
+=attr filter_name
 
-Returns a nice name for the filter. Will default to the class of the filter, or its value if it is a simple scalar.
+This is a nice name for the filter. Defaults to the class of the filter, or its value if it is a simple scalar.
 
 =cut
 
@@ -283,9 +289,9 @@ Returns a nice name for the filter. Will default to the class of the filter, or 
         required => 1,
     );
 
-=method match_name()
+=attr match_name
 
-Returns a nice name for the matcher. C<match_name> will be passed as the second argument to the filter. Will default to the class of the matcher, or its value if it is a simple scalar.
+This is a nice name for the matcher, which will be used as the reason for the match given to the filter. Defaults to the class of the matcher, or its value if it is a simple scalar.
 
 =cut
 
@@ -294,9 +300,11 @@ Returns a nice name for the matcher. C<match_name> will be passed as the second 
         required => 1,
     );
 
-=method constrain( $Mojo_DOM )
+=method constrain
 
-Finds all C<item> child elements in C<$Mojo_DOM>, gathers those with are matched by the matcher, and passes each one to the filter. Returns the number of items that were matched (and filtered).
+    my $count_of_filtered_items = $rule->constrain( $Mojo_DOM )
+
+Gathers all child item elements of C<Mojo_DOM> which are matched by the matcher, and passes each one to the filter. Returns the number of items that were matched (and filtered).
 
 =cut
 
