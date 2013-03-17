@@ -1,4 +1,4 @@
-# ABSTRACT: Apply the same Rules to a collection of RSS Feeds
+# ABSTRACT: Apply the same Rules to many Feeds
 
 =head1 SYNOPSIS
 
@@ -21,6 +21,12 @@
 
 =head1 DESCRIPTION
 
+A group runs the same rules over many feeds. Use a group when:
+
+=for :list
+* you have a rule which keeps track of items seen (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) and you wish it to retain state over muplitple feeds
+* you wish to apply the same rules configuration to multiple feeds
+
 =cut
 
 use strict;
@@ -29,7 +35,6 @@ use feature qw< :5.14 >;
 
 package App::Rssfilter::Group {
     use Moo;
-    with 'App::Rssfilter::FromHash';
     with 'App::Rssfilter::Logger';
     use Method::Signatures;
 
@@ -40,13 +45,9 @@ package App::Rssfilter::Group {
         return { @options };
     }
 
-=method new( %options )
+=attr name
 
-=cut
-
-=method name()
-
-Returns the name passed to the constructor, or '.' if no name passed.
+This is the name of the group. Group names are used when storing a feed so that feeds from the same group are kept together. The default value is '.' (a single period).
 
 =cut
 
@@ -55,20 +56,20 @@ Returns the name passed to the constructor, or '.' if no name passed.
         default => sub { '.' },
     );
 
-=method storage()
+=attr storage
 
-Returns the L<App::Rssfilter::Feed::Storage> instance passed to the constructor, or a suitable default.
+This is the an instance of a feed storage implementation for feeds to use when they are updated. The default value is a freshly-instance of L<App::Rssfilter::Feed::Storage>. The default is not used when updating subgroups; see L<update > for more details.
 
 =cut
 
     has storage => (
         is => 'ro',
-        default => method { App::Rssfilter::Feed::Storage->new( groups => [ $self->name ] ) },
+        default => method { App::Rssfilter::Feed::Storage->new },
     );
 
-=method groups()
+=attr groups
 
-Returns an array reference to the list of subgroups.
+This is an arrayref of subgroups attatched to this group.
 
 =cut
 
@@ -79,7 +80,7 @@ Returns an array reference to the list of subgroups.
 
 =method add_group( $group | %group_options )
 
-Adds the L<App::Rssfilter::group> $group (or creates a new App::RssFilter::group instance from the passed parameters) to the groups.
+Adds the L<App::Rssfilter::group> $group (or creates a new App::RssFilter::group instance from the passed parameters) to the list of subgroups for this group.
 
 =cut
 
@@ -94,9 +95,9 @@ Adds the L<App::Rssfilter::group> $group (or creates a new App::RssFilter::group
         return $self;
     }
 
-=method rules()
+=attr rules
 
-Returns an array reference to the list of rules which will be applied to the feeds in this group (and subgroups).
+This is an arrayref of rules to apply to the feeds in this group (and subgroups).
 
 =cut
 
@@ -107,7 +108,7 @@ Returns an array reference to the list of rules which will be applied to the fee
 
 =method add_rule( $rule | %rule_options )
 
-Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule instance from the passed parameters) to the rules.
+Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule instance from the passed parameters) to the rules for this group.
 
 =cut
 
@@ -123,9 +124,9 @@ Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule in
         return $self;
     }
 
-=method feeds()
+=attr feeds
 
-Returns an array reference to the list of feeds within this group.
+This is an arrayref of feeds.
 
 =cut
 
@@ -136,7 +137,7 @@ Returns an array reference to the list of feeds within this group.
 
 =method add_feed( $feed | %feed_options )
 
-Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilter::Feed instance from the passed parameters) and adds it to the group.
+Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilter::Feed instance from the passed parameters) and adds it to the feeds for this group.
 
 =cut
 
@@ -154,11 +155,11 @@ Takes the existing L<App::Rssfilter::Feed> $feed (or creates a new App::RssFilte
 
 =method update( rules => $rules, storage => $storage )
 
-Recursively calls update() on the feeds and groups attatched to this group.
+Recursively calls C<update> on the feeds and subgroups of this group.
 
-C<$rules> is an optional arrayref of  rules to constrain the feed and groups, in addition to the group's current list of rules.
+C<$rules> is an arrayref of additional rules to constrain the feed and groups, in addition to the group's current list of rules.
 
-C<$storage> is an optional L<App::Rssfilter::Feed::Storage> for children to use when loading or saving feeds. If it is not specified, the storage argument passed to the constructor is used instead.
+C<$storage> is a feed storage instance for children to use when loading or saving feeds. It defaults to this group's C<storage>. The group's C<name> is appended to the current path of C<$storage> before feeds and subgroups use it for updating.
 
 =cut
 
