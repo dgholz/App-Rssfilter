@@ -3,16 +3,20 @@
 =head1 SYNOPSIS
 
     use App::RssFilter::Rule;
-    use App::RssFilter::Feed;
 
-    my $feed = App::RssFilter::Feed->new( 'examples' => 'http://example.org/e.g.rss' );
+    use Mojo::DOM;
+    my $rss = Mojo::DOM->new( 'an RSS document' );
 
-    $feed->add_rule( Duplicate => 'DeleteItem' );
+    my $delete_duplicates_rule = App::Rssfilter::Rule->new( Duplicate => 'DeleteItem' );
+
     # shorthand for
-    $feed->add_rule(
+    $delete_duplicates_rule = App::Rssfilter::Rule->new(
         match  => 'App::Rssfilter::Match::Duplicate',
         filter => 'App::Rssfilter::Filter::DeleteItem',
     );
+
+    # apply rule to RSS document
+    $delete_duplicates_rule->constrain( $rss );
 
     # write modules and use them to match and filter
     {
@@ -43,19 +47,21 @@
         }
     }
 
-    $feed->add_rule(
+    my $boring_made_interesting_rule = App::Rssfilter::Rule->new( 
         'MyMatcher::LevelOfInterest[BORING]'
             => 'MyFilter::MakeMoreInteresting[glitter,lasers]'
     );
+    $boring_made_interesting_rule->constrain( $rss );
 
-    $feed->add_rule(
+    my $interesting_with_decoration_rule = App::Rssfilter::Rule->new( 
         match      => MyMatcher::LevelOfInterest->new('OUT_OF_SIGHT'),
         match_name => 'ReallyInteresting', # instead of plain 'MyMatcher::LevelOfInterest'
         filter     => 'MyFilter::MakeMoreInteresting[ascii_art]',
     );
+    $interesting_with_decoration_rule->constrain( $rss );
 
     # or use anonymous subs
-    $feed->add_rule(
+    my $space_the_final_frontier_rule = App::Rssfilter:Rule->new(
         match => sub {
             my ( $item_to_match ) = @_;
             return $item_to_match->title->text =~ / \b space \b /ixms;
@@ -76,19 +82,17 @@
             }
         },
     );
+    $space_the_final_frontier_rule->constrain( $rss );
 
+    ### or with a App::Rssfilter feed or group
+
+    use App::RssFilter::Feed;
+    my $feed = App::RssFilter::Feed->new( 'examples' => 'http://example.org/e.g.rss' );
+    $feed->add_rule( $_ ) for ( $rule1, $rule2, $rule3 );
+    $feed->add_rule( 'My::Matcher' => 'My::Filter' );
+    # same as
+    $feed->add_rule( App::Rssfilter::Rule->new( 'My::Matcher' => 'My::Filter' ) );
     $feed->update;
-
-    ### or standalone
-
-    use App::Rssfilter::Rule;
-    use My::Matcher;
-    use My::Filter;
-    use Mojo::DOM;
-
-    my $rss = Mojo::DOM->new( 'an RSS document' );
-    my $rule = App::Rssfilter::Rule->new( 'My::Matcher' => 'My::Filter' );
-    $rule->constrain( $rss );
 
 =head1 DESCRIPTION
 
