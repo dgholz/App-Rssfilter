@@ -177,7 +177,7 @@ The C<condition_name> option let you specify a string which will be passed to C<
 
     has condition_name => (
         is => 'lazy',
-        default => method { nice_name_for( $self->condition, 'match' ) },
+        default => method { $self->nice_name_for( $self->condition, 'match' ) },
     );
 
 =attr action
