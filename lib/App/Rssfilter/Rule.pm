@@ -251,6 +251,11 @@ This is a nice name for the action. Defaults to the class of the action, or its 
         return \%args;
     }
 
+    method BUILD( $args ) {
+        # validate coercion of condition & action
+        $self->$_ for qw< _filter _match >;
+    }
+
     method coerce_attr( :$attr, :$type ) {
         die "can't use an undefined value to $type RSS items" if not defined $attr;
         given( ref $attr ) {
