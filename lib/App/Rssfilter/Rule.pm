@@ -172,7 +172,7 @@ Returns the result of testing this rule's condition against C<$item>.
 
 =attr condition_name
 
-This is a nice name for the condition, which will be used as the reason for the match given to the action. Defaults to the class of the condition, or its value if it is a simple scalar, or 'unnamed RSS matcher' otherwise.
+This is a nice name for the condition, which will be used as the reason for the match given to the action. Defaults to the class of the condition, or its value if it is a simple scalar, or C<unnamed RSS matcher> otherwise.
 
 =cut
 
@@ -231,7 +231,7 @@ Applies this rule's action to C<$item>.
 
 =attr action_name
 
-This is a nice name for the action. Defaults to the class of the action, or its value if it is a simple scalar, or 'unnamed RSS filter' owtherwise.
+This is a nice name for the action. Defaults to the class of the action, or its value if it is a simple scalar, or C<unnamed RSS filter> otherwise.
 
 =cut
 
