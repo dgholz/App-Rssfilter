@@ -23,19 +23,19 @@ package Test::NoFilter {
 
 throws_ok {
     App::Rssfilter::Rule->new(
-        match  => 'Test::NoMatch',
-        filter => sub {},
+        condition => 'Test::NoMatch',
+        action    => sub {},
     );
 } qr/Test::NoMatch::match does not exist/,
-'match option must specify a namespace with a match sub';
+'condition attr must specify a namespace with a match sub';
 
 throws_ok {
     App::Rssfilter::Rule->new(
-        match  => sub {},
-        filter => 'Test::NoFilter'
+        condition => sub {},
+        action    => 'Test::NoFilter'
     );
 } qr/Test::NoFilter::filter does not exist/,
-'filter option must specify a namespace with a filter sub';
+'action attr must specify a namespace with a filter sub';
 
 package Test::NoMatch::OO {
 
@@ -62,35 +62,35 @@ package Test::NoFilter::OO {
 
 throws_ok {
     App::Rssfilter::Rule->new(
-        match  => 'Test::NoMatch::OO',
-        filter => sub {},
+        condition => 'Test::NoMatch::OO',
+        action    => sub {},
     );
 } qr/Test::NoMatch::OO::match does not exist/,
-'match option must specify an OO namespace with a match method';
+'condition attr must specify an OO namespace with a match method';
 
 throws_ok {
     App::Rssfilter::Rule->new(
-        match  => Test::NoMatch::OO->new(),
-        filter => sub {},
+        condition => Test::NoMatch::OO->new(),
+        action    => sub {},
     );
 } qr/Test::NoMatch::OO::match does not exist/,
-'match option must specify an OO instance with a match method';
+'condition attr must specify an OO instance with a match method';
 
 throws_ok {
     App::Rssfilter::Rule->new(
-        match  => sub {},
-        filter => 'Test::NoFilter::OO',
+        condition => sub {},
+        action    => 'Test::NoFilter::OO',
     );
 } qr/Test::NoFilter::OO::filter does not exist/,
-'filter option must specify an OO namespace with a filter method';
+'action attr must specify an OO namespace with a filter method';
 
 throws_ok {
     App::Rssfilter::Rule->new(
-        match  => sub {},
-        filter => Test::NoFilter::OO->new(),
+        condition => sub {},
+        action    => Test::NoFilter::OO->new(),
     );
 } qr/Test::NoFilter::OO::filter does not exist/,
-'filter option must specify an OO instance with a filter method';
+'action attr must specify an OO instance with a filter method';
 
 
 done_testing;
