@@ -11,8 +11,8 @@
 
     # shorthand for
     $delete_duplicates_rule = App::Rssfilter::Rule->new(
-        match  => 'App::Rssfilter::Match::Duplicate',
-        filter => 'App::Rssfilter::Filter::DeleteItem',
+        condition => 'App::Rssfilter::Match::Duplicate',
+        action    => 'App::Rssfilter::Filter::DeleteItem',
     );
 
     # apply rule to RSS document
@@ -54,19 +54,19 @@
     $boring_made_interesting_rule->constrain( $rss );
 
     my $interesting_with_decoration_rule = App::Rssfilter::Rule->new( 
-        match      => MyMatcher::LevelOfInterest->new('OUT_OF_SIGHT'),
-        match_name => 'ReallyInteresting', # instead of plain 'MyMatcher::LevelOfInterest'
-        filter     => 'MyFilter::MakeMoreInteresting[ascii_art]',
+        condition      => MyMatcher::LevelOfInterest->new('OUT_OF_SIGHT'),
+        condition_name => 'ReallyInteresting', # instead of plain 'MyMatcher::LevelOfInterest'
+        action         => 'MyFilter::MakeMoreInteresting[ascii_art]',
     );
     $interesting_with_decoration_rule->constrain( $rss );
 
     # or use anonymous subs
     my $space_the_final_frontier_rule = App::Rssfilter:Rule->new(
-        match => sub {
+        condition => sub {
             my ( $item_to_match ) = @_;
             return $item_to_match->title->text =~ / \b space \b /ixms;
         },
-        filter => sub {
+        action => sub {
             my ( $reason_for_match, $matched_item ) = @_;
             my @to_check = ( $matched_item->tree );
             my %seen;
@@ -96,7 +96,7 @@
 
 =head1 DESCRIPTION
 
-This module will find all the C<item> elements in a L<Mojo::DOM> object and passes each one to a matcher. If the matcher returns true, the element will be passed to a filter.
+This module will test all C<item> elements in a L<Mojo::DOM> object against some condition, and apply some action to those tiems where the condition is true.
 
 =head1 SEE ALSO
 
@@ -124,117 +124,7 @@ package App::Rssfilter::Rule {
     use Class::Inspector qw<>;
     with 'App::Rssfilter::Logger';
 
-    has _match => (
-        is       => 'ro',
-        required => 1,
-        init_arg => 'match',
-        coerce   => sub { unshift @_, 'match'; goto &App::Rssfilter::Rule::coerce_match_or_filter_to_sub }
-    );
-
-    has _filter => (
-        is       => 'ro',
-        required => 1,
-        init_arg => 'filter',
-        coerce   => sub { unshift @_, 'filter'; goto &App::Rssfilter::Rule::coerce_match_or_filter_to_sub }
-    );
-
-    method BUILDARGS( %args ) {
-        if ( 1 == keys %args ) {
-            @args{'match','filter'} = each %args;
-            delete $args{ $args{ match } };
-        }
-        my %nice_names;
-        for my $name ( qw< match filter > ) {
-            $nice_names{"${name}_name"} = do {
-                given( ref $args{ $name } ) {
-                    when( 'CODE' ) { "unnamed RSS ${name}er"; }
-                    when( q{}    ) { $args{ $name } }
-                    default        { $_ }
-                }
-            };
-        }
-        return { %nice_names, %args };
-    }
-
-    func coerce_match_or_filter_to_sub( $option_name, $value ) {
-        die "can't use an undefined value to $option_name RSS items" if not defined $value;
-        given( ref $value ) {
-            when( 'CODE' ) {
-                return $value;
-            }
-            when( q{} ) { # not a ref
-                my ($namespace, $additional_args) =
-                    $value =~ m/
-                        \A
-                        ( [^\[]+ ) # namespace
-                        (?:        # followed by optional
-                         \[
-                           ( .* )    # additional arguments
-                         \]          # in square brackets
-                        )?         # optional, remember?
-                        \z
-                    /xms;
-                my @additional_args = split q{,}, $additional_args // q{};
-                if( $namespace !~ /::/xms ) {
-                    $namespace = join q{::}, qw< App Rssfilter >, ucfirst( $option_name ), $namespace;
-                }
-
-                $namespace =~ s/\A :: //xms; # '::anything'->can() will die
-
-                if( not Class::Inspector->loaded( $namespace ) ) {
-                    Module::Runtime::require_module $namespace;
-                }
-
-                # create an object if we got an OO package
-                my $invocant = $namespace;
-                if( $namespace->can( 'new' ) ) {
-                    $invocant = $namespace->new( @additional_args );
-                }
-
-                # return a wrapper
-                if( my $method = $invocant->can( $option_name ) ) {
-                    if( $invocant eq $namespace ) {
-                        return sub {
-                            $method->( @_, @additional_args) ;
-                        };
-                    }
-                    else
-                    {
-                        return sub {
-                            $invocant->$option_name( @_ );
-                        };
-                    }
-                }
-                else
-                {
-                    die "${namespace}::$option_name does not exist";
-                }
-            }
-            default {
-                if( my $method = $value->can( $option_name ) ) {
-                    return sub { $value->$option_name( @_ ); }
-                }
-                else
-                {
-                    die "${_}::$option_name does not exist";
-                }
-            }
-        }
-    }
-
-=method new( %options )
-
-    my $rule = App::RssFilter::Rule->new(
-        'My::Rss::Matcher' => 'My::Rss::Filter[with,some,arguments]'
-    );
-
-    my $rule = App::RssFilter::Rule->new(
-        match       => 'My::Rss::Matcher',
-        filter      => 'My::Rss::Filter[with,some,arguments]',
-        match_name  => 'a better name than My::Rss::Matcher' # optional
-    );
-
-As a convenience, the constructor will interpret being called with a single key-value pair as equivalent to being called with C<match> set to the key, and C<filter> set to the value.
+=attr condition
 
 The C<match> option can be specified as a string, subref, or object.
 
@@ -249,19 +139,27 @@ The matcher will then be set to a wrapper:
 If the C<match> option is specified as an object, the matcher will be set to a wrapper which calls the C<match> method of the object.
 If the C<match> option is specified as a subref, the matcher will be set to that subref.
 
-The C<filter> option behaves exactly as the C<match> option, except it will be set to a reference to the C<filter> sub in the namespace, if set to a string.
-
-The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the filter will be called as C<filter( $Mojo_DOM, $match_name, @addditional_args)>.
-
-The C<match_name> option let you specify a string which will be passed to C<filter> when C<match> matches an item. It defaults to the string passed as C<match> to the constructor, or 'unnamed RSS matcher' otherwise.
+The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the filter will be called as C<filter( $Mojo_DOM, $condition_name, @addditional_args)>.
 
 =cut
+
+    has condition => (
+        is       => 'ro',
+        required => 1,
+    );
+
+    has _match => (
+        is       => 'ro',
+        required => 1,
+        init_arg => undef,
+        default  => method { $self->coerce_attr( attr => $self->action, type => 'match' ) },
+    );
 
 =method match
 
     my $did_match = $self->match( $item_element_from_Mojo_DOM );
 
-Returns true if the matcher set in the constructor matches C<$item>.
+Returns the result of testing this rule's condition against C<$item>.
 
 =cut
 
@@ -269,46 +167,165 @@ Returns true if the matcher set in the constructor matches C<$item>.
         return $self->_match->( $item );
     }
 
+
+=attr condition_name
+
+This is a nice name for the condition, which will be used as the reason for the match given to the action. Defaults to the class of the condition, or its value if it is a simple scalar.
+The C<condition_name> option let you specify a string which will be passed to C<filter> when C<match> matches an item. It defaults to the string passed as C<match> to the constructor, or 'unnamed RSS matcher' otherwise.
+
+=cut
+
+    has condition_name => (
+        is => 'ro',
+        default => method { nice_name_for( $self->condition, 'match' ) },
+    );
+
+=attr action
+
+The C<match> option can be specified as a string, subref, or object.
+
+If the C<match> option is specified as a string, then it wil be treated as a namespace. If the string is not a fully-specified namespace, it will be changed to 'App::Rssfilter::Match::<string>'; if you really want to use C<&TopLevelNamespace::match>, specify C<match> as '::TopLevelNamespace'.
+You can specify additional arguments to be passed to the matcher by joining them with commas, surrounding them with square brackets, and appending them to the namespace string.
+The matcher will then be set to a wrapper:
+
+=for :list
+* If the namespace has a constructor (a sub called C<new>), a new object will be created with the additional arguemnts passed to the contructor, and the wrapper will call the C<match> method of the object.
+* Otherwise, the wrapper will call the C<match> sub in the namespace with the additional arguments.
+
+If the C<match> option is specified as an object, the matcher will be set to a wrapper which calls the C<match> method of the object.
+If the C<match> option is specified as a subref, the matcher will be set to that subref.
+
+The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the filter will be called as C<filter( $Mojo_DOM, $condition_name, @addditional_args)>.
+
+=cut
+
+    has action => (
+        is       => 'ro',
+        required => 1,
+    );
+
+    has _filter => (
+        is       => 'ro',
+        required => 1,
+        init_arg => undef,
+        default  => method { $self->coerce_attr( attr => $self->action, type => 'filter' ) },
+    );
+
 =method filter
 
     $self->filter( $item_element_from_Mojo_DOM );
 
-Passes C<$item> to the filter set in the constructor.
+Applies this rule's action to C<$item>.
 
 =cut
 
     method filter( $item ) {
-        $self->logger->debugf( 'applying %s since %s matched %s', $self->filter_name, $self->match_name, $item->at('guid')->text );
-        return $self->_filter->( $item, $self->match_name );
+        $self->logger->debugf( 'applying %s since %s matched %s', $self->action_name, $self->condition_name, $item->at('guid')->text );
+        return $self->_filter->( $item, $self->condition_name );
     }
 
-=attr filter_name
+=attr action_name
 
-This is a nice name for the filter. Defaults to the class of the filter, or its value if it is a simple scalar.
-
-=cut
-
-    has filter_name => (
-        is => 'ro',
-        required => 1,
-    );
-
-=attr match_name
-
-This is a nice name for the matcher, which will be used as the reason for the match given to the filter. Defaults to the class of the matcher, or its value if it is a simple scalar.
+This is a nice name for the action. Defaults to the class of the action, or its value if it is a simple scalar.
 
 =cut
 
-    has match_name => (
+    has action_name => (
         is => 'ro',
-        required => 1,
+        default => method { $self->nice_name_for( $self->action, 'filter' ) },
     );
+
+    method nice_name_for( $attr, $type ) {
+        given( ref $attr ) {
+            when( 'CODE' ) { "unnamed RSS ${type}"; }
+            when( q{}    ) { $attr }
+            default        { $_ }
+        }
+    }
+
+    method BUILDARGS( %args ) {
+        if ( 1 == keys %args ) {
+            @args{'condition','action'} = each %args;
+            delete $args{ $args{ condition } };
+        }
+        return \%args;
+    }
+
+    method coerce_attr( :$attr, :$type ) {
+        die "can't use an undefined value to $type RSS items" if not defined $attr;
+        given( ref $attr ) {
+            when( 'CODE' ) {
+                return $attr;
+            }
+            when( q{} ) { # not a ref
+                return $self->coerce_module_name_to_sub( module_name => $attr, type => $type );
+            }
+            default {
+                if( my $method = $attr->can( $type ) ) {
+                    return sub { $attr->$type( @_ ); }
+                }
+                else
+                {
+                    die "${_}::$type does not exist";
+                }
+            }
+        }
+    }
+
+    method coerce_module_name_to_sub( :$module_name, :$type ) {
+        my ($namespace, $additional_args) =
+            $module_name =~ m/
+                \A
+                ( [^\[]+ ) # namespace
+                (?:        # followed by optional
+                 \[
+                   ( .* )    # additional arguments
+                 \]          # in square brackets
+                )?         # optional, remember?
+                \z
+            /xms;
+        my @additional_args = split q{,}, $additional_args // q{};
+        if( $namespace !~ /::/xms ) {
+            $namespace = join q{::}, qw< App Rssfilter >, ucfirst( $type ), $namespace;
+        }
+
+        $namespace =~ s/\A :: //xms; # '::anything'->can() will die
+
+        if( not Class::Inspector->loaded( $namespace ) ) {
+            Module::Runtime::require_module $namespace;
+        }
+
+        # create an object if we got an OO package
+        my $invocant = $namespace;
+        if( $namespace->can( 'new' ) ) {
+            $invocant = $namespace->new( @additional_args );
+        }
+
+        # return a wrapper
+        if( my $method = $invocant->can( $type ) ) {
+            if( $invocant eq $namespace ) {
+                return sub {
+                    $method->( @_, @additional_args) ;
+                };
+            }
+            else
+            {
+                return sub {
+                    $invocant->$method( @_ );
+                };
+            }
+        }
+        else
+        {
+            die "${namespace}::$type does not exist";
+        }
+    }
 
 =method constrain
 
     my $count_of_filtered_items = $rule->constrain( $Mojo_DOM )
 
-Gathers all child item elements of C<Mojo_DOM> which are matched by the matcher, and passes each one to the filter. Returns the number of items that were matched (and filtered).
+Gathers all child item elements of C<$Mojo_DOM> for which the condition is true, and applies the action to each. Returns the number of items that were matched (and filtered).
 
 =cut
 
