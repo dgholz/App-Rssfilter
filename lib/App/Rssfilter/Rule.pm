@@ -84,7 +84,7 @@
     );
     $space_the_final_frontier_rule->constrain( $rss );
 
-    ### or with a App::Rssfilter feed or group
+    ### or with an App::Rssfilter feed or group
 
     use App::RssFilter::Feed;
     my $feed = App::RssFilter::Feed->new( 'examples' => 'http://example.org/e.g.rss' );
