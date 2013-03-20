@@ -34,11 +34,11 @@ package App::Rssfilter::Feed::Test::AddedRule {
     test created_and_added_rule => method {
         my $match  = sub {};
         my $filter = sub {};
-        $self->feed->add_rule( match => $match, filter => $filter );
+        $self->feed->add_rule( condition => $match, action => $filter );
 
         my $created_rule = $self->feed->rules->[-1];
-        is( $created_rule->_match,  $match,  'add_rule passed options ...' );
-        is( $created_rule->_filter, $filter, '... to App::Rssfilter::Rule->new()' );
+        is( $created_rule->condition, $match,  'add_rule passed options ...' );
+        is( $created_rule->action,    $filter, '... to App::Rssfilter::Rule->new()' );
 
     };
 

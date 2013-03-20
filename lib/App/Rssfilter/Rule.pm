@@ -149,7 +149,7 @@ The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the fi
     );
 
     has _match => (
-        is       => 'ro',
+        is       => 'lazy',
         required => 1,
         init_arg => undef,
         default  => method { $self->coerce_attr( attr => $self->action, type => 'match' ) },
@@ -176,7 +176,7 @@ The C<condition_name> option let you specify a string which will be passed to C<
 =cut
 
     has condition_name => (
-        is => 'ro',
+        is => 'lazy',
         default => method { nice_name_for( $self->condition, 'match' ) },
     );
 
@@ -205,7 +205,7 @@ The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the fi
     );
 
     has _filter => (
-        is       => 'ro',
+        is       => 'lazy',
         required => 1,
         init_arg => undef,
         default  => method { $self->coerce_attr( attr => $self->action, type => 'filter' ) },
@@ -231,7 +231,7 @@ This is a nice name for the action. Defaults to the class of the action, or its 
 =cut
 
     has action_name => (
-        is => 'ro',
+        is => 'lazy',
         default => method { $self->nice_name_for( $self->action, 'filter' ) },
     );
 
