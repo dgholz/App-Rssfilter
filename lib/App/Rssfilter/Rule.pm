@@ -240,6 +240,22 @@ This is a nice name for the action. Defaults to the class of the action, or its 
         default => method { $self->nice_name_for( $self->action, 'filter' ) },
     );
 
+=method constrain
+
+    my $count_of_filtered_items = $rule->constrain( $Mojo_DOM )
+
+Gathers all child item elements of C<$Mojo_DOM> for which the condition is true, and applies the action to each. Returns the number of items that were matched (and filtered).
+
+=cut
+
+    method constrain( Mojo::DOM $Mojo_DOM ) {
+        my $count = 0;
+        $Mojo_DOM->find( 'item' )->grep( sub { $self->match( shift ) } )->each( sub { $self->filter( shift ); ++$count; } );
+        return $count;
+    }
+
+    # internal helper methods
+
     method nice_name_for( $attr, $type ) {
         given( ref $attr ) {
             when( 'CODE' ) { "unnamed RSS ${type}"; }
@@ -329,20 +345,6 @@ This is a nice name for the action. Defaults to the class of the action, or its 
         {
             die "${namespace}::$type does not exist";
         }
-    }
-
-=method constrain
-
-    my $count_of_filtered_items = $rule->constrain( $Mojo_DOM )
-
-Gathers all child item elements of C<$Mojo_DOM> for which the condition is true, and applies the action to each. Returns the number of items that were matched (and filtered).
-
-=cut
-
-    method constrain( Mojo::DOM $Mojo_DOM ) {
-        my $count = 0;
-        $Mojo_DOM->find( 'item' )->grep( sub { $self->match( shift ) } )->each( sub { $self->filter( shift ); ++$count; } );
-        return $count;
     }
 }
 
