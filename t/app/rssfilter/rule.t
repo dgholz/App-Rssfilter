@@ -18,7 +18,7 @@ package Test::Match {
 
 package Test::Filter {
     sub filter {
-        my( $item, $match_name, %replacements ) = @_;
+        my( $item, $condition_name, %replacements ) = @_;
         %replacements = ( filter => 'WAS_FILTERED', %replacements );
         while( my ($k,$v) = each %replacements ) {
             $item->description->replace_content( $item->description->text =~ s/\Q$k\E/$v/xmserg );
@@ -44,9 +44,9 @@ END_OF_RSS
 subtest 'passing match & filter as strings referring to locally declared packages', sub {
     my $string_opt_rule = App::Rssfilter::Rule->new( 'Test::Match' => 'Test::Filter' );
     is(
-        $string_opt_rule->match_name,
+        $string_opt_rule->condition_name,
         'Test::Match',
-        'match_name defaults to match option (if a string)'
+        'condition_name defaults to condition attr (if a string)'
     );
 
     my $string_opt_rss = Mojo::DOM->new( $rss );
@@ -79,9 +79,9 @@ subtest 'passing match & filter as strings with additional arguments', sub {
 END_OF_ITEM
 
     is(
-        $addn_args_rule->match_name,
+        $addn_args_rule->condition_name,
         'Test::Match[heyo]',
-        'match_name is set to match option (including additional arguments)'
+        'condition_name is set to condition attr (including additional arguments)'
     );
 
     my $count = $addn_args_rule->constrain( $addn_args_rss );
@@ -107,7 +107,7 @@ package App::Rssfilter::Match::Everything {
 
 package App::Rssfilter::Filter::MoreCowbell {
     sub filter {
-      my( $item, $match_name ) = @_;
+      my( $item, $condition_name ) = @_;
       $item->description->replace_content('cowbell');
     }
 };
@@ -119,15 +119,15 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
     my $count = $relative_module_rule->constrain( $relative_module_rss );
 
     is(
-        $relative_module_rule->match_name,
+        $relative_module_rule->condition_name,
         'Everything',
-        'match_name is set before changing match option to fully-qualified namespace'
+        'condition_name is set before changing condition attr to fully-qualified namespace'
     );
 
     is(
         $relative_module_rss->find( 'item' )->first->description->text,
         'cowbell',
-        'fully qualifies match option into the App::Rssfilter::Match:: namespace (likewise for filter)'
+        'fully qualifies condition attr into the App::Rssfilter::Match:: namespace (likewise for filter)'
     );
 };
 
@@ -156,15 +156,15 @@ END_OF_ITEM
     my $count = $fully_qualified_module_rule->constrain( $fully_qualified_module_rss );
 
     is(
-        $fully_qualified_module_rule->match_name,
+        $fully_qualified_module_rule->condition_name,
         '::ShortName',
-        'match_name is set to namespace'
+        'condition_name is set to namespace'
     );
 
     is(
         $fully_qualified_module_rss->find( 'item' )->[1]->description->text,
         'Short Name is all',
-        'a fully qualified match option is not assumed to be in the App::Rssfilter::Match:: namespace (likewise for filter)'
+        'a fully qualified condition attr is not assumed to be in the App::Rssfilter::Match:: namespace (likewise for filter)'
     );
 };
 
@@ -216,7 +216,7 @@ package Test::Filter::OO {
     );
 
     sub filter {
-      my( $self, $item, $match_name ) = @_;
+      my( $self, $item, $condition_name ) = @_;
       my %replacements = ( filter => 'WAS_FILTERED', @{ $self->additional_args } );
       while( my ($k,$v) = each %replacements ) {
         $item->description->replace_content( $item->description->text =~ s/\Q$k\E/$v/xmserg );
@@ -248,14 +248,14 @@ END_OF_ITEM
 
 subtest 'passing match and filter as OO instances', sub {
     my $oo_rule = App::Rssfilter::Rule->new(
-        match  => Test::Match::OO->new('just this'),
-        filter => Test::Filter::OO->new("good cop" => "bad cop" ),
+        condition => Test::Match::OO->new('just this'),
+        action    => Test::Filter::OO->new("good cop" => "bad cop" ),
     );
 
     is(
-        $oo_rule->match_name,
+        $oo_rule->condition_name,
         'Test::Match::OO',
-        'match_name uses class name of passed instance'
+        'condition_name uses class name of passed instance'
     );
 
     my $oo_rss =  Mojo::DOM->new( $rss );
@@ -279,18 +279,18 @@ END_OF_ITEM
 
 subtest 'passing match and filter as anonymous subs', sub {
     my $anon_sub_rule = App::Rssfilter::Rule->new(
-        match  => sub {
+        condition => sub {
           $_[0]->title->text =~ /A[.] [ ] Noni [ ] Mouse/xmsi;
         },
-        filter => sub {
+        action    => sub {
           $_[0]->description->replace_content( 'Kilroy was here' );
         },
     );
 
     is(
-        $anon_sub_rule->match_name,
+        $anon_sub_rule->condition_name,
         'unnamed RSS matcher',
-        q{match_name falls back to default if it can't work out the name of match option}
+        q{condition_name falls back to default if it can't work out the name of condition attr}
     );
 
     my $anon_sub_rss =  Mojo::DOM->new( $rss );
