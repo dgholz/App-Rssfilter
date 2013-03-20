@@ -152,7 +152,7 @@ The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the fi
         is       => 'lazy',
         required => 1,
         init_arg => undef,
-        default  => method { $self->coerce_attr( attr => $self->action, type => 'match' ) },
+        default  => method { $self->coerce_attr( attr => $self->condition, type => 'match' ) },
     );
 
 =method match
