@@ -18,34 +18,34 @@
     # apply rule to RSS document
     $delete_duplicates_rule->constrain( $rss );
 
-    # write modules and use them to match and filter
-    {
-        package MyMatcher::LevelOfInterest;
-        
-        sub new {
-            my ( $class, @bracketed_args) = @_;
-            if ( 'BORING' eq $bracket_args[0] ) {
-                # turn on boredom detection circuits
-                ...
-            }
+    # write modules with match and filter subs
+
+    package MyMatcher::LevelOfInterest;
+    
+    sub new {
+        my ( $class, @bracketed_args) = @_;
+        if ( 'BORING' eq $bracket_args[0] ) {
+            # turn on boredom detection circuits
             ...
         }
-        
-        sub match {
-            my ( $self, $mojo_dom ) = @_;
-            ...
-        }
+        ...
+    }
+    
+    sub match {
+        my ( $self, $mojo_dom_rss_item ) = @_;
+        ...
     }
 
-    {
-        package MyFilter::MakeMoreInteresting;
-        sub filter {
-            my ( $reason_for_match,
-                 $matched_mojo_dom,
-                 @bracketed_args ) = @_;
-            ...
-        }
+    package MyFilter::MakeMoreInteresting;
+
+    sub filter {
+        my ( $reason_for_match,
+             $matched_mojo_dom_rss_item,
+             @bracketed_args ) = @_;
+        ...
     }
+
+    package main;
 
     my $boring_made_interesting_rule = App::Rssfilter::Rule->new( 
         'MyMatcher::LevelOfInterest[BORING]'
@@ -88,7 +88,6 @@
 
     use App::RssFilter::Feed;
     my $feed = App::RssFilter::Feed->new( 'examples' => 'http://example.org/e.g.rss' );
-    $feed->add_rule( $_ ) for ( $rule1, $rule2, $rule3 );
     $feed->add_rule( 'My::Matcher' => 'My::Filter' );
     # same as
     $feed->add_rule( App::Rssfilter::Rule->new( 'My::Matcher' => 'My::Filter' ) );
@@ -96,7 +95,7 @@
 
 =head1 DESCRIPTION
 
-This module will test all C<item> elements in a L<Mojo::DOM> object against some condition, and apply some action to those tiems where the condition is true.
+This module will test all C<item> elements in a L<Mojo::DOM> object against a condition, and apply a action to those tiems where the condition is true.
 
 =head1 SEE ALSO
 
@@ -126,20 +125,7 @@ package App::Rssfilter::Rule {
 
 =attr condition
 
-The C<match> option can be specified as a string, subref, or object.
-
-If the C<match> option is specified as a string, then it wil be treated as a namespace. If the string is not a fully-specified namespace, it will be changed to 'App::Rssfilter::Match::<string>'; if you really want to use C<&TopLevelNamespace::match>, specify C<match> as '::TopLevelNamespace'.
-You can specify additional arguments to be passed to the matcher by joining them with commas, surrounding them with square brackets, and appending them to the namespace string.
-The matcher will then be set to a wrapper:
-
-=for :list
-* If the namespace has a constructor (a sub called C<new>), a new object will be created with the additional arguemnts passed to the contructor, and the wrapper will call the C<match> method of the object.
-* Otherwise, the wrapper will call the C<match> sub in the namespace with the additional arguments.
-
-If the C<match> option is specified as an object, the matcher will be set to a wrapper which calls the C<match> method of the object.
-If the C<match> option is specified as a subref, the matcher will be set to that subref.
-
-The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the filter will be called as C<filter( $Mojo_DOM, $condition_name, @addditional_args)>.
+This is the module, object, or coderef to use to match C<item> elements for filtering. Modules are passed as strings, and must contain a C<match> sub. Object must have a C<match> method.
 
 =cut
 
@@ -147,6 +133,23 @@ The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the fi
         is       => 'ro',
         required => 1,
     );
+
+=attr _match
+
+This is a coderef created from this rule's condition which will be used by L</match> to check RSS items. It is automatically coerced from the C<condition> attribute and cannot be passed to the constructor.
+
+If this rule's condition is an object, C<_match> will store a wrapper which calls the C<match> method of the object.
+If this rule's condition is a subref, C<_match> will store the same subref.
+
+If this rule's condition is a string, it is treated as a namespace. If the string is not a fully-specified namespace, it will be changed to C<App::Rssfilter::Match::I<<string>>>; if you really want to use C<&TopLevelNamespace::match>, specify C<condition> as C<'::TopLevelNamespace'> (or directly as C<\&TopLevelNameSpace::match>). Additional arguments can be passed to the matcher by appending then to the string, separated by commas, surrounded by square brackets.
+
+C<_match> will then be set to a wrapper:
+
+=for :list
+* If C<I<namespace>::new> exists, C<_match> will be set as if C<condition> had originally been the object returned from calling C<I<namespace>::new( @additional_arguments )>.
+* Otherwise, C<_match> will store a wrapper which calls C<I<namespace>::match( $rss_item, @additional_arguments )>.
+
+=cut
 
     has _match => (
         is       => 'lazy',
@@ -167,11 +170,9 @@ Returns the result of testing this rule's condition against C<$item>.
         return $self->_match->( $item );
     }
 
-
 =attr condition_name
 
-This is a nice name for the condition, which will be used as the reason for the match given to the action. Defaults to the class of the condition, or its value if it is a simple scalar.
-The C<condition_name> option let you specify a string which will be passed to C<filter> when C<match> matches an item. It defaults to the string passed as C<match> to the constructor, or 'unnamed RSS matcher' otherwise.
+This is a nice name for the condition, which will be used as the reason for the match given to the action. Defaults to the class of the condition, or its value if it is a simple scalar, or 'unnamed RSS matcher' otherwise.
 
 =cut
 
@@ -182,20 +183,7 @@ The C<condition_name> option let you specify a string which will be passed to C<
 
 =attr action
 
-The C<match> option can be specified as a string, subref, or object.
-
-If the C<match> option is specified as a string, then it wil be treated as a namespace. If the string is not a fully-specified namespace, it will be changed to 'App::Rssfilter::Match::<string>'; if you really want to use C<&TopLevelNamespace::match>, specify C<match> as '::TopLevelNamespace'.
-You can specify additional arguments to be passed to the matcher by joining them with commas, surrounding them with square brackets, and appending them to the namespace string.
-The matcher will then be set to a wrapper:
-
-=for :list
-* If the namespace has a constructor (a sub called C<new>), a new object will be created with the additional arguemnts passed to the contructor, and the wrapper will call the C<match> method of the object.
-* Otherwise, the wrapper will call the C<match> sub in the namespace with the additional arguments.
-
-If the C<match> option is specified as an object, the matcher will be set to a wrapper which calls the C<match> method of the object.
-If the C<match> option is specified as a subref, the matcher will be set to that subref.
-
-The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the filter will be called as C<filter( $Mojo_DOM, $condition_name, @addditional_args)>.
+This is the module, object, or coderef to use to filter C<item> elements matched by this rule's condition. Modules are passed as strings, and must contain a C<filter> sub. Object must have a C<filter> method.
 
 =cut
 
@@ -203,6 +191,23 @@ The matcher will be called as C<match( $Mojo_DOM, @additional_args)>, and the fi
         is       => 'ro',
         required => 1,
     );
+
+=attr _filter
+
+This is a coderef created from this rule's action which will be used by L</filter> to check RSS items. It is automatically coerced from the C<action> attribute and cannot be passed to the constructor.
+
+If this rule's action is an object, C<_filter> will store a wrapper which calls the C<filter> method of the object.
+If this rule's action is a subref, C<_filter> will store the same subref.
+
+If the rule's action is a string, it is treated as a namespace. If the string is not a fully-specified namespace, it will be changed to C<App::Rssfilter::filter::I<<string>>>; if you really want to use C<&TopLevelNamespace::filter>, specify C<action> as C<'::TopLevelNamespace'> (or directly as C<\&TopLevelNameSpace::filter>). Additional arguments can be passed to the filter by appending then to the string, separated by commas, surrounded by square brackets.
+
+The filter will then be set to a wrapper:
+
+=for :list
+* If C<I<namespace>::new> exists, C<_filter> will be set as if C<action> had originally been the object returned from calling C<I<namespace>::new( @additional_arguments )>.
+* Otherwise, C<_filter> will store a wrapper which calls C<I<namespace>::filter( $rss_item, @additional_arguments )>.
+
+=cut
 
     has _filter => (
         is       => 'lazy',
@@ -226,7 +231,7 @@ Applies this rule's action to C<$item>.
 
 =attr action_name
 
-This is a nice name for the action. Defaults to the class of the action, or its value if it is a simple scalar.
+This is a nice name for the action. Defaults to the class of the action, or its value if it is a simple scalar, or 'unnamed RSS filter' owtherwise.
 
 =cut
 
