@@ -2,25 +2,21 @@
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
+    use App::Rssfilter::Feed;
 
-    my $group = App::RssFilter::Group->new( 'Tubular' );
-    $group->add_feed( RadName => 'http://r.a.d.i.c.al/feed.rss' )
-                        ->add_rule( 'A Matcher' => 'A Filter' )
-                        ->add_rule( 'Another Matcher' => 'Another Filter' );
-
-    $group->update;
-
+    my $feed = App::Rssfilter::Feed->new( 'filename' => 'http://get.your.files/here.rss' );
     # shorthand for
-    my $feed = $group->add_feed(
+    $feed = App::Rssfilter::Feed->new(
         name => 'RadName'
         url  => 'http://r.a.d.i.c.al/feed.rss',
     );
+
     my $rule = App::RssFilter::Rule->new( 
         match  => 'A Matcher',
         filter => 'A Filter',
     );
     $feed->add_rule( $rule );
+
     $feed->add_rule(
         match  => 'Another Matcher',
         filter => 'Another Filter',
@@ -28,15 +24,18 @@
 
     $feed->update;
 
-    ### or standalone
+    ### or with an App::Rssfilter feed or group
 
-    App::Rssfilter::Feed->new( 'filename' => 'http://get.your.files/here.rss' )
-        ->add_rule( 'Category[clogging]' => 'DeleteItem' )
-        ->update;
+    use App::Rssfilter::Group;
+    my $group = App::RssFilter::Group->new( 'Tubular' );
+    $group->add_feed( RadName => 'http://r.a.d.i.c.al/feed.rss' );
+    # shorthand for
+    $group->add_feed( App::Rssfilter::Feed->new( RadName => 'http://r.a.d.i.c.al/feed.rss' ) );
+    $group->update;
 
 =head1 DESCRIPTION
 
-This module updates an RSS feed by fetching the latest version of it from a URL and applying a list of L<App::Rssfilter::Rules|App::Rssfilter::Rule> to it before saving it.
+This module fetches the latest version of an RSS feed from a URL and uses a list of L<App::Rssfilter::Rule> objects to constrain it before saving it.
 
 =cut
 
