@@ -48,25 +48,47 @@ package App::Rssfilter::Feed {
     with 'App::Rssfilter::Logger';
     use Method::Signatures;
 
+=attr name
+
+=cut
+
     has name => (
         is => 'ro',
         required => 1,
     );
+
+=attr url
+
+=cut
 
     has url => (
         is => 'ro',
         required => 1,
     );
 
+=attr rules
+
+Returns an array reference to the list of rules which will be applied to the feed.
+
+=cut
+
     has rules => (
         is => 'ro',
         default => sub { [] },
     );
 
+=attr user_agent
+
+=cut
+
     has user_agent => (
         is => 'ro',
         default => sub { use Mojo::UserAgent; Mojo::UserAgent->new },
     );
+
+=attr storage
+
+=cut
 
     has storage => (
         is => 'lazy',
@@ -134,7 +156,9 @@ As a convenience, the constructor will interpret being called with a single key-
 
 =cut
 
-=method add_rule( $rule | %rule_parameters )
+=method add_rule
+
+    $feed->add_rule( $rule )->add_rule( %rule_parameters );
 
 Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule instance from the passed parameters) to the rules.
 
@@ -152,13 +176,9 @@ Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule in
         return $self;
     }
 
-=method rules()
+=method update
 
-Returns an array reference to the list of rules which will be applied to the feed.
-
-=cut
-
-=method update( rules => $rules, storage => $storage )
+    $feed->update( rules => $rules, storage => $storage );
 
 This method will:
 
