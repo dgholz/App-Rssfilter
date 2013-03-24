@@ -4,11 +4,11 @@
 
     use App::Rssfilter::Feed;
 
-    my $feed = App::Rssfilter::Feed->new( 'filename' => 'http://get.your.files/here.rss' );
+    my $feed = App::Rssfilter::Feed->new( filename => 'http://get.your.files/here.rss' );
     # shorthand for
     $feed = App::Rssfilter::Feed->new(
-        name => 'RadName'
-        url  => 'http://r.a.d.i.c.al/feed.rss',
+        name => 'filename',
+        url  => 'http://get.your.files/here/rss',
     );
 
     my $rule = App::RssFilter::Rule->new( 
@@ -24,7 +24,7 @@
 
     $feed->update;
 
-    ### or with an App::Rssfilter feed or group
+    ### or with App::Rssfilter::Group
 
     use App::Rssfilter::Group;
     my $group = App::RssFilter::Group->new( 'Tubular' );
@@ -35,7 +35,7 @@
 
 =head1 DESCRIPTION
 
-This module fetches the latest version of an RSS feed from a URL and uses a list of L<App::Rssfilter::Rule> objects to constrain it before saving it.
+This module fetches the latest version of an RSS feed from a URL and constrains it with its list of L<rules|App::Rssfilter::Rule>.
 
 =cut
 
@@ -50,6 +50,8 @@ package App::Rssfilter::Feed {
 
 =attr name
 
+This is the name of the feed to use when storing it, and is required. This will be used by the default L</storage> as the filename to store the feed under.
+
 =cut
 
     has name => (
@@ -58,6 +60,8 @@ package App::Rssfilter::Feed {
     );
 
 =attr url
+
+This is the URL to fetch the latest feed content from, and is required.
 
 =cut
 
@@ -68,7 +72,7 @@ package App::Rssfilter::Feed {
 
 =attr rules
 
-Returns an array reference to the list of rules which will be applied to the feed.
+This is the arrayref of L<rules|App::Rssfilter::Rule> which will constrain newly-fetched feeds. It defaults to an empty arrayref.
 
 =cut
 
@@ -79,6 +83,8 @@ Returns an array reference to the list of rules which will be applied to the fee
 
 =attr user_agent
 
+This is the L<Mojo::UserAgent>-compatible object to use when getting its L<URL|/url>. It defaults to a new L<Mojo::UserAgent>.
+
 =cut
 
     has user_agent => (
@@ -87,6 +93,8 @@ Returns an array reference to the list of rules which will be applied to the fee
     );
 
 =attr storage
+
+This is the L<App::Rssfilter::Feed::Storage>-compatible object to use when storing newly-fetched feeds, or retrieving the previously-fetched version. It defaults to a new L<App::Rssfilter::Feed::Storage>, with its name set to this feed's name.
 
 =cut
 
@@ -108,59 +116,11 @@ Returns an array reference to the list of rules which will be applied to the fee
         return { %options };
     }
 
-=method new( %options )
- 
-    my $feed = App::Rssfilter::Feed->new(
-        'Where is My Feed' => 'http://where.is/my_feed.rss',
-    );
-
-    my $feed = App::Rssfilter::Feed->new(
-        name       => 'Where is My Feed',
-        url        => 'http://where.is/my_feed.rss',
-        rules      => [ $a_rule, $another_rule, $etc ],
-        user_agent => Mojo::UserAgent->new,
-        storage    => App::Rssfilter::Feed::Storage->new( feed_name => 'Where is My Feed' ),
-    );
-
-This creates a new feed object. It accepts a hash (or hashref) of options:
-
-=over 4
-
-=item * name
-
-B<Required>
-
-The name of the feed. It will be used to save and load the feed to and from storage.
-
-=item * url
-
-B<Required>
-
-The URL to fetch the feed from.
-
-=item * rules
-
-A arrayref of rules to apply to this feed when it is updated. Defaults to the empty list.
-
-=item * user_agent
-
-Defaults to a new instance of L<Mojo::UserAgent>.
-
-=item * storage
-
-Object to use when loading/saving the feed. Defaults to a new instance of L<App::Rssfilter::Feed::Storage>.
-
-=back
-
-As a convenience, the constructor will interpret being called with a single key-value pair as equivalent to being called with C<name> set to the key, and C<url> set to the value.
-
-=cut
-
 =method add_rule
 
     $feed->add_rule( $rule )->add_rule( %rule_parameters );
 
-Adds the L<App::Rssfilter::Rule> $rule (or creates a new App::RssFilter::Rule instance from the passed parameters) to the rules.
+Adds the C<$rule> (or creates a new L<App::RssFilter::Rule> from the passed parameters) to the rules.
 
 =cut
 
