@@ -9,19 +9,19 @@ use feature qw( :5.14 );
     use App::Rssfilter::Feed::Storage;
 
     my $fs = App::Rssfilter::Feed::Storage->new(
-        path => 'BBC',
-        name => 'London',
+        path => 'Hi-type feeds',
+        name => 'Hello',
     );
 
     print 'last update of feed was ', $fs->last_modified, "\n";
     print 'what we got last time: ', $fs->load_existing, "\n";
 
-    $fs->save_feed( Mojo::DOM->new( "<hi><hello/></hi>" ) );
+    $fs->save_feed( Mojo::DOM->new( "<hi>hello</hi>" ) );
     print 'now it is: ', $fs->load_existing, "\n";
 
 =head1 DESCRIPTION
 
-This module saves and loads RSS feeds to and from files, where the file name is based on a group and feed name. L<Rss::Filter> will use this class for storing & retreiving feeds, unless constructed with a compatible alternative.
+This module saves and loads RSS feeds to and from files, where the file name is based on a group and feed name. It is the default implementation used by L<App::Rssfilter::Feed> for storing & retreiving feeds.
 
 =cut
 
@@ -35,24 +35,9 @@ package App::Rssfilter::Feed::Storage {
     use Path::Class::Dir;
     use HTTP::Date;
 
-=method new
+=attr path
 
-    my $fs = App::Rssfilter::Feed::Storage->new(
-        path => 'BBC',
-        name => 'London',
-    );
-
-The constructer has two required named parameters: a path specifying where the feed should be located, and the name for the feed. These are used as the directory path and filename (respectively) for the feed.
-
-The path parameter may be a string specifying an absolute or relative directory path, or an array ref of directory names which will be joined to form a directory path.
-
-=cut
-
-=method path
-
-    print $fs->path, "\n";
-
-Returns the path to feed, as passed to the constructor.
+This is the directory path to the stored feed file. If not specified, the current working directory will be used. It is coerced into a L<Path::Class::Dir> object, if it is a string specifying an absolute or relative directory path, or an array or arrayref of directory names (which will be joined to form a directory path).
 
 =cut
 
@@ -68,26 +53,26 @@ Returns the path to feed, as passed to the constructor.
          },
     );
 
-=method path_push( @paths )
+=method path_push
 
-    my $new_fs = $fs->path_push( 'list', 'of', 'paths' )
+    my $new_fs = $fs->path_push( @paths );
 
-Returns a new App::Rssfilter::Feed::Storage object whose path has had C<@paths> appended to it.
+Returns a clone of this object whose path has had C<@paths> appended to it.
 
 =cut
 
-    method path_push( @_ ) {
+    method path_push( @paths ) {
         return App::Rssfilter::Feed::Storage->new(
-            path => $self->path->subdir( @_ ),
+            path => $self->path->subdir( @paths ),
             name => $self->name,
         );
     }
 
-=method name
+=attr name
 
     print $fs->name, "\n";
 
-Returns the name of the feed, as passed to the constructor.
+This is the name of the feed, and will be used as the filename to store the feed under.
 
 =cut
 
@@ -95,9 +80,9 @@ Returns the name of the feed, as passed to the constructor.
          is => 'ro',
     );
 
-=method set_name( $new_name )
+=method set_name
 
-    my $new_fs = $fs->set_name( 'formally known as App::Rssfilter::Feed::Storage' );
+    my $new_fs = $fs->set_name( $new_name );
 
 Returns this object if its name is already C<$new_name>, else returns a clone of this object with its name set to C<$name>.
 
@@ -122,16 +107,15 @@ Returns this object if its name is already C<$new_name>, else returns a clone of
         $self->path->file( $self->name .'.rss' );
     }
 
-=method last_modified
+=attr last_modified
 
-    print $fs->last_modified, "\n";
-
-Returns the time of the last modification as a HTTP date string suitable for use in a 'Last-Modified' header. If the feed has never been saved, returns 'Thu, 01 Jan 1970 00:00:00 GMT'.
+This is the last time the stored RSS feed was saved, as a HTTP date string suitable for use in a C<Last-Modified> header. If the feed has never been saved, returns C<Thu, 01 Jan 1970 00:00:00 GMT>. It cannot be set from the constructor.
 
 =cut
 
     has last_modified => (
         is => 'lazy',
+        init_arg => undef,
         clearer => '_clear_last_modified',
     );
 
@@ -144,7 +128,7 @@ Returns the time of the last modification as a HTTP date string suitable for use
 
 =method load_existing
 
-    print $fs->load_existing;
+    print $fs->load_existing->to_xml;
 
 Returns a L<Mojo::DOM> object initialised with the content of the previously-saved feed. If the feed has never been saved, returns a L<Mojo::DOM> object initialised with an empty string.
 
@@ -160,11 +144,11 @@ Returns a L<Mojo::DOM> object initialised with the content of the previously-sav
         return Mojo::DOM->new( scalar $self->_file_path->slurp );
     }
 
-=method save_feed( $dom )
+=method save_feed
 
     $fs->save_feed( Mojo::DOM->new( '<rss> ... </rss>' ) );
 
-Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method). C<last_modified()> is updated.
+Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method), and updates C<last_modified()>.
 
 =cut
 
