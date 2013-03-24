@@ -217,7 +217,7 @@ The parameters are optional. If C<rules> is specified, they will be added to the
             $self->logger->debug( 'filtering '. $self->name );
             my $new = $latest->res->dom;
             for my $rule ( @rules ) {
-                $self->logger->debugf( 'applying %s => %s to new feed', $rule->match_name, $rule->filter_name ) if $self->logger->is_debug;
+                $self->logger->debugf( 'applying %s => %s to new feed', $rule->condition_name, $rule->action_name ) if $self->logger->is_debug;
                 $rule->constrain( $new );
             }
             $storage->save_feed( $new );
