@@ -89,7 +89,7 @@ The hash may have four elements:
 * C<feeds>  - arrayref of feeds to fetch
 * C<rules>  - arrayref of rules to apply
 
-Bare scalars in C<feeds> will be collected into key-value pairs; everything else will be mapped onto the receivers C<add_feed>. Likewise for C<rules>.
+Bare scalars in C<feeds> will be collected into key-value pairs; everything else will be mapped onto the receiver's C<add_feed>. Likewise for C<rules>.
 
 =cut
 
