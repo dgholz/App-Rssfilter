@@ -15,35 +15,49 @@
 
 
     my $cool_name = Cool::Name->from_hash(
+        name => 'some group',
+        rules => [
+            # add_rule will be called with ...
+            keyvalue_pair => 'some value',
+            # then ...
+            {
+                this_hashref => 'of options',
+                with_multiple => 'keys and values',
+            },
+            # and then ...
+            $already_constructed_object,
+        ],
+        feeds => [
+            # same as rules above
+            # mix elements as you please
+            keyword_pair_for_first_feed => 'and value',
+            keyword_pair_for_second_feed => 'with different value',
+            {
+                feed_option1 => 'more key-value pairs',
+                feed_option2 => 'which will be passed as arguments',
+                feed_option3 => 'for the third call to add_feed',
+            },
+        ],
         groups => [
             {
-                group => 'hi',
-                rules => [
-                    Duplicates => 'DeleteItem',
-                ],
-                feeds => [
-                    WashPost => 'http://feeds.washingtonpost.com/rss/national',
-                    {
-                        name => 'Pravda',
-                        url  => 'http://english.pravda.ru/russia/export.xml',
-                    },
-                ],
+                name => 'a subgroup',
+                # subgroups can have their own feeds, rules, and subgroups
+                feeds => [ ... ],
+                rules => [ ... ],
+                groups => [ ... ],
             },
             {
-                group => 'hello',
-                rules => [
-                    {
-                        match => 'Category[Politics]',
-                        filter => 'MarkTitle'
-                    },
-                ],
+                name => 'another subgroup',
+                feeds => [ ... ],
+                rules => [ ... ],
+                groups => [ ... ],
             },
         ],
     );
 
 =head1 DESCRIPTION
 
-This role will extend its receiving class with a L</from_hash> method. It requires that the receiver has C<add_group>, C<add_feed>, and C<add_rule> methods.
+This role will extend its receiving class with a L</from_hash> method. It requires that the receiver has C<add_group>, C<add_feed>, and C<add_rule> methods, and accepts a C<name> attribute to its constructor.
 
 =cut
 
@@ -65,12 +79,12 @@ package App::Rssfilter::FromHash {
 
     my $receiver_instance = Receiver::Class->from_hash( %config );
 
-Create a new instance of the receiving class, then walk the hash to create subgroups and add feeds or rules to it (or its subgroups).
+Create a new instance of the receiving class (using C<$config{name}> as its name), then walk the hash to create subgroups and add feeds or rules to it (or its subgroups).
 
 The hash may have four elements:
 
 =for :list
-* C<group>  - name of this group, used when storing its feeds
+* C<name>   - name of this group
 * C<groups> - arrayref of hashrefs for subgroups, same schema as the original hash
 * C<feeds>  - arrayref of feeds to fetch
 * C<rules>  - arrayref of rules to apply
@@ -88,7 +102,7 @@ Bare scalars in C<feeds> will be collected into key-value pairs; everything else
     }
 
     method _from_hash( %config ) {
-        my $group = $self->new( name => $config{group} );
+        my $group = $self->new( name => $config{name} );
 
         map { $group->add_feed( @{ $_ } ) } $self->split_for_ctor( @{ $config{feeds} } );
         map { $group->add_rule( @{ $_ } ) } $self->split_for_ctor( @{ $config{rules} } );

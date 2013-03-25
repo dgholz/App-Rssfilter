@@ -38,7 +38,7 @@ package App::Rssfilter::FromHash::Test::CreateGroup {
         lives_ok(
             sub {
                 $group = $self->from_hash(
-                    group => 'coil',
+                    name  => 'coil',
                     feeds => [ $self->mock_feed ],
                     rules => [ $self->mock_rule ],
                 );
@@ -70,7 +70,7 @@ package App::Rssfilter::FromHash::Test::CreateGroup {
             group => 'coil',
             groups => [
                 {
-                    group => 'turn',
+                    name  => 'turn',
                     feeds => [ $self->mock_feed ],
                     rules => [ $self->mock_rule ],
                 },
