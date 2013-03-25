@@ -21,11 +21,13 @@
 
 =head1 DESCRIPTION
 
-A group runs the same rules over many feeds. Use a group when:
+This module groups together feeds so that the same rules will be used to constrain them.
+
+Use a group to:
 
 =for :list
-* you have a rule which keeps track of items seen (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) and you wish it to retain state over multiple feeds
-* you wish to apply the same rules configuration to multiple feeds
+* allow a rule which retains state (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) to constrain over multiple feeds
+* apply the same rules configuration to multiple feeds
 
 =cut
 
