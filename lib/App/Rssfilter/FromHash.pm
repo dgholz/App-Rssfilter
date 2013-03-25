@@ -1,10 +1,20 @@
-# ABSTRACT: Create an App::Rssfilter object from a hash
+# ABSTRACT: a role for creating App::Rssfilter objects from a configuration hash
 
 =head1 SYNOPSIS
 
-    use App::RssFilter;
+    {
+        package Cool::Name;
+        use Role::Tiny::With;
+        with 'App::Rssfilter::FromHash';
 
-    my $rssfilter = App::RssFilter->from_hash(
+        sub new { ... }
+        sub add_group { ... }
+        sub add_feed { ... }
+        sub add_rule { ... }
+    };
+
+
+    my $cool_name = Cool::Name->from_hash(
         groups => [
             {
                 group => 'hi',
@@ -30,23 +40,10 @@
             },
         ],
     );
-    $rssfilter->group('hello')->add_feed( $rssfilter->group('hi')->feed('WashPost') );
-    $rssfilter->group('hello')->add_rule( $rssfilter->group('hi')->rules[0] );
 
 =head1 DESCRIPTION
 
-Creates an instance of L<App::Rssfilter::Group> and adds the groups, feeds, and rules specified in the hash to it. The created Group will store any filtered feeds in the current directory, or in subdirectories corresponding to the sub-groups.
-
-C<App::Rssfilter::FromHash> is a role that can be composed into any class which provides C<add_feed>, C<add_rule>, and C<add_group> methods.
-
-=cut
-
-=head1 SEE ALSO
-
-=for :list
-* L<App::RssFilter>
-* L<App::RssFilter::FromYaml>
-* L<App::RssFilter::FromJson>
+This role will extend its receiving class with a L</from_hash> method. It requires that the receiver has C<add_group>, C<add_feed>, and C<add_rule> methods.
 
 =cut
 
@@ -56,7 +53,7 @@ use feature qw( :5.14 );
 
 package App::Rssfilter::FromHash {
 
-    use Moo::Role;
+    use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny
     use Method::Signatures;
     use Scalar::Util qw< blessed >;
 
@@ -64,16 +61,20 @@ package App::Rssfilter::FromHash {
     requires 'add_rule';
     requires 'add_group';
 
-=method from_hash( %hash )
+=method from_hash
 
-Create a new L<App::Rssfilter::Group>, then walk the hash to create additional Groups, Feeds, or Rules & add them to the Group, sub-Groups, etc.
+    my $receiver_instance = Receiver::Class->from_hash( %config );
+
+Create a new instance of the receiving class, then walk the hash to create subgroups and add feeds or rules to it (or its subgroups).
 
 The hash may have four elements:
 =for :list
-* C<groups> - arrayref of hashrefs for subgroups, same schema as the original hash
 * C<group>  - name of this group, used when storing its feeds
-* C<feeds>  - arrayref of feeds to fetch, contents should be valid L<App::Rssfilter::Feed> ctor arguments.
-* C<rules>  - arrayref of rules to apply, contents should be valid L<App::Rssfilter::Rule> ctor arguments.
+* C<groups> - arrayref of hashrefs for subgroups, same schema as the original hash
+* C<feeds>  - arrayref of feeds to fetch
+* C<rules>  - arrayref of rules to apply
+
+Bare scalars in C<feeds> will be collected into key-value pairs; everything else will be mapped onto the receivers C<add_feed>. Likewise for C<rules>.
 
 =cut
 
@@ -97,6 +98,16 @@ The hash may have four elements:
 
         return $group;
     }
+
+=method split_for_ctor
+
+    my @arguments_for_ctor_in_arrayrefs = $receiving_instance->split_for_ctor( @args );
+
+B<INTERNAL>
+
+Returns the contents of C<args> partitioned into arrayrefs, whose contents are suitable arguments for a L<Moose>-y constructor. Collects bare scalars in C<@args> with their following element into key-value pairs; arrayrefs & hashrefs are dereferenced; everthing else is taken as-is.
+
+=cut
 
     method split_for_ctor( @list ) {
         my @results;
