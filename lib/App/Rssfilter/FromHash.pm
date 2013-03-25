@@ -116,9 +116,9 @@ Bare scalars in C<feeds> will be collected into key-value pairs; everything else
 
 =method split_for_ctor
 
-    my @arguments_for_ctor_in_arrayrefs = $receiving_instance->split_for_ctor( @args );
-
 B<INTERNAL>
+
+    my @arguments_for_ctor_in_arrayrefs = $receiving_instance->split_for_ctor( @args );
 
 Returns the contents of C<args> partitioned into arrayrefs, whose contents are suitable arguments for a L<Moose>-y constructor. Collects bare scalars in C<@args> with their following element into key-value pairs; arrayrefs & hashrefs are dereferenced; everthing else is taken as-is.
 
