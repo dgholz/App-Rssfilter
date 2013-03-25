@@ -68,6 +68,7 @@ package App::Rssfilter::FromHash {
 Create a new instance of the receiving class, then walk the hash to create subgroups and add feeds or rules to it (or its subgroups).
 
 The hash may have four elements:
+
 =for :list
 * C<group>  - name of this group, used when storing its feeds
 * C<groups> - arrayref of hashrefs for subgroups, same schema as the original hash
