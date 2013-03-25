@@ -97,6 +97,10 @@
 
 This module will test all C<item> elements in a L<Mojo::DOM> object against a condition, and apply a action to those tiems where the condition is true.
 
+It consumes the L<App::Rssfilter::Logger> role.
+
+=cut
+
 =head1 SEE ALSO
 
 =for :list
@@ -122,6 +126,12 @@ package App::Rssfilter::Rule {
     use Module::Runtime qw<>;
     use Class::Inspector qw<>;
     with 'App::Rssfilter::Logger';
+
+=attr logger
+
+This is a object used for logging; it defaults to a L<Log::Any> object. It is provided by the L<App::Rssfilter::Logger> role.
+
+=cut
 
 =attr condition
 

@@ -23,11 +23,15 @@
 
 This module groups together feeds so that the same rules will be used to constrain them.
 
+It consumes the L<App::Rssfilter::Logger> role.
+
 Use a group to:
 
 =for :list
 * allow a rule which retains state (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) to constrain over multiple feeds
 * apply the same rules configuration to multiple feeds
+
+It consumes the L<App::Rssfilter::Logger> role.
 
 =cut
 
@@ -46,6 +50,12 @@ package App::Rssfilter::Group {
         }
         return { @options };
     }
+
+=attr logger
+
+This is a object used for logging; it defaults to a L<Log::Any> object. It is provided by the L<App::Rssfilter::Logger> role.
+
+=cut
 
 =attr name
 

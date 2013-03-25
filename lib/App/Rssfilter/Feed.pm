@@ -37,6 +37,8 @@
 
 This module fetches the latest version of an RSS feed from a URL and constrains it with its list of L<rules|App::Rssfilter::Rule>.
 
+It consumes the L<App::Rssfilter::Logger> role.
+
 =cut
 
 use strict;
@@ -47,6 +49,12 @@ package App::Rssfilter::Feed {
     use Moo;
     with 'App::Rssfilter::Logger';
     use Method::Signatures;
+
+=attr logger
+
+This is a object used for logging; it defaults to a L<Log::Any> object. It is provided by the L<App::Rssfilter::Logger> role.
+
+=cut
 
 =attr name
 

@@ -23,6 +23,8 @@ use feature qw( :5.14 );
 
 This module saves and loads RSS feeds to and from files, where the file name is based on a group and feed name. It is the default implementation used by L<App::Rssfilter::Feed> for storing & retreiving feeds.
 
+It consumes the L<App::Rssfilter::Logger> role.
+
 =cut
 
 package App::Rssfilter::Feed::Storage {
@@ -34,6 +36,12 @@ package App::Rssfilter::Feed::Storage {
     use Path::Class::File;
     use Path::Class::Dir;
     use HTTP::Date;
+
+=attr logger
+
+This is a object used for logging; it defaults to a L<Log::Any> object. It is provided by the L<App::Rssfilter::Logger> role.
+
+=cut
 
 =attr path
 
