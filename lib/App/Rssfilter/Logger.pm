@@ -1,19 +1,19 @@
-# ABSTRACT: Adds a logger to a class
+# ABSTRACT: adds a logger to a class
 
 =head1 SYNOPSIS
 
-    {
-        package Foo;
-        use Moo; # or Role::Tiny::With;
-        with 'App::Rssfilter::Logger';
-    }
+    package Foo;
+    use Moo; # or Role::Tiny::With;
+    with 'App::Rssfilter::Logger';
+
+    package main;
 
     my $foo = Foo->new;
-    $foo->logger->debug( 'logger to my fresh new foo' );
+    $foo->logger->debug( 'logging to my fresh new foo' );
 
 =head1 DESCRIPTION
 
-C<App::Rssfilter::Logger> is a role that can be composed into any class, and adds a C<logger> method which logs to L<Log::Any::Adapter>.
+C<App::Rssfilter::Logger> is a role that can be composed into any class, and adds a C<logger> attribute which can be used to log to a L<Log::Any::Adapter>.
 
 =cut
 
@@ -34,9 +34,11 @@ package App::Rssfilter::Logger {
     use Moo::Role;
     use Log::Any;
 
-=method log()
+=attr logger
 
-Returns a L<Log::Any> object.
+    $receiver->logger->debug( 'cutting down trees' );
+
+This is a L<Log::Any> object.
 
 =cut
 
