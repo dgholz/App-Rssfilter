@@ -1,4 +1,4 @@
-# ABSTRACT: command-line application class for App::Rssfilter
+# ABSTRACT: App::Rssfilter's App::Cmd
 
 use strict;
 use warnings;
