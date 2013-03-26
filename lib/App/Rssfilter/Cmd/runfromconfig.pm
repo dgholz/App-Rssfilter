@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-package App::Rssfilter::Cmd::RunFromConfig {
+package App::Rssfilter::Cmd::runfromconfig {
     use App::Rssfilter::Cmd -command;
     use App::Rssfilter::Group;
     use YAML::XS;
@@ -36,14 +36,14 @@ Path to config file; default is C<Rssfilter.yaml> in the current directory.
 Turns on logging; default is off.
 
 =cut
-     
+
     method opt_spec( $app ) {
         return (
             [ 'config-file|f:s',  'config file for App::Rssfilter (searches for RssFilter.yaml if not set)', ],
             [ 'log|v',  'turn logging on' ],
         );
     }
-     
+
     method validate_args( $opt, $args ) {
     }
 
