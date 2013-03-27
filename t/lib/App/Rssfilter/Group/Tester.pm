@@ -59,6 +59,7 @@ package App::Rssfilter::Group::Tester {
             my $mock_group = Test::MockObject->new;
             $mock_group->set_isa( 'App::Rssfilter::Group' );
             $mock_group->set_true( 'update' );
+            $mock_group->set_always( 'name', 'mock group' );
             return $mock_group;
         },
     );
