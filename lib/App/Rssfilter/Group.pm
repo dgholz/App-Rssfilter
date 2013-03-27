@@ -109,6 +109,19 @@ Adds $app_rssfilter_group (or creates a new App::RssFilter::Group instance from 
         return $self;
     }
 
+=method group
+
+    my $subgroup = $group->group( $name );
+
+Returns the last subgroup added to this group whose name is C<$name>, or C<undef> if no matching group.
+
+=cut
+
+    method group( $name ) {
+        use List::Util qw< first >;
+        first { $_->name eq $name } reverse @{ $self->groups };
+    }
+
 =attr rules
 
 This is an arrayref of rules to apply to the feeds in this group (and subgroups).
