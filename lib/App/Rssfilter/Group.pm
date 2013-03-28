@@ -1,18 +1,42 @@
-# ABSTRACT: Apply the same Rules to many Feeds
+# ABSTRACT: associate one or more rules with more than one feed
 
 =head1 SYNOPSIS
 
     use App::RssFilter::Group;
 
-    my $new_group = App::RssFilter::Group->new( name => 'news' );
-    $news_group->add_group( 'USA' );
-    my $uk_news_group = $news_group->add_group( 'UK' );
+    my $news_group = App::Rssfilter::Group->new( 'news' );
+    # shorthand for
+    $news_group = App::Rssfilter::Group( name => 'news' );
 
-    my $dupe_rule = $news_group->group( 'USA' )->add_rule( Duplicate => 'DeleteItem' );
-    $uk_news_group->add_rule( match => 'Category[Politics]', filter => 'MarkTitle' );
+    $news_group->add_group( 'USA' );
+    # shorthand for
+    $news_group->add_group(
+        App::Rssfilter::Group->new(
+            name => 'USA',
+        )
+    );
+    my $uk_news_group = $news_group->add_group( name => 'UK' );
+
+    $uk_news_group->add_rule( 'Category[Politics]' => 'MarkTitle' );
+    # shorthand for
+    $uk_news_group->add_rule(
+        App::Rssfilter::Rule->new(
+            condition => 'Category[Politics]',
+            action    => 'MarkTitle',
+        )
+    );
+
+    my $dupe_rule = $news_group->group( 'USA' )->add_rule( condition => 'Duplicate', action => 'DeleteItem' );
     $uk_news_group->add_rule( $dupe_rule );
 
     $news_group->group( 'USA' )->add_feed( WashPost => 'http://feeds.washingtonpost.com/rss/national' );
+    # shorthand for
+    $news_group->group( 'USA' )->add_feed(
+        App::Rssfilter::Feed->new(
+            name => 'WashPost',
+            url  => 'http://feeds.washingtonpost.com/rss/national',
+       )
+    );
     $news_group->group( 'USA' )->add_feed( name => 'NYTimes', url => 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml' );
 
     $uk_news_group->add_feed( $news_group->group( 'USA' )->feed( 'WashPost' ) );
@@ -28,10 +52,8 @@ It consumes the L<App::Rssfilter::Logger> role.
 Use a group to:
 
 =for :list
-* allow a rule which retains state (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) to constrain over multiple feeds
+* allow rules which retain state (e.g. L<Duplicates|App::Rssfilter::Match::Duplicates>) to constrain over multiple feeds
 * apply the same rules configuration to multiple feeds
-
-It consumes the L<App::Rssfilter::Logger> role.
 
 =cut
 
@@ -49,6 +71,26 @@ package App::Rssfilter::Group {
             unshift @options, 'name';
         }
         return { @options };
+    }
+
+=method update
+
+    $group->update( rules => $rules, storage => $storage );
+
+Recursively calls C<update> on the feeds and subgroups of this group.
+
+C<$rules> is an arrayref of additional rules to constrain the feed and groups, in addition to the group's current list of rules.
+
+C<$storage> is the feed storage object that feeds and subgroups will use to store their updated contents. If not specified, groups will use their default C<storage>. The group's C<name> is appended to the current path of C<$storage> before being passed to feeds and subgroups.
+
+=cut
+
+    method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
+        my $child_storage = $storage->path_push( $self->name );
+        my @rules = map { @{ $_ } } $rules, $self->rules;
+        $self->logger->debugf( 'filtering feeds in %s', $self->name );
+        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->groups };
+        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->feeds };
     }
 
 =attr logger
@@ -70,7 +112,7 @@ This is the name of the group. Group names are used when storing a feed so that 
 
 =attr storage
 
-This is the an instance of a feed storage implementation for feeds to use when they are updated. The default value is a freshly-instance of L<App::Rssfilter::Feed::Storage>. The default is not used when updating subgroups; see L</update> for more details.
+This is a feed storage object for feeds to use when they are updated. The default value is a fresh instance of L<App::Rssfilter::Feed::Storage>. See L</update> for details on when the default value is used.
 
 =cut
 
@@ -94,7 +136,7 @@ This is an arrayref of subgroups attatched to this group.
 
     $group = $group->add_group( $app_rssfilter_group | %group_options );
 
-Adds $app_rssfilter_group (or creates a new App::RssFilter::Group instance from the C<%group_options>) to the list of subgroups for this group. Returns this group (for chaining).
+Adds C<$app_rssfilter_group> (or creates a new App::RssFilter::Group instance from the C<%group_options>) to the list of subgroups for this group. Returns this group (for chaining).
 
 =cut
 
@@ -137,7 +179,7 @@ This is an arrayref of rules to apply to the feeds in this group (and subgroups)
 
     $group = $group->add_rule( $app_rssfilter_rule | %rule_options )
 
-Adds $app_rssfilter_rule (or creates a new App::RssFilter::Rule instance from the C<%rule_options>) to the list of rules for this group. Returns this group (for chaining). 
+Adds C<$app_rssfilter_rule> (or creates a new App::RssFilter::Rule instance from the C<%rule_options>) to the list of rules for this group. Returns this group (for chaining).
 
 =cut
 
@@ -168,7 +210,7 @@ This is an arrayref of feeds.
 
     $group = $group->add_feed( $app_rssfilter_feed | %feed_options );
 
-Adds $app_rssfilter_feed (or creates a new App::RssFilter::Feed instance from the C<%feed_options>) to the list of feeds for this group. Returns this group (for chaining).
+Adds C<$app_rssfilter_feed> (or creates a new App::RssFilter::Feed instance from the C<%feed_options>) to the list of feeds for this group. Returns this group (for chaining).
 
 =cut
 
@@ -182,26 +224,6 @@ Adds $app_rssfilter_feed (or creates a new App::RssFilter::Feed instance from th
 
         push $self->feeds, $app_rssfilter_feed;
         return $app_rssfilter_feed;
-    }
-
-=method update
-
-    $group->update( rules => $rules, storage => $storage );
-
-Recursively calls C<update> on the feeds and subgroups of this group.
-
-C<$rules> is an arrayref of additional rules to constrain the feed and groups, in addition to the group's current list of rules.
-
-C<$storage> is a feed storage instance for children to use when loading or saving feeds. It defaults to this group's C<storage>. The group's C<name> is appended to the current path of C<$storage> before feeds and subgroups use it for updating.
-
-=cut
-
-    method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
-        my $child_storage = $storage->path_push( $self->name );
-        my @rules = map { @{ $_ } } $rules, $self->rules;
-        $self->logger->debugf( 'filtering feeds in %s', $self->name );
-        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->groups };
-        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->feeds };
     }
 
 }
