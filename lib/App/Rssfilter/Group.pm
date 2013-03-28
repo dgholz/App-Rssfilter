@@ -226,6 +226,19 @@ Adds C<$app_rssfilter_feed> (or creates a new App::RssFilter::Feed instance from
         return $app_rssfilter_feed;
     }
 
+=method feed
+
+    my $feed = $group->feed( $name );
+
+Returns the last feed added to this group whose name is C<$name>, or C<undef> if no matching feed.
+
+=cut
+
+    method feed( $name ) {
+        use List::Util qw< first >;
+        first { $_->name eq $name } reverse @{ $self->feeds };
+    }
+
 }
 
 1;

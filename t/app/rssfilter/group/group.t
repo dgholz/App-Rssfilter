@@ -14,6 +14,7 @@ run_tests(
         'App::Rssfilter::Group::Test::AddedFeed',
         'App::Rssfilter::Group::Test::AddedGroup',
         'App::Rssfilter::Group::Test::FetchedSubgroupByName',
+        'App::Rssfilter::Group::Test::FetchedFeedByName',
     ],
 );
 
