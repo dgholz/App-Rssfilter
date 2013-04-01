@@ -65,7 +65,9 @@ package App::Rssfilter::Filter::DeleteItem {
 
    App::Rssfilter::Filter::DeleteItem::filter( $item, $matcher );
 
-Removes C<$item> from its parent and discards it. C<$matcher> is an optional string specifying the condition which caused $item to be removed, and is ignored--it exists solely so that L<App::Rssfilter::Rule/constrain> can set it to the name of the condition causing the match.
+Removes C<$item> from its parent and discards it.
+
+C<$matcher> is an optional string specifying the condition which caused C<$item> to be removed, and is ignored; it exists solely so that L<App::Rssfilter::Rule/constrain> can set it to the name of the condition causing the match.
 
 =cut
 
