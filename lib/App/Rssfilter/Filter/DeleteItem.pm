@@ -14,7 +14,7 @@ use feature qw( :5.14 );
 <rss>
   <channel>
     <item><title>it's hi time</title><description>hi</description></item>
-    <item><title>here we are again</title><description>hello</description></item
+    <item><title>here we are again</title><description>hello</description></item>
   </channel>
 </rss>
 End_of_RSS
@@ -34,7 +34,7 @@ End_of_RSS
     App::Rssfilter::Rule->new(
         condition => sub { shift =~ m/hello/xms },
         action    => 'DeleteItem'
-    )->constrain( $rss );;
+    )->constrain( $rss );
 
     # either way
     print $rss->to_xml;
