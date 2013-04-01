@@ -2,68 +2,60 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: add some text to the title element of an RSS item
+# ABSTRACT: add some text to the title of an RSS item
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
-    use YAML::XS;
-
-    App::Rssfilter->run( Load(<<"End_of_Config") );
-    groups:
-    - group: YoyoDyne
-      match:
-      - Duplicates
-      ifMatched: MarkTitle
-      feeds:
-      - YoyoDyne News:    http://yoyodyne.com/news.rss
-      - YoyoDyne Stories: http://yoyodyne.com/stories.rss
-    End_of_Config
-
-    # or manually
-
-    use Mojo::DOM;
     use App::Rssfilter::Filter::MarkTitle;
 
+    use Mojo::DOM;
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
 <rss>
   <channel>
-    <item><title>it's hi time</title>hi</item>
-    <item><title>here we are again</title>hello</item>
+    <item><title>it's hi time</title><description>hi</description></item>
+    <item><title>here we are again</title><description>hello</description></item
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
     $rss->find( 'item' )->each(
         sub {
           my $item = shift;
           if( $item =~ /hello/ ) {
-            App::Rssfilter::Filter::MarkTitle::filter( $item, 'manual match' );
+            App::Rssfilter::Filter::MarkTitle::filter( $item, 'HELLO' );
           }
         }
     );
 
-    print $rss;
+    # or with an App::Rssfilter::Rule
+
+    use App::Rssfilter::Rule;
+    App::Rssfilter::Rule->new(
+        condition => sub { shift =~ m/hello/xms },
+        action    => 'MarkTitle[HELLO]'
+    )->constrain( $rss );;
+
+    # either way
+    print $rss->to_xml;
+
     # <?xml version="1.0" encoding="UTF-8"?>
     # <rss>
     #   <channel>
-    #     <item><title>it's hi time</title>hi</item>
-    #     <item><title>MANUAL MATCH - here we are again</title>hello</item>
+    #     <item><title>it&#39;s hi time</title><description>hi</description></item>
+    #     <item><title>HELLO - here we are again</title><description>hello</description></item>
     #   </channel>
     # </rss>
 
 =head1 DESCRIPTION
 
-L<App::Rssfilter::Filter::MarkTitle> will add some uppercase text to the title of a L<Mojo::DOM> element. Use this module instead of L<App::Rssfilter::Filter::DeleteItem> when you wish to verify that your matchers are working correctly, as MarkTitle will simply mark the title of matched items with the name of the matching module.
-
-You should use this module by specifying it as a group's 'ifMatched' action in your L<App::Rssfilter> configuration.
+This module will add some uppercase text to the title of a L<Mojo::DOM> element. Use this module instead of L<App::Rssfilter::Filter::DeleteItem> when you wish to verify that your matchers are working correctly, as MarkTitle will simply mark the title of matched items with a specific string, or the name of the matching module.
 
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<App::Rssfilter::Filter::DeleteItem>
+* L<App::Rssfilter::Rule>
 
 =cut
 
