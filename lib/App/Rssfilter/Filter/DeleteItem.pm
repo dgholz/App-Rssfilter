@@ -42,7 +42,7 @@ End_of_RSS
     # <?xml version="1.0" encoding="UTF-8"?>
     # <rss>
     #   <channel>
-    #     <item><title>it's hi time</title>hi</item>
+    #     <item><title>it&#39;s hi time</title>hi</item>
     #   </channel>
     # </rss>
 
