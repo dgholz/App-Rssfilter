@@ -70,14 +70,16 @@ You should use this module by specifying it as a group's 'ifMatched' action in y
 package App::Rssfilter::Filter::MarkTitle {
     use Method::Signatures;
 
-=func filter( $item, $matcher )
+=func filter
 
-Prefixes $item's title with $matcher in uppercase.
+    App::Rssfilter::Filter::filter( $item, $matcher, $explicit_prefix )
+
+Prefixes C<$item>'s title with C<$explicit_prefix> (or, if not specified, C<$matcher>) in uppercase. When called from L<App::Rssfilter::Rule/constrain>, C<$matcher> will be set to the nice name of the rule's condition, and C<$explicit_prefix> will be the first bracketed argument.
 
 =cut
 
-    func filter ( $item, $matcher ) {
-        $item->title->replace_content(uc($matcher) ." - ".$item->title->content_xml);
+    func filter ( $item, $matcher, $explicit_prefix = $matcher ) {
+        $item->title->replace_content(uc($explicit_prefix) ." - ".$item->title->content_xml);
     }
 }
 
