@@ -33,8 +33,8 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => sub { shift =~ m/hello/xms },
-        action    => 'MarkTitle[HELLO]'
-    )->constrain( $rss );;
+        action    => 'MarkTitle[HELLO]',
+    )->constrain( $rss );
 
     # either way
     print $rss->to_xml;

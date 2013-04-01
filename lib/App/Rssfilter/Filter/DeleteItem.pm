@@ -33,7 +33,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => sub { shift =~ m/hello/xms },
-        action    => 'DeleteItem'
+        action    => 'DeleteItem',
     )->constrain( $rss );
 
     # either way
