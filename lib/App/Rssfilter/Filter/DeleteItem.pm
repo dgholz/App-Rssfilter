@@ -2,67 +2,58 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: remove a Mojo::DOM element from its parent element
+# ABSTRACT: remove an RSS item from its channel
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
-    use YAML::XS;
-
-    App::Rssfilter->run( Load(<<"End_of_Config") );
-    groups:
-    - group: YoyoDyne
-      match:
-      - Duplicates
-      ifMatched: DeleteItem
-      feeds:
-      - YoyoDyne News:    http://yoyodyne.com/news.rss
-      - YoyoDyne Stories: http://yoyodyne.com/stories.rss
-    End_of_Config
-
-    # or manually
+    use App::Rssfilter::Filter::MarkTitle;
 
     use Mojo::DOM;
-    use App::Rssfilter::Filter::DeleteItem;
-
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
 <rss>
   <channel>
-    <item>hi</item>
-    <item>hello</item>
+    <item><title>it's hi time</title><description>hi</description></item>
+    <item><title>here we are again</title><description>hello</description></item
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
     $rss->find( 'item' )->each(
         sub {
           my $item = shift;
           if( $item =~ /hello/ ) {
-            App::Rssfilter::Filter::DeleteItem::filter( $item, 'manual match' );
+            App::Rssfilter::Filter::DeleteItem::filter( $item );
           }
         }
     );
 
-    print $rss;
+    # or with an App::Rssfilter::Rule
+
+    use App::Rssfilter::Rule;
+    App::Rssfilter::Rule->new(
+        condition => sub { shift =~ m/hello/xms },
+        action    => 'DeleteItem'
+    )->constrain( $rss );;
+
+    # either way
+    print $rss->to_xml;
     # <?xml version="1.0" encoding="UTF-8"?>
-    #  <rss>
-    #    <channel>
-    #      <item>hi</item>
-    #    </channel>
-    #  </rss>
+    # <rss>
+    #   <channel>
+    #     <item><title>it's hi time</title>hi</item>
+    #   </channel>
+    # </rss>
 
 =head1 DESCRIPTION
 
-L<App::Rssfilter::Filter::DeleteItem> will remove a L<Mojo::DOM> element from its parent element.
-
-You should use this module by specifying it as a group's 'ifMatched' action in your L<App::Rssfilter> configuration.
+This module will remove an RSS item from its channel. Actually, it will remove any L<Mojo::DOM> element from its parent. Use L<App::Rssfilter::Filter::MarkTitle> for a non-destructive filter.
 
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<App::Rssfilter::Filter::MarkTitle>
+* L<App::Rssfilter::Rule>
 
 =cut
 
