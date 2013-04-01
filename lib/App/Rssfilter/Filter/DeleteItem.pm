@@ -38,6 +38,7 @@ End_of_RSS
 
     # either way
     print $rss->to_xml;
+
     # <?xml version="1.0" encoding="UTF-8"?>
     # <rss>
     #   <channel>
