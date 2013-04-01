@@ -235,7 +235,12 @@ Applies this rule's action to C<$item>.
 =cut
 
     method filter( $item ) {
-        $self->logger->debugf( 'applying %s since %s matched %s', $self->action_name, $self->condition_name, $item->at('guid')->text );
+        $self->logger->debugf(
+            'applying %s since %s matched %s',
+                $self->action_name,
+                $self->condition_name,
+                $item->find('guid, link, title')->first->text
+        );
         return $self->_filter->( $item, $self->condition_name );
     }
 
