@@ -69,13 +69,15 @@ You should use this module by specifying it as a group's 'ifMatched' action in y
 package App::Rssfilter::Filter::DeleteItem {
     use Method::Signatures;
 
-=func filter( $item, $matcher )
+=func filter
 
-Removes $item from its parent. The second argument specifies what causes $item to be removed, and is ignored.
+   App::Rssfilter::Filter::DeleteItem::filter( $item, $matcher );
+
+Removes C<$item> from its parent and discards it. C<$matcher> is an optional string specifying the condition which caused $item to be removed, and is ignored--it exists solely so that L<App::Rssfilter::Rule/constrain> can set it to the name of the condition causing the match.
 
 =cut
 
-    func filter ( $item, $matcher ) {
+    func filter ( $item, $matcher = 'no reason' ) {
         $item->replace(q{});
     }
 }
