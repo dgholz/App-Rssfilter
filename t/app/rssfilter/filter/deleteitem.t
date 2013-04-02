@@ -10,7 +10,7 @@ throws_ok(
 );
 
 throws_ok(
-    sub { App::Rssfilter::Filter::DeleteItem::filter( qw( one two three) ) },
+    sub { App::Rssfilter::Filter::DeleteItem::filter( qw< one two three > ) },
     qr/too many arguments/,
     'throws error when given multiple matchers'
 );
