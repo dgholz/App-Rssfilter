@@ -2,30 +2,14 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: match an ABC preview article
+# ABSTRACT: match an ABC preview RSS item
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
-    use YAML::XS;
-
-    App::Rssfilter->run( Load(<<"End_of_Config") );
-    groups:
-    - group: ABC
-      match:
-      - AbcPreviews
-      ifMatched: DeleteItem
-      feeds:
-      - Top Stories: http://www.abc.net.au/news/feed/45910/rss.xml
-    End_of_Config
-
-    # or manually
-
-    use Mojo::DOM;
     use App::Rssfilter::Match::AbcPreviews;
-
+    
+    use Mojo::DOM;
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
-<?xml version="1.0" encoding="UTF-8"?>
 <rss>
   <channel>
     <item>
@@ -38,42 +22,45 @@ use feature qw( :5.14 );
     </item>
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
-    $rss->find( 'item' )->each(
-        sub {
-          my $item = shift;
-          if( App::Rssfilter::Match::AbcPreviews::match( $item ) ) {
-            say $item->guid->text, " is a preview article";
-          }
-        }
-    );
+    print $_, "\n" for $rss->find( 'item' )->grep( \&App::Rssfilter::Match::AbcPreviews::match );
 
-    # prints
-    # http://www.abc.net.au/preview/some_article is a preview article
+    # or with an App::Rssfilter::Rule
+
+    use App::Rssfilter::Rule;
+    App::Rssfilter::Rule->new(
+        condition => 'AbcPreviews',
+        action    => sub { print shift->to_xml, "\n" },
+    )->constrain( $rss );
+
+    # either way, prints
+
+    # <item>
+    #   <guid>http://www.abc.net.au/preview/some_article</guid>
+    #   <description>here is an article which is in preview mode</description>
+    # </item>
 
 =head1 DESCRIPTION
 
-L<App::Rssfilter::Match::AbcPreviews> will match a Mojo::DOM element if its GUID contains 'preview' (unless it is also in the title of the item). The Australian Broadcasting Corporation occasionally include links to preview articles in their feeds, which link to non-existent pages.
-
-You should use this module by specifying it under a group's 'match' section in your L<App::Rssfilter> configuration.
+This module will match an RSS item if its GUID contains 'C<preview>', unless 'C<preview>' is also in the title of the item. The Australian Broadcasting Corporation RSS feeds occasionally include items whose GUIDS contain 'C<preview>' and link to non-existent pages, so this matcher was created to find them.
 
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<App::Rssfilter::Match::BbcSports>
-* L<App::Rssfilter::Match::Category>
-* L<App::Rssfilter::Match::Duplicates>
+* L<App::Rssfilter::Rule>
 
 =cut
 
 package App::Rssfilter::Match::AbcPreviews {
     use Method::Signatures;
 
-=func match( $item )
+=func match
 
-Returns true if $item contains 'preview' in its GUID and not in its title.
+    my $item_is_preview = App::Rssfilter::Match::AbcPreviews::match( $item );
+
+Returns true if C<$item> contains 'C<preview>' in its GUID and not in its title.
 
 =cut
 
