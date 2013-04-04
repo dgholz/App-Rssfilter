@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 # PODNAME: rssfilter
+# ABSTRACT: command-line interface to App::Rssfilter
 
 use strict;
 use warnings;
@@ -9,4 +10,8 @@ use App::Rssfilter::Cmd;
 
 App::Rssfilter::Cmd->run;
 
-1;
+=head1 OVERVIEW
+
+See L<App::Rssfilter> for examples of configuring & running C<rssfilter>.
+
+=cut
