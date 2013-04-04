@@ -2,78 +2,66 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: match a BBC sport article
+# ABSTRACT: match a BBC sport RSS item
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
-    use YAML::XS;
-
-    App::Rssfilter->run( Load(<<"End_of_Config") );
-    groups:
-    - group: BBC
-      match:
-      - BbcSports
-      ifMatched: DeleteItem
-      feeds:
-      - Front Page: http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/front_page/rss.xml
-    End_of_Config
-
-    # or manually
-
-    use Mojo::DOM;
     use App::Rssfilter::Match::BbcSports;
 
+    use Mojo::DOM;
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
 <rss>
   <channel>
     <item>
-      <title>Jumping jackrabbit shames long jump record</title>
-      <category>Sport</category>
+      <guid>http://www.bbc.co.uk/sport/some_article</guid>
+      <description>here is an article about a sporting event</description>
     </item>
     <item>
-      <title>Online poll proves programmers cool, successful</title>
-      <category>Internet</category>
+      <guid>http://www.bbc.co.uk/tech/new_rss_tool_changes_how_we_read_news</guid>
+      <description>here is an article about an rss tool</description>
     </item>
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
-    $rss->find( 'item' )->each(
-        sub {
-          my $item = shift;
-          if( App::Rssfilter::Match::BbcSports::match( $item ) ) {
-            say $item->title->text, " is a sport article";
-          }
-        }
-    );
+    print $_, "\n" for $rss->find( 'item' )->grep( \&App::Rssfilter::Match::BbcSports::match );
 
-    # prints
-    # Jumping jackrabbit smashes long jump record is a sport article
+    # or with an App::Rssfilter::Rule
+
+    use App::Rssfilter::Rule;
+    App::Rssfilter::Rule->new(
+        condition => 'BbcSports',
+        action    => sub { print shift->to_xml, "\n" },
+    )->constrain( $rss );
+
+    # either way, prints
+    
+    # <item>
+    #   <guid>http://www.bbc.co.uk/tech/new_rss_tool_changes_how_we_read_news</guid>
+    #   <description>here is an article about an rss tool</description>
+    # </item>
 
 =head1 DESCRIPTION
 
-L<App::Rssfilter::Match::BBcSports> will match an item if it is tagged as belonging to the 'Sport' category.
-
-You should use this module by specifying it under a group's 'match' section in your L<App::Rssfilter> configuration.
+This module will match items from BBC RSS feeds which are about sporting events.
 
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<App::Rssfilter::Match::AbcPreviews>
-* L<App::Rssfilter::Match::Category>
-* L<App::Rssfilter::Match::Duplicates>
+* L<App::Rssfilter::Rule>
 
 =cut
 
 package App::Rssfilter::Match::BbcSports {
     use Method::Signatures;
 
-=func match( $item )
+=func match
 
-Returns true if $item has a GUID which looks like a BBC sport GUID e.g. http://www.bbc.co.uk/sport.
+    my $item_is_BBC_sport = App::Rssfilter::Match::BbcSports::match( $item );
+
+Returns true if ther GUID of C<$item> looks like a BBC sport GUID (like C<http://www.bbc.co.uk/sport>).
 
 =cut
 
