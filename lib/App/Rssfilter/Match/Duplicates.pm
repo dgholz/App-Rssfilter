@@ -2,29 +2,13 @@ use strict;
 use warnings;
 use feature qw( :5.14 );
 
-# ABSTRACT: match an article which has been seen before
+# ABSTRACT: match an RSS item which has been seen before
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
-    use YAML::XS;
-
-    App::Rssfilter->run( Load(<<"End_of_Config") );
-    groups:
-    - group: ABC
-      match:
-      - Duplicates
-      ifMatched: DeleteItem
-      feeds:
-      - NSW: http://www.abc.net.au/news/feed/52498/rss.xml
-      - Top Stories: http://www.abc.net.au/news/feed/45910/rss.xml
-    End_of_Config
-
-    # or manually
-
-    use Mojo::DOM;
     use App::Rssfilter::Match::Duplicates;
 
+    use Mojo::DOM;
     my $first_rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
 <rss>
@@ -39,7 +23,7 @@ use feature qw( :5.14 );
     </item>
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
     my $second_rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
@@ -55,42 +39,38 @@ use feature qw( :5.14 );
     </item>
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
-    $first_rss->find( 'item' )->each(
-        sub {
-          my $item = shift;
-          if( App::Rssfilter::Match::Duplicates::match( $item ) ) {
-            say $item->link->text, " is a duplicate article";
-          }
-        }
+    print "$_\n" for $first_rss->find( 'item' )->grep( \&App::Rssfilter::Match::Duplicates::match );
+    print "$_\n" for $second_rss->find( 'item' )->grep( \&App::Rssfilter::Match::Duplicates::match );
+
+    # or with an App::Rssfilter::Rule
+
+    use App::Rssfilter::Rule;
+    my $dupe_rule = App::Rssfilter::Rule->new(
+        condition => 'Duplicates',
+        action    => sub { print shift->to_xml, "\n" },
     );
+    $dupe_rule->constrain( $first_rss );
+    $dupe_rule->constrain( $second_rss );
 
-    $second_rss->find( 'item' )->each(
-        sub {
-          my $item = shift;
-          if( App::Rssfilter::Match::Duplicates::match( $item ) ) {
-            say $item->link->text, " is a duplicate article";
-          }
-        }
-    );
+    # either way, prints
 
-    # prints
-    # http://rss.slashdot.org/~r/Slashdot/slashdot/~9/lloek9InU2p/new-planet-discovered-on-far-side-of-sun is a duplicate article
+    # <item>
+    #   <link>http://rss.slashdot.org/~r/Slashdot/slashdot/~9/lloek9InU2p/new-planet-discovered-on-far-side-of-sun</link>
+    #   <description>vulcan is here</description>
+    # </item>
+        
 
 =head1 DESCRIPTION
 
-L<App::Rssfilter::Match::Duplicates> will record the GUID and link of a Mojo::DOM element, and then match the element if either the GUID or link have previously been recorded.
-
-You should use this module by specifying it under a group's 'match' section in your L<App::Rssfilter> configuration.
+This module will match RSS items if either the GUID or link of the item have been seen previously.
 
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<App::Rssfilter::Match::AbcPreviews>
-* L<App::Rssfilter::Match::BbcSports>
-* L<App::Rssfilter::Match::Category>
+* L<App::Rssfilter::Rule>
 
 =cut
 
@@ -98,9 +78,11 @@ package App::Rssfilter::Match::Duplicates {
     use Method::Signatures;
     use Try::Tiny;
 
-=func match( $item )
+=func match
 
-Returns true if $item has a guid or link which matches a guid of link of an item previously processed. Query strings in the link of the $item will be ignore for the purposes of matching a previous link.
+    my $item_seen_before = App::Rssfilter::Match::Duplicate::match( $item );
+
+Returns true if C<$item> has a GUID or link which matches a previously-seen GUID or link. Query strings in links and GUIDs will be ignore for the purposes of matching a previous link.
 
 =cut
 
