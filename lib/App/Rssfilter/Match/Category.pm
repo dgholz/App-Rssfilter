@@ -6,24 +6,9 @@ use feature qw( :5.14 );
 
 =head1 SYNOPSIS
 
-    use App::Rssfilter;
-    use YAML::XS;
-
-    App::Rssfilter->run( Load(<<"End_of_Config") );
-    groups:
-    - group: ABC
-      match:
-      - Category[Sport]
-      ifMatched: DeleteItem
-      feeds:
-      - Top Stories: http://www.abc.net.au/news/feed/45910/rss.xml
-    End_of_Config
-
-    # or manually
-
-    use Mojo::DOM;
     use App::Rssfilter::Match::Category;
 
+    use Mojo::DOM;
     my $rss = Mojo::DOM->new( <<"End_of_RSS" );
 <?xml version="1.0" encoding="UTF-8"?>
 <rss>
@@ -38,32 +23,38 @@ use feature qw( :5.14 );
     </item>
   </channel>
 </rss>
-    End_of_RSS
+End_of_RSS
 
-    $rss->find( 'item' )->each(
+    print $_, "\n" for $rss->find( 'item' )->grep(
         sub {
-          my $item = shift;
-          if( App::Rssfilter::Match::Category::match( $item, 'Sport' ) ) {
-            say $item->title->text, " is a sport article";
-          }
+            App::Rssfilter::Match::Category::match( shift, 'Sport' ) ) {
         }
     );
 
-    # prints
-    # Jumping jackrabbit smash long jump record is a sport article
+    # or with an App::Rssfilter::Rule
+
+    use App::Rssfilter::Rule;
+    App::Rssfilter::Rule->new(
+        condition => 'Category[Sport]',
+        action    => sub { print shift->to_xml, "\n" },
+    )->constrain( $rss );
+
+    # either way, prints
+
+    # <item>
+    #   <title>Jumping jackrabbit smash long jump record</title>
+    #   <category>Sport:leporine</category>
+    # </item>
 
 =head1 DESCRIPTION
 
-L<App::Rssfilter::Match::Category> will match a Mojo::DOM element if it has a category which matches one of the specified categories.
+This module will match an RSS item if it has one or more specific category.
 
-You should use this module by specifying it under a group's 'match' section in your L<App::R-
 =head1 SEE ALSO
 
 =for :list
 * L<App::Rssfilter>
-* L<App::Rssfilter::Match::AbcPreviews>
-* L<App::Rssfilter::Match::BbcSports>
-* L<App::Rssfilter::Match::Duplicates>
+* L<App::Rssfilter::Rule>
 
 =cut
 
@@ -71,18 +62,21 @@ package App::Rssfilter::Match::Category {
     use Method::Signatures;
     use List::MoreUtils qw( any );
 
-=func match( $item, @categories )
+=func match
 
-Returns true if $item has a category which matches any of @categories. Categories can be specified as:
+    my $item_has_category = App::Rssfilter::Match::Category::match( $item, @categories );
+
+Returns true if C<$item> has a category which matches any of C<@categories>. Since some RSS feeds specify categories & subcategories as 'C<main category:subcategory>', elements of C<@categories> can be:
+
 =for :list
-* Category - this category, with any subcategory
-* Category:subcategory - only this category with this subcategory
-* :subcategory - any category with a matching subcategory
+* C<category> - this category, with any subcategory
+* C<category:subcategory> - only this category with this subcategory
+* C<:subcategory> - any category with a matching subcategory
 
 =cut
 
     func match ( $item, @bad_cats ) {
-        my @categories = $item->find("category")->map( sub { $_->text } )->each;
+        my @categories = $item->find("category")->pluck( 'text' )->each;
         my @split_categories = map { ( / \A ( [^:]+ ) ( [:] .* ) \z /xms, $_ ) } @categories;
         my %cats = map { $_ => 1 } @split_categories;
         return List::MoreUtils::any { defined $_ } @cats{ @bad_cats };
