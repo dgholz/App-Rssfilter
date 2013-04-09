@@ -64,6 +64,8 @@ use feature qw< :5.14 >;
 package App::Rssfilter::Group {
     use Moo;
     with 'App::Rssfilter::Logger';
+    with 'App::Rssfilter::FromHash';
+    with 'App::Rssfilter::FromYaml';
     use Method::Signatures;
 
     method BUILDARGS( @options ) {
