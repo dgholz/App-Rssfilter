@@ -14,8 +14,7 @@ use feature qw( :5.14 );
 
 package App::Rssfilter::Cmd::runfromconfig {
     use App::Rssfilter::Cmd -command;
-    use App::Rssfilter::Group;
-    use YAML::XS;
+    use App::Rssfilter;
     use Method::Signatures;
     use Cwd;
     use Path::Class qw<>;
@@ -61,8 +60,7 @@ Turns on logging; default is off.
     method execute( $opt, $args ) {
         my $yaml_config = Path::Class::file( $opt->config_file // $self->find_config );
         Log::Any::Adapter->set( 'Stdout' ) if $opt->log;
-        my $rssfilter = Role::Tiny->create_class_with_roles( 'App::Rssfilter::Group', 'App::Rssfilter::FromHash');
-        $rssfilter->from_hash( Load( scalar $yaml_config->slurp ) )->update();
+        App::Rssfilter->from_yaml( scalar $yaml_config->slurp )->update();
     }
 };
 
