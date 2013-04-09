@@ -47,8 +47,8 @@ App::Rssfilter downloads RSS feeds and then applies rules to remove duplicate it
 =cut
 
 package App::Rssfilter {
-    use Carp qw<>;
-    Carp::confess "you're not meant to use App::Rssfilter, just read it!";
-}
+    use Moo;
+    extends 'App::Rssfilter::Group';
+};
 
 1;
