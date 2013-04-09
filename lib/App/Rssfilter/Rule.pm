@@ -1,4 +1,4 @@
-# ABSTRACT: match and filter Rss items
+# ABSTRACT: match and filter RSS feeds
 
 =head1 SYNOPSIS
 
