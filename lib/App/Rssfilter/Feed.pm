@@ -8,18 +8,18 @@
     # shorthand for
     $feed = App::Rssfilter::Feed->new(
         name => 'filename',
-        url  => 'http://get.your.files/here/rss',
+        url  => 'http://get.your.files/here.rss',
     );
 
     my $rule = App::RssFilter::Rule->new( 
-        match  => 'A Matcher',
-        filter => 'A Filter',
+        condition => 'A Matcher',
+        action    => 'A Filter',
     );
     $feed->add_rule( $rule );
 
     $feed->add_rule(
-        match  => 'Another Matcher',
-        filter => 'Another Filter',
+        condition => 'Another Matcher',
+        action    => 'Another Filter',
     );
 
     $feed->update;
@@ -30,7 +30,11 @@
     my $group = App::RssFilter::Group->new( 'Tubular' );
     $group->add_feed( RadName => 'http://r.a.d.i.c.al/feed.rss' );
     # shorthand for
-    $group->add_feed( App::Rssfilter::Feed->new( RadName => 'http://r.a.d.i.c.al/feed.rss' ) );
+    $group->add_feed(
+        App::Rssfilter::Feed->new(
+            RadName => 'http://r.a.d.i.c.al/feed.rss'
+        )
+    );
     $group->update;
 
 =head1 DESCRIPTION
@@ -52,13 +56,13 @@ package App::Rssfilter::Feed {
 
 =attr logger
 
-This is a object used for logging; it defaults to a L<Log::Any> object. It is provided by the L<App::Rssfilter::Logger> role.
+This is a object used for logging. It defaults to a L<Log::Any> object. It is provided by the L<App::Rssfilter::Logger> role.
 
 =cut
 
 =attr name
 
-This is the name of the feed to use when storing it, and is required. This will be used by the default L</storage> as the filename to store the feed under.
+This is the name of the feed to use when storing it, and is required. This will be used by the default C<storage> as the filename to store the feed under.
 
 =cut
 
@@ -91,7 +95,7 @@ This is the arrayref of L<rules|App::Rssfilter::Rule> which will constrain newly
 
 =attr user_agent
 
-This is the L<Mojo::UserAgent>-compatible object to use when getting its L<URL|/url>. It defaults to a new L<Mojo::UserAgent>.
+This is a L<Mojo::UserAgent> to use to fetch this feed's C<url>. It defaults to a new L<Mojo::UserAgent>.
 
 =cut
 
@@ -102,7 +106,7 @@ This is the L<Mojo::UserAgent>-compatible object to use when getting its L<URL|/
 
 =attr storage
 
-This is the L<App::Rssfilter::Feed::Storage>-compatible object to use when storing newly-fetched feeds, or retrieving the previously-fetched version. It defaults to a new L<App::Rssfilter::Feed::Storage>, with its name set to this feed's name.
+This is the L<App::Rssfilter::Feed::Storage> to store newly-fetched iRSS documents, or retrieve the previously-fetched version. It defaults to a new L<App::Rssfilter::Feed::Storage>, with its name set to this feed's name.
 
 =cut
 
@@ -158,7 +162,7 @@ This method will:
 
 The old feed has rules applied to it so that any group-wide rules will always see all of the latest items, even if a feed does not have a newer version available. 
 
-The parameters are optional. If C<rules> is specified, they will be added to the feed's rules for this update only. If C<storage> is specified, it will used instead of the feed's storage to load/save feed content.
+The parameters are optional. C<$rules> should be an arryref of additional rules to be added to the feed's C<rules> for this update only. C<$storage> should be an L<App::Rssfilter::Feed::Storage> that will used instead of this feed's C<storage> to load/save RSS doucments.
 
 =cut
 
