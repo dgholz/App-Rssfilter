@@ -156,8 +156,8 @@ If this rule's condition is a string, it is treated as a namespace. If the strin
 C<_match> will then be set to a wrapper:
 
 =for :list
-* If C<I<namespace>::new> exists, C<_match> will be set as if C<condition> had originally been the object returned from calling C<I<namespace>::new( @additional_arguments )>.
-* Otherwise, C<_match> will store a wrapper which calls C<I<namespace>::match( $rss_item, @additional_arguments )>.
+* If C<I<< <namespace> >>::new> exists, C<_match> will be set as if C<condition> had originally been the object returned from calling C<I<< <namespace> >>::new( @additional_arguments )>.
+* Otherwise, C<_match> will store a wrapper which calls C<I<< <namespace> >>::match( $rss_item, @additional_arguments )>.
 
 =cut
 
@@ -214,8 +214,8 @@ If the rule's action is a string, it is treated as a namespace. If the string is
 The filter will then be set to a wrapper:
 
 =for :list
-* If C<I<namespace>::new> exists, C<_filter> will be set as if C<action> had originally been the object returned from calling C<I<namespace>::new( @additional_arguments )>.
-* Otherwise, C<_filter> will store a wrapper which calls C<I<namespace>::filter( $rss_item, @additional_arguments )>.
+* If C<I<< <namespace> >>::new> exists, C<_filter> will be set as if C<action> had originally been the object returned from calling C<I<< <namespace> >>::new( @additional_arguments )>.
+* Otherwise, C<_filter> will store a wrapper which calls C<I<< <namespace> >>::filter( $rss_item, @additional_arguments )>.
 
 =cut
 
