@@ -6,7 +6,6 @@ use Test::Routine::Util;
 use Test::Most;
 use lib qw< t/lib >;
 
-use Carp::Always;
 run_tests(
     'from_yaml just calls from_hash',
     [

@@ -6,7 +6,6 @@ use Test::Routine::Util;
 use Test::Most;
 use lib qw< t/lib >;
 
-use Carp::Always;
 run_tests(
     'create a group from a hash',
     [
