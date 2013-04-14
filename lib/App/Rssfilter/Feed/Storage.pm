@@ -33,7 +33,7 @@ package App::Rssfilter::Feed::Storage {
     use Moo;
     with 'App::Rssfilter::Logger';
     use Mojo::DOM;
-    use Path::Class::File;
+    use Path::Class::File 0.26;
     use Path::Class::Dir;
     use HTTP::Date;
 
