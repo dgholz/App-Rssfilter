@@ -243,6 +243,22 @@ Returns the last feed added to this group whose name is C<$name>, or C<undef> if
 
 }
 
+=method from_hash
+
+    my $group = App::Rssfilter::Group::from_hash( %config );
+
+Returns a new instance of this class with the feeds, rules, and subgroups specifed in C<%config>. This method is provided by L<App::Rssfilter::FromHash/from_hash>, which has additional documentation & examples.
+
+=cut
+
+=method from_yaml
+
+    my $group = App::Rssfilter::Group::from_yaml( $yaml_config );
+
+Returns a new instance of this class with the feeds, rules, and subgroups specifed in C<$yaml_config>. This method is provided by L<App::Rssfilter::FromYaml/from_yaml>, which has additional documentation & examples.
+
+=cut
+
 1;
 
 =head1 SEE ALSO
