@@ -1,7 +1,6 @@
 
 use strict;
 use warnings;
-use feature qw< :5.14 >;
 
 package App::Rssfilter::Feed::Storage::Test::SetName {
 

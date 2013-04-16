@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use feature qw< :5.14 >;
 
 use Test::Routine::Util;
 use Test::Most;

@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use feature qw< :5.14 >;
 
 use App::Rssfilter::Feed;
 use Test::Most;
