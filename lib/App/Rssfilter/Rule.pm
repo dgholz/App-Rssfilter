@@ -1,5 +1,8 @@
 # ABSTRACT: match and filter RSS feeds
 
+use strict;
+use warnings;
+
 =head1 SYNOPSIS
 
     use App::RssFilter::Rule;
@@ -116,16 +119,13 @@ It consumes the L<App::Rssfilter::Logger> role.
 
 =cut
 
-use strict;
-use warnings;
-use feature qw< :5.14 >;
+package App::Rssfilter::Rule;
 
-package App::Rssfilter::Rule {
-    use Moo;
-    use Method::Signatures;
-    use Module::Runtime qw<>;
-    use Class::Inspector qw<>;
-    with 'App::Rssfilter::Logger';
+use Moo;
+use Method::Signatures;
+use Module::Runtime qw<>;
+use Class::Inspector qw<>;
+with 'App::Rssfilter::Logger';
 
 =attr logger
 
@@ -139,10 +139,10 @@ This is the module, object, or coderef to use to match C<item> elements for filt
 
 =cut
 
-    has condition => (
-        is       => 'ro',
-        required => 1,
-    );
+has condition => (
+    is       => 'ro',
+    required => 1,
+);
 
 =attr _match
 
@@ -161,12 +161,12 @@ C<_match> will then be set to a wrapper:
 
 =cut
 
-    has _match => (
-        is       => 'lazy',
-        required => 1,
-        init_arg => undef,
-        default  => method { $self->coerce_attr( attr => $self->condition, type => 'match' ) },
-    );
+has _match => (
+    is       => 'lazy',
+    required => 1,
+    init_arg => undef,
+    default  => method { $self->coerce_attr( attr => $self->condition, type => 'match' ) },
+);
 
 =method match
 
@@ -176,9 +176,9 @@ Returns the result of testing this rule's condition against C<$item>.
 
 =cut
 
-    method match( $item ) {
-        return $self->_match->( $item );
-    }
+method match( $item ) {
+    return $self->_match->( $item );
+}
 
 =attr condition_name
 
@@ -186,10 +186,10 @@ This is a nice name for the condition, which will be used as the reason for the 
 
 =cut
 
-    has condition_name => (
-        is => 'lazy',
-        default => method { $self->nice_name_for( $self->condition, 'matcher' ) },
-    );
+has condition_name => (
+    is => 'lazy',
+    default => method { $self->nice_name_for( $self->condition, 'matcher' ) },
+);
 
 =attr action
 
@@ -197,10 +197,10 @@ This is the module, object, or coderef to use to filter C<item> elements matched
 
 =cut
 
-    has action => (
-        is       => 'ro',
-        required => 1,
-    );
+has action => (
+    is       => 'ro',
+    required => 1,
+);
 
 =attr _filter
 
@@ -219,12 +219,12 @@ The filter will then be set to a wrapper:
 
 =cut
 
-    has _filter => (
-        is       => 'lazy',
-        required => 1,
-        init_arg => undef,
-        default  => method { $self->coerce_attr( attr => $self->action, type => 'filter' ) },
-    );
+has _filter => (
+    is       => 'lazy',
+    required => 1,
+    init_arg => undef,
+    default  => method { $self->coerce_attr( attr => $self->action, type => 'filter' ) },
+);
 
 =method filter
 
@@ -234,15 +234,15 @@ Applies this rule's action to C<$item>.
 
 =cut
 
-    method filter( $item ) {
-        $self->logger->debugf(
-            'applying %s since %s matched %s',
-                $self->action_name,
-                $self->condition_name,
-                $item->find('guid, link, title')->first->text
-        );
-        return $self->_filter->( $item, $self->condition_name );
-    }
+method filter( $item ) {
+    $self->logger->debugf(
+        'applying %s since %s matched %s',
+            $self->action_name,
+            $self->condition_name,
+            $item->find('guid, link, title')->first->text
+    );
+    return $self->_filter->( $item, $self->condition_name );
+}
 
 =attr action_name
 
@@ -250,117 +250,117 @@ This is a nice name for the action. Defaults to the class of the action, or its 
 
 =cut
 
-    has action_name => (
-        is => 'lazy',
-        default => method { $self->nice_name_for( $self->action, 'filter' ) },
-    );
+has action_name => (
+    is => 'lazy',
+    default => method { $self->nice_name_for( $self->action, 'filter' ) },
+);
 
 =method constrain
 
-    my $count_of_filtered_items = $rule->constrain( $Mojo_DOM )
+    my $count_of_filtered_items = $rule->constrain( $Mojo_DOM );
 
 Gathers all child item elements of C<$Mojo_DOM> for which the condition is true, and applies the action to each. Returns the number of items that were matched (and filtered).
 
 =cut
 
-    method constrain( Mojo::DOM $Mojo_DOM ) {
-        my $count = 0;
-        $Mojo_DOM->find( 'item' )->grep( sub { $self->match( shift ) } )->each( sub { $self->filter( shift ); ++$count; } );
-        return $count;
+method constrain( Mojo::DOM $Mojo_DOM ) {
+    my $count = 0;
+    $Mojo_DOM->find( 'item' )->grep( sub { $self->match( shift ) } )->each( sub { $self->filter( shift ); ++$count; } );
+    return $count;
+}
+
+# internal helper methods
+
+method nice_name_for( $attr, $type ) {
+    use 5.010;
+    given( ref $attr ) {
+        when( 'CODE' ) { return "unnamed RSS ${type}"; }
+        when( q{}    ) { return $attr }
+        default        { return $_ }
     }
+}
 
-    # internal helper methods
-
-    method nice_name_for( $attr, $type ) {
-        given( ref $attr ) {
-            when( 'CODE' ) { "unnamed RSS ${type}"; }
-            when( q{}    ) { $attr }
-            default        { $_ }
-        }
+method BUILDARGS( %args ) {
+    if ( 1 == keys %args ) {
+        @args{'condition','action'} = each %args;
+        delete $args{ $args{ condition } };
     }
+    return \%args;
+}
 
-    method BUILDARGS( %args ) {
-        if ( 1 == keys %args ) {
-            @args{'condition','action'} = each %args;
-            delete $args{ $args{ condition } };
+method BUILD( $args ) {
+    # validate coercion of condition & action
+    $self->$_ for qw< _filter _match >;
+}
+
+method coerce_attr( :$attr, :$type ) {
+    die "can't use an undefined value to $type RSS items" if not defined $attr;
+    use 5.010;
+    given( ref $attr ) {
+        when( 'CODE' ) {
+            return $attr;
         }
-        return \%args;
-    }
-
-    method BUILD( $args ) {
-        # validate coercion of condition & action
-        $self->$_ for qw< _filter _match >;
-    }
-
-    method coerce_attr( :$attr, :$type ) {
-        die "can't use an undefined value to $type RSS items" if not defined $attr;
-        given( ref $attr ) {
-            when( 'CODE' ) {
-                return $attr;
-            }
-            when( q{} ) { # not a ref
-                return $self->coerce_module_name_to_sub( module_name => $attr, type => $type );
-            }
-            default {
-                if( my $method = $attr->can( $type ) ) {
-                    return sub { $attr->$type( @_ ); }
-                }
-                else
-                {
-                    die "${_}::$type does not exist";
-                }
-            }
+        when( q{} ) { # not a ref
+            return $self->coerce_module_name_to_sub( module_name => $attr, type => $type );
         }
-    }
-
-    method coerce_module_name_to_sub( :$module_name, :$type ) {
-        my ($namespace, $additional_args) =
-            $module_name =~ m/
-                \A
-                ( [^\[]+ ) # namespace
-                (?:        # followed by optional
-                 \[
-                   ( .* )    # additional arguments
-                 \]          # in square brackets
-                )?         # optional, remember?
-                \z
-            /xms;
-        my @additional_args = split q{,}, $additional_args // q{};
-        if( $namespace !~ /::/xms ) {
-            $namespace = join q{::}, qw< App Rssfilter >, ucfirst( $type ), $namespace;
-        }
-
-        $namespace =~ s/\A :: //xms; # '::anything'->can() will die
-
-        if( not Class::Inspector->loaded( $namespace ) ) {
-            Module::Runtime::require_module $namespace;
-        }
-
-        # create an object if we got an OO package
-        my $invocant = $namespace;
-        if( $namespace->can( 'new' ) ) {
-            $invocant = $namespace->new( @additional_args );
-        }
-
-        # return a wrapper
-        if( my $method = $invocant->can( $type ) ) {
-            if( $invocant eq $namespace ) {
-                return sub {
-                    $method->( @_, @additional_args) ;
-                };
+        default {
+            if( my $method = $attr->can( $type ) ) {
+                return sub { $attr->$type( @_ ); }
             }
             else
             {
-                return sub {
-                    $invocant->$method( @_ );
-                };
+                die "${_}::$type does not exist";
             }
-        }
-        else
-        {
-            die "${namespace}::$type does not exist";
         }
     }
 }
 
+method coerce_module_name_to_sub( :$module_name, :$type ) {
+    my ($namespace, $additional_args) =
+        $module_name =~ m/
+            \A
+            ( [^\[]+ ) # namespace
+            (?:        # followed by optional
+             \[
+               ( .* )    # additional arguments
+             \]          # in square brackets
+            )?         # optional, remember?
+            \z
+        /xms;
+    my @additional_args = split q{,}, $additional_args // q{};
+    if( $namespace !~ /::/xms ) {
+        $namespace = join q{::}, qw< App Rssfilter >, ucfirst( $type ), $namespace;
+    }
+
+    $namespace =~ s/\A :: //xms; # '::anything'->can() will die
+
+    if( not Class::Inspector->loaded( $namespace ) ) {
+        Module::Runtime::require_module $namespace;
+    }
+
+    # create an object if we got an OO package
+    my $invocant = $namespace;
+    if( $namespace->can( 'new' ) ) {
+        $invocant = $namespace->new( @additional_args );
+    }
+
+    # return a wrapper
+    if( my $method = $invocant->can( $type ) ) {
+        if( $invocant eq $namespace ) {
+            return sub {
+                $method->( @_, @additional_args) ;
+            };
+        }
+        else
+        {
+            return sub {
+                $invocant->$method( @_ );
+            };
+        }
+    }
+    else
+    {
+        die "${namespace}::$type does not exist";
+    }
+}
 1;

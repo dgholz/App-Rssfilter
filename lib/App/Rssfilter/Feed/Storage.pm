@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use feature qw( :5.14 );
 
 # ABSTRACT: load and save RSS feeds as files
 
@@ -27,15 +26,15 @@ It consumes the L<App::Rssfilter::Logger> role.
 
 =cut
 
-package App::Rssfilter::Feed::Storage {
+package App::Rssfilter::Feed::Storage;
 
-    use Method::Signatures;
-    use Moo;
-    with 'App::Rssfilter::Logger';
-    use Mojo::DOM;
-    use Path::Class::File 0.26;
-    use Path::Class::Dir;
-    use HTTP::Date;
+use Method::Signatures;
+use Moo;
+with 'App::Rssfilter::Logger';
+use Mojo::DOM;
+use Path::Class::File 0.26;
+use Path::Class::Dir;
+use HTTP::Date;
 
 =attr logger
 
@@ -49,17 +48,17 @@ This is the directory path to the stored feed file. If not specified, the curren
 
 =cut
 
-    has path => (
-         is => 'ro',
-         default => sub { Path::Class::Dir->new() },
-         coerce => sub {
-             return $_[0] if 'Path::Class::Dir' eq ref $_[0];
-             if ( 1 == @_  && 'Array' eq ref $_[0] ) {
-                 @_ = @{ $_[0] };
-             }
-             Path::Class::Dir->new( @_ )
-         },
-    );
+has path => (
+     is => 'ro',
+     default => sub { Path::Class::Dir->new() },
+     coerce => sub {
+         return $_[0] if 'Path::Class::Dir' eq ref $_[0];
+         if ( 1 == @_  && 'Array' eq ref $_[0] ) {
+             @_ = @{ $_[0] };
+         }
+         Path::Class::Dir->new( @_ )
+     },
+);
 
 =method path_push
 
@@ -69,24 +68,22 @@ Returns a clone of this object whose path has had C<@paths> appended to it.
 
 =cut
 
-    method path_push( @paths ) {
-        return App::Rssfilter::Feed::Storage->new(
-            path => $self->path->subdir( @paths ),
-            name => $self->name,
-        );
-    }
+method path_push( @paths ) {
+    return App::Rssfilter::Feed::Storage->new(
+        path => $self->path->subdir( @paths ),
+        name => $self->name,
+    );
+}
 
 =attr name
-
-    print $fs->name, "\n";
 
 This is the name of the feed, and will be used as the filename to store the feed under.
 
 =cut
 
-    has name => (
-         is => 'ro',
-    );
+has name => (
+     is => 'ro',
+);
 
 =method set_name
 
@@ -96,24 +93,24 @@ Returns this object if its name is already C<$new_name>, else returns a clone of
 
 =cut
 
-    method set_name( $new_name ) {
-        return $self if defined($self->name) && defined($new_name) ? $self->name eq $new_name : ! defined($self->name) && ! defined($new_name);
-        return App::Rssfilter::Feed::Storage->new(
-            name => $new_name,
-            path => $self->path,
-        );
-    }
-
-    has _file_path => (
-        is => 'lazy',
-        init_arg => undef,
+method set_name( $new_name ) {
+    return $self if defined($self->name) && defined($new_name) ? $self->name eq $new_name : ! defined($self->name) && ! defined($new_name);
+    return App::Rssfilter::Feed::Storage->new(
+        name => $new_name,
+        path => $self->path,
     );
+}
 
-    method _build__file_path {
-        die "no name" if not defined $self->name;
-        die "no path" if not defined $self->path;
-        $self->path->file( $self->name .'.rss' );
-    }
+has _file_path => (
+    is => 'lazy',
+    init_arg => undef,
+);
+
+method _build__file_path {
+    die "no name" if not defined $self->name;
+    die "no path" if not defined $self->path;
+    $self->path->file( $self->name .'.rss' );
+}
 
 =attr last_modified
 
@@ -121,18 +118,18 @@ This is the last time the stored RSS feed was saved, as a HTTP date string suita
 
 =cut
 
-    has last_modified => (
-        is => 'lazy',
-        init_arg => undef,
-        clearer => '_clear_last_modified',
-    );
+has last_modified => (
+    is => 'lazy',
+    init_arg => undef,
+    clearer => '_clear_last_modified',
+);
 
-    method _build_last_modified {
-        if ( my $stat = $self->_file_path->stat ) {
-            return time2str $stat->mtime;
-        }
-        return time2str 0;
+method _build_last_modified {
+    if ( my $stat = $self->_file_path->stat ) {
+        return time2str $stat->mtime;
     }
+    return time2str 0;
+}
 
 =method load_existing
 
@@ -142,15 +139,15 @@ Returns a L<Mojo::DOM> object initialised with the content of the previously-sav
 
 =cut
 
-    method load_existing {
-        $self->logger->debugf( 'loading '. $self->_file_path );
-        my $stat = $self->_file_path->stat;
+method load_existing {
+    $self->logger->debugf( 'loading '. $self->_file_path );
+    my $stat = $self->_file_path->stat;
 
-        return Mojo::DOM->new if not defined $stat;
+    return Mojo::DOM->new if not defined $stat;
 
-        $self->_clear_last_modified;
-        return Mojo::DOM->new( scalar $self->_file_path->slurp );
-    }
+    $self->_clear_last_modified;
+    return Mojo::DOM->new( scalar $self->_file_path->slurp );
+}
 
 =method save_feed
 
@@ -160,17 +157,15 @@ Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method), and updates C
 
 =cut
 
-    method save_feed( $feed ) {
-        $self->logger->debugf( 'writing out new filtered feed to '. $self->_file_path );
-        my $target_dir = $self->_file_path->dir;
-        if( not defined $target_dir->stat ) {
-            $self->logger->debug( "no $target_dir directory! making one" );
-            $target_dir->mkpath;
-        }
-        $self->_file_path->spew( $feed->to_xml );
-        $self->_clear_last_modified;
+method save_feed( $feed ) {
+    $self->logger->debugf( 'writing out new filtered feed to '. $self->_file_path );
+    my $target_dir = $self->_file_path->dir;
+    if( not defined $target_dir->stat ) {
+        $self->logger->debug( "no $target_dir directory! making one" );
+        $target_dir->mkpath;
     }
-
-};
+    $self->_file_path->spew( $feed->to_xml );
+    $self->_clear_last_modified;
+}
 
 1;

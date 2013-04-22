@@ -1,5 +1,8 @@
 # ABSTRACT: adds a logger to a class
 
+use strict;
+use warnings;
+
 =head1 SYNOPSIS
 
     package Foo;
@@ -25,28 +28,22 @@ C<App::Rssfilter::Logger> is a role that can be composed into any class, and add
 
 =cut
 
-use strict;
-use warnings;
-use feature qw( :5.14 );
+package App::Rssfilter::Logger;
 
-package App::Rssfilter::Logger {
-
-    use Moo::Role;
-    use Log::Any;
+use Moo::Role;
+use Log::Any;
 
 =attr logger
 
-    $receiver->logger->debug( 'cutting down trees' );
+$receiver->logger->debug( 'cutting down trees' );
 
 This is a L<Log::Any> object.
 
 =cut
 
-    has 'logger' => (
-        is => 'lazy',
-        default => sub { Log::Any->get_logger() },
-    );
-
-};
+has 'logger' => (
+    is => 'lazy',
+    default => sub { Log::Any->get_logger() },
+);
 
 1;

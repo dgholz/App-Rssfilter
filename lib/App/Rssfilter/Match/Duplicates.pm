@@ -1,8 +1,7 @@
+# ABSTRACT: match an RSS item which has been seen before
+
 use strict;
 use warnings;
-use feature qw( :5.14 );
-
-# ABSTRACT: match an RSS item which has been seen before
 
 =head1 SYNOPSIS
 
@@ -74,9 +73,9 @@ This module will match RSS items if either the GUID or link of the item have bee
 
 =cut
 
-package App::Rssfilter::Match::Duplicates {
-    use Method::Signatures;
-    use Try::Tiny;
+package App::Rssfilter::Match::Duplicates;
+use Method::Signatures;
+use Try::Tiny;
 
 =func match
 
@@ -86,15 +85,18 @@ Returns true if C<$item> has a GUID or link which matches a previously-seen GUID
 
 =cut
 
-    func match ( $item ) {
-        state %prev;
-        my $link = try { $item->guid->text =~ s/ [?] .* \z //xmsr } || "";
-        my $url  = try { $item->link->text =~ s/ [?] .* \z //xmsr } || "";
-        my @matchables = grep { $_ ne "" } $link, $url;
-        my $res  = grep { defined } @prev{ @matchables };
-        @prev{ @matchables } = ( 1 ) x @matchables;
-        return 0 < $res;
-    }
+func match ( $item ) {
+    use 5.010;
+    state %prev;
+
+    my @matchables = 
+        map  { s/ [?] .* \z //xms; $_ }
+        grep { $_ ne '' }
+        $item->find( 'guid, link' )->pluck( 'text' )->each;
+
+    my $res = grep { defined } @prev{ @matchables };
+    @prev{ @matchables } = ( 1 ) x @matchables;
+    return 0 < $res;
 }
 
 1;

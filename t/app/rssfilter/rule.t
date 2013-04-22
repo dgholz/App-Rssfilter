@@ -6,7 +6,8 @@ use App::Rssfilter::Rule;
 use List::MoreUtils;
 use Mojo::DOM;
 
-package Test::Match {
+{
+    package Test::Match;
     sub match {
         my( $item, @patterns ) = @_;
         unshift @patterns, 'match';
@@ -15,13 +16,16 @@ package Test::Match {
     }
 }
 
-package Test::Filter {
+{
+    package Test::Filter;
     sub filter {
         my( $item, $condition_name, %replacements ) = @_;
         %replacements = ( filter => 'WAS_FILTERED', %replacements );
+        my $item_description = $item->description->text;
         while( my ($k,$v) = each %replacements ) {
-            $item->description->replace_content( $item->description->text =~ s/\Q$k\E/$v/xmserg );
+            $item_description =~ s/\Q$k\E/$v/xmseg;
         }
+        $item->description->replace_content( $item_description );
     }
 }
 
@@ -98,18 +102,20 @@ END_OF_ITEM
     );
 };
 
-package App::Rssfilter::Match::Everything {
-  sub match {
-      1;
-  }
+{
+    package App::Rssfilter::Match::Everything;
+    sub match {
+        1;
+    }
 };
 
-package App::Rssfilter::Filter::MoreCowbell {
+{
+    package App::Rssfilter::Filter::MoreCowbell;
     sub filter {
       my( $item, $condition_name ) = @_;
       $item->description->replace_content('cowbell');
     }
-};
+}
 
 subtest 'passing match and filter as non-fully qualified strings', sub {
     my $relative_module_rule = App::Rssfilter::Rule->new( 'Everything' => 'MoreCowbell' );
@@ -130,7 +136,8 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
     );
 };
 
-package ShortName {
+{
+    package ShortName;
     sub match {
         $_[0]->title->text =~ /shortname/xmsi;
     }
@@ -138,7 +145,7 @@ package ShortName {
     sub filter {
         $_[0]->description->replace_content( 'Short Name is all' );
     }
-};
+}
 
 subtest 'passing a fully qualified namespace with leading colons', sub {
     my $fully_qualified_module_rule = App::Rssfilter::Rule->new( '::ShortName' => '::ShortName' );
@@ -187,7 +194,8 @@ subtest 'passing match and filter as strings to modules in INC', sub {
     );
 };
 
-package Test::Match::OO {
+{
+    package Test::Match::OO;
     use Moo;
     sub BUILDARGS {
         my( $self, @addn_args ) = @_;
@@ -204,7 +212,8 @@ package Test::Match::OO {
     }
 }
 
-package Test::Filter::OO {
+{
+    package Test::Filter::OO;
     use Moo;
     sub BUILDARGS {
         my( $self, @addn_args ) = @_;
@@ -217,9 +226,11 @@ package Test::Filter::OO {
     sub filter {
       my( $self, $item, $condition_name ) = @_;
       my %replacements = ( filter => 'WAS_FILTERED', @{ $self->additional_args } );
+      my $item_description = $item->description->text;
       while( my ($k,$v) = each %replacements ) {
-        $item->description->replace_content( $item->description->text =~ s/\Q$k\E/$v/xmserg );
+          $item_description =~ s/\Q$k\E/$v/xmseg;
       }
+      $item->description->replace_content( $item_description );
     }
 }
 

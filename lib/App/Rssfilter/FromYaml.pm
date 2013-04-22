@@ -1,5 +1,8 @@
 # ABSTRACT: create App::Rssfilter objects from YAML configuration
 
+use strict;
+use warnings;
+
 =head1 SYNOPSIS
 
     {
@@ -59,16 +62,12 @@ This role will extend its receiving class with a L</from_yaml> method. It requir
 
 =cut
 
-use strict;
-use warnings;
-use feature qw( :5.14 );
+package App::Rssfilter::FromYaml;
 
-package App::Rssfilter::FromYaml {
-
-    use Moo::Role;
-    use Method::Signatures;
-    use YAML::XS;
-    requires 'from_hash';
+use Moo::Role;
+use Method::Signatures;
+use YAML::XS;
+requires 'from_hash';
 
 =method from_yaml
 
@@ -86,10 +85,8 @@ C<$config> may have four keys:
 
 =cut
 
-    method from_yaml( $config ) {
-        $self->from_hash( Load( $config ) );
-    }
-
-};
+method from_yaml( $config ) {
+    $self->from_hash( Load( $config ) );
+}
 
 1;

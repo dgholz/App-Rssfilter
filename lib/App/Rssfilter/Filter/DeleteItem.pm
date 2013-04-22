@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use feature qw( :5.14 );
 
 # ABSTRACT: remove an RSS item from its channel
 
@@ -58,12 +57,13 @@ This module will remove an RSS item from its channel. Actually, it will remove a
 
 =cut
 
-package App::Rssfilter::Filter::DeleteItem {
-    use Method::Signatures;
+package App::Rssfilter::Filter::DeleteItem;
+
+use Method::Signatures;
 
 =func filter
 
-   App::Rssfilter::Filter::DeleteItem::filter( $item, $matcher );
+    App::Rssfilter::Filter::DeleteItem::filter( $item, $matcher );
 
 Removes C<$item> from its parent and discards it.
 
@@ -71,9 +71,7 @@ C<$matcher> is an optional string specifying the condition which caused C<$item>
 
 =cut
 
-    func filter ( $item, $matcher = 'no reason' ) {
-        $item->replace(q{});
-    }
+func filter ( $item, $matcher = 'no reason' ) {
+    $item->replace(q{});
 }
-
 1;

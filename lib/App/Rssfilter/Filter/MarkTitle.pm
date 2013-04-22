@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use feature qw( :5.14 );
 
 # ABSTRACT: add some text to the title of an RSS item
 
@@ -59,8 +58,9 @@ This module will add some uppercase text to the title of a L<Mojo::DOM> element.
 
 =cut
 
-package App::Rssfilter::Filter::MarkTitle {
-    use Method::Signatures;
+package App::Rssfilter::Filter::MarkTitle;
+
+use Method::Signatures;
 
 =func filter
 
@@ -70,9 +70,7 @@ Prefixes C<$item>'s title with C<$explicit_prefix> (or, if not specified, C<$mat
 
 =cut
 
-    func filter ( $item, $matcher, $explicit_prefix = $matcher ) {
-        $item->title->replace_content(uc($explicit_prefix) ." - ".$item->title->content_xml);
-    }
+func filter ( $item, $matcher, $explicit_prefix = $matcher ) {
+    $item->title->replace_content(uc($explicit_prefix) ." - ".$item->title->content_xml);
 }
-
 1;

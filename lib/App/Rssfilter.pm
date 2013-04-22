@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 # ABSTRACT: remove clutter from your news feeds
 
 =head1 SYNOPSIS
@@ -94,9 +95,9 @@ This can be mitigated by filtering Regional before National, or by fetching the 
 
 =cut
 
-package App::Rssfilter {
-    use Moo;
-    extends 'App::Rssfilter::Group';
-};
+package App::Rssfilter;
+
+use Moo;
+extends 'App::Rssfilter::Group';
 
 1;

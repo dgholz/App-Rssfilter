@@ -1,8 +1,7 @@
+# ABSTRACT: match an ABC preview RSS item
+
 use strict;
 use warnings;
-use feature qw( :5.14 );
-
-# ABSTRACT: match an ABC preview RSS item
 
 =head1 SYNOPSIS
 
@@ -53,8 +52,8 @@ This module will match an RSS item if its GUID contains 'C<preview>', unless 'C<
 
 =cut
 
-package App::Rssfilter::Match::AbcPreviews {
-    use Method::Signatures;
+package App::Rssfilter::Match::AbcPreviews;
+use Method::Signatures;
 
 =func match
 
@@ -64,9 +63,8 @@ Returns true if C<$item> contains 'C<preview>' in its GUID and not in its title.
 
 =cut
 
-    func match ( $item ) {
-        return $item->guid->text =~ / [^-] preview /xms and $item->title->text !~ / preview /ixms;
-    }
+func match ( $item ) {
+    return $item->guid->text =~ / [^-] preview /xms and $item->title->text !~ / preview /ixms;
 }
 
 1;

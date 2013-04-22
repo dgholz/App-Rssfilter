@@ -6,14 +6,16 @@ use App::Rssfilter::Rule;
 use List::MoreUtils;
 use Mojo::DOM;
 
-package Test::NoMatch {
+{
+    package Test::NoMatch;
     sub finder {
         my( $item ) = @_;
         return 1;
     }
 }
 
-package Test::NoFilter {
+{
+    package Test::NoFilter;
     sub exclude {
         my( $item, $finder_name ) = @_;
         $item->description->replace_content( "Found by $finder_name" );
@@ -36,7 +38,8 @@ throws_ok {
 } qr/Test::NoFilter::filter does not exist/,
 'action attr must specify a namespace with a filter sub';
 
-package Test::NoMatch::OO {
+{
+    package Test::NoMatch::OO;
 
     sub new {
         return bless \do { my $anon }, $_[0] ;
@@ -48,7 +51,8 @@ package Test::NoMatch::OO {
     }
 }
 
-package Test::NoFilter::OO {
+{
+    package Test::NoFilter::OO;
     sub new {
         return bless \do { my $anon }, $_[0] ;
     }

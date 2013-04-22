@@ -1,5 +1,8 @@
 # ABSTRACT: associate one or more rules with more than one feed
 
+use strict;
+use warnings;
+
 =head1 SYNOPSIS
 
     use App::RssFilter::Group;
@@ -57,23 +60,19 @@ Use a group to:
 
 =cut
 
-use strict;
-use warnings;
-use feature qw< :5.14 >;
+package App::Rssfilter::Group;
+use Moo;
+with 'App::Rssfilter::Logger';
+with 'App::Rssfilter::FromHash';
+with 'App::Rssfilter::FromYaml';
+use Method::Signatures;
 
-package App::Rssfilter::Group {
-    use Moo;
-    with 'App::Rssfilter::Logger';
-    with 'App::Rssfilter::FromHash';
-    with 'App::Rssfilter::FromYaml';
-    use Method::Signatures;
-
-    method BUILDARGS( @options ) {
-        if( 1 == @options ) {
-            unshift @options, 'name';
-        }
-        return { @options };
+method BUILDARGS( @options ) {
+    if( 1 == @options ) {
+        unshift @options, 'name';
     }
+    return { @options };
+}
 
 =method update
 
@@ -87,13 +86,13 @@ C<$storage> is the feed storage object that feeds and subgroups will use to stor
 
 =cut
 
-    method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
-        my $child_storage = $storage->path_push( $self->name );
-        my @rules = map { @{ $_ } } $rules, $self->rules;
-        $self->logger->debugf( 'filtering feeds in %s', $self->name );
-        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->groups };
-        $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->feeds };
-    }
+method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
+    my $child_storage = $storage->path_push( $self->name );
+    my @rules = map { @{ $_ } } $rules, $self->rules;
+    $self->logger->debugf( 'filtering feeds in %s', $self->name );
+    $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->groups };
+    $_->update( rules => \@rules, storage => $child_storage ) for @{ $self->feeds };
+}
 
 =attr logger
 
@@ -107,10 +106,10 @@ This is the name of the group. Group names are used when storing a feed so that 
 
 =cut
 
-    has name => (
-        is => 'ro',
-        default => sub { '.' },
-    );
+has name => (
+    is => 'ro',
+    default => sub { '.' },
+);
 
 =attr storage
 
@@ -118,10 +117,10 @@ This is a feed storage object for feeds to use when they are updated. The defaul
 
 =cut
 
-    has storage => (
-        is => 'ro',
-        default => method { App::Rssfilter::Feed::Storage->new },
-    );
+has storage => (
+    is => 'ro',
+    default => method { App::Rssfilter::Feed::Storage->new },
+);
 
 =attr groups
 
@@ -129,10 +128,10 @@ This is an arrayref of subgroups attatched to this group.
 
 =cut
 
-    has groups => (
-        is => 'ro',
-        default => sub { [] },
-    );
+has groups => (
+    is => 'ro',
+    default => sub { [] },
+);
 
 =method add_group
 
@@ -142,16 +141,16 @@ Adds C<$app_rssfilter_group> (or creates a new App::RssFilter::Group instance fr
 
 =cut
 
-    method add_group( $app_rssfilter_group, @group_options ) {
-        use Scalar::Util qw< blessed >;
-        if ( ! blessed( $app_rssfilter_group ) or ! $app_rssfilter_group->isa( 'App::Rssfilter::Group' ) ) {
-            unshift @group_options, $app_rssfilter_group; # restore original @_
-            $app_rssfilter_group = App::Rssfilter::Group->new( @group_options );
-        }
-
-        push $self->groups, $app_rssfilter_group;
-        return $self;
+method add_group( $app_rssfilter_group, @group_options ) {
+    use Scalar::Util qw< blessed >;
+    if ( ! blessed( $app_rssfilter_group ) or ! $app_rssfilter_group->isa( 'App::Rssfilter::Group' ) ) {
+        unshift @group_options, $app_rssfilter_group; # restore original @_
+        $app_rssfilter_group = App::Rssfilter::Group->new( @group_options );
     }
+
+    push @{ $self->groups }, $app_rssfilter_group;
+    return $self;
+}
 
 =method group
 
@@ -161,10 +160,10 @@ Returns the last subgroup added to this group whose name is C<$name>, or C<undef
 
 =cut
 
-    method group( $name ) {
-        use List::Util qw< first >;
-        first { $_->name eq $name } reverse @{ $self->groups };
-    }
+method group( $name ) {
+    use List::Util qw< first >;
+    first { $_->name eq $name } reverse @{ $self->groups };
+}
 
 =attr rules
 
@@ -172,10 +171,10 @@ This is an arrayref of rules to apply to the feeds in this group (and subgroups)
 
 =cut
 
-    has rules => (
-        is => 'ro',
-        default => sub { [] },
-    );
+has rules => (
+    is => 'ro',
+    default => sub { [] },
+);
 
 =method add_rule
 
@@ -185,17 +184,17 @@ Adds C<$app_rssfilter_rule> (or creates a new App::RssFilter::Rule instance from
 
 =cut
 
-    method add_rule( $app_rssfilter_rule, @rule_options ) {
-        use Scalar::Util qw< blessed >;
-        if ( ! blessed( $app_rssfilter_rule ) or ! $app_rssfilter_rule->isa( 'App::Rssfilter::Rule' ) ) {
-            unshift @rule_options, $app_rssfilter_rule; # restore original @_
-            use App::Rssfilter::Rule;
-            $app_rssfilter_rule = App::Rssfilter::Rule->new( @rule_options );
-        }
-
-        push $self->rules, $app_rssfilter_rule;
-        return $self;
+method add_rule( $app_rssfilter_rule, @rule_options ) {
+    use Scalar::Util qw< blessed >;
+    if ( ! blessed( $app_rssfilter_rule ) or ! $app_rssfilter_rule->isa( 'App::Rssfilter::Rule' ) ) {
+        unshift @rule_options, $app_rssfilter_rule; # restore original @_
+        use App::Rssfilter::Rule;
+        $app_rssfilter_rule = App::Rssfilter::Rule->new( @rule_options );
     }
+
+    push @{ $self->rules }, $app_rssfilter_rule;
+    return $self;
+}
 
 =attr feeds
 
@@ -203,10 +202,10 @@ This is an arrayref of feeds.
 
 =cut
 
-    has feeds => (
-        is => 'ro',
-        default => sub { [] },
-    );
+has feeds => (
+    is => 'ro',
+    default => sub { [] },
+);
 
 =method add_feed
 
@@ -216,17 +215,17 @@ Adds C<$app_rssfilter_feed> (or creates a new App::RssFilter::Feed instance from
 
 =cut
 
-    method add_feed( $app_rssfilter_feed, @feed_options ) {
-        use Scalar::Util qw< blessed >;
-        if ( ! blessed( $app_rssfilter_feed ) or ! $app_rssfilter_feed->isa( 'App::Rssfilter::Feed' ) ) {
-            unshift @feed_options, $app_rssfilter_feed; # restore original @_
-            use App::Rssfilter::Feed;
-            $app_rssfilter_feed = App::Rssfilter::Feed->new( @feed_options );
-        }
-
-        push $self->feeds, $app_rssfilter_feed;
-        return $app_rssfilter_feed;
+method add_feed( $app_rssfilter_feed, @feed_options ) {
+    use Scalar::Util qw< blessed >;
+    if ( ! blessed( $app_rssfilter_feed ) or ! $app_rssfilter_feed->isa( 'App::Rssfilter::Feed' ) ) {
+        unshift @feed_options, $app_rssfilter_feed; # restore original @_
+        use App::Rssfilter::Feed;
+        $app_rssfilter_feed = App::Rssfilter::Feed->new( @feed_options );
     }
+
+    push @{ $self->feeds }, $app_rssfilter_feed;
+    return $app_rssfilter_feed;
+}
 
 =method feed
 
@@ -236,11 +235,9 @@ Returns the last feed added to this group whose name is C<$name>, or C<undef> if
 
 =cut
 
-    method feed( $name ) {
-        use List::Util qw< first >;
-        first { $_->name eq $name } reverse @{ $self->feeds };
-    }
-
+method feed( $name ) {
+    use List::Util qw< first >;
+    first { $_->name eq $name } reverse @{ $self->feeds };
 }
 
 =method from_hash
@@ -267,6 +264,4 @@ Returns a new instance of this class with the feeds, rules, and subgroups specif
 * L<App::RssFilter::Rule>
 * L<App::RssFilter::Feed>
 * L<App::RssFilter>
-
-=cut
 

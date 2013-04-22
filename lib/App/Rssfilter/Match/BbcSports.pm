@@ -1,8 +1,7 @@
+# ABSTRACT: match a BBC sport RSS item
+
 use strict;
 use warnings;
-use feature qw( :5.14 );
-
-# ABSTRACT: match a BBC sport RSS item
 
 =head1 SYNOPSIS
 
@@ -54,8 +53,8 @@ This module will match items from BBC RSS feeds which are about sporting events.
 
 =cut
 
-package App::Rssfilter::Match::BbcSports {
-    use Method::Signatures;
+package App::Rssfilter::Match::BbcSports;
+use Method::Signatures;
 
 =func match
 
@@ -65,9 +64,8 @@ Returns true if ther GUID of C<$item> looks like a BBC sport GUID (like C<http:/
 
 =cut
 
-    func match ( $item ) {
-        return $item->guid->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
-    }
+func match ( $item ) {
+    return $item->guid->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
 }
 
 1;

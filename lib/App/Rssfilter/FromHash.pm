@@ -63,17 +63,16 @@ This role will extend its receiving class with a L</from_hash> method. It requir
 
 use strict;
 use warnings;
-use feature qw( :5.14 );
 
-package App::Rssfilter::FromHash {
+package App::Rssfilter::FromHash;
 
-    use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny
-    use Method::Signatures;
-    use Scalar::Util qw< blessed >;
+use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny
+use Method::Signatures;
+use Scalar::Util qw< blessed >;
 
-    requires 'add_feed';
-    requires 'add_rule';
-    requires 'add_group';
+requires 'add_feed';
+requires 'add_rule';
+requires 'add_group';
 
 =method from_hash
 
@@ -93,53 +92,50 @@ Bare scalars in C<feeds> will be collected into key-value pairs; everything else
 
 =cut
 
-    method from_hash( $config_ref, @config ) {
-        if ( 'HASH' ne ref $config_ref ) {
-            unshift @config, $config_ref;
-            $config_ref = {};
-        }
-        $self->_from_hash( %{ $config_ref }, @config );
+method from_hash( $config_ref, @config ) {
+    if ( 'HASH' ne ref $config_ref ) {
+        unshift @config, $config_ref;
+        $config_ref = {};
+    }
+    $self->_from_hash( %{ $config_ref }, @config );
+}
+
+method _from_hash( %config ) {
+    my $group = $self->new( name => $config{name} );
+
+    map { $group->add_feed( @{ $_ } ) } $self->split_for_ctor( @{ $config{feeds} } );
+    map { $group->add_rule( @{ $_ } ) } $self->split_for_ctor( @{ $config{rules} } );
+
+    for my $subgroup ( @{ $config{groups} } ) {
+        $group->add_group( $self->_from_hash( %{ $subgroup } ) );
     }
 
-    method _from_hash( %config ) {
-        my $group = $self->new( name => $config{name} );
-
-        map { $group->add_feed( @{ $_ } ) } $self->split_for_ctor( @{ $config{feeds} } );
-        map { $group->add_rule( @{ $_ } ) } $self->split_for_ctor( @{ $config{rules} } );
-
-        for my $subgroup ( @{ $config{groups} } ) {
-            $group->add_group( $self->_from_hash( %{ $subgroup } ) );
-        }
-
-        return $group;
-    }
+    return $group;
+}
 
 =method split_for_ctor
 
-B<INTERNAL>
+    B<INTERNAL>
 
     my @arguments_for_ctor_in_arrayrefs = $receiving_instance->split_for_ctor( @args );
 
-Returns the contents of C<args> partitioned into arrayrefs, whose contents are suitable arguments for a L<Moose>-y constructor. Collects bare scalars in C<@args> with their following element into key-value pairs; arrayrefs & hashrefs are dereferenced; everthing else is taken as-is.
+Returns the elements of C<@args> partitioned into arrayrefs, whose contents are suitable arguments for a L<Moose>-y constructor. Collects bare scalars in C<@args> with their following element into key-value pairs; arrayrefs & hashrefs are dereferenced; everthing else is taken as-is.
 
 =cut
 
-    method split_for_ctor( @list ) {
-        my @results;
-        while( @list ) {
-            push @results, do {
-                given( shift @list ) {
-                    [ %{ $_ } ] when 'HASH'  eq ref $_;
-                    [ @{ $_ } ] when 'ARRAY' eq ref $_;
-                    # squash 'Argument "foo" isn't numeric in smart match'
-                    [ $_ ]      when '' ne ref $_;
-                    default { [ $_ => shift @list ] };
-                }
-            };
-        }
-        return @results;
+method split_for_ctor( @list ) {
+    my @results;
+    while( @list ) {
+        use 5.010;
+        given( shift @list ) {
+            when( 'HASH'  eq ref $_ ) { push @results, [ %{ $_ } ] }
+            when( 'ARRAY' eq ref $_ ) { push @results, [ @{ $_ } ] }
+            # squash 'Argument "foo" isn't numeric in smart match'
+            when( '' ne ref $_ )      { push @results, [ $_ ] }
+            default                   { push @results, [ $_ => shift @list ] };
+        };
     }
-
-};
+    return @results;
+}
 
 1;
