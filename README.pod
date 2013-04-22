@@ -7,7 +7,9 @@ See how the development is progressing at L<the Trello board|https://trello.com/
 =begin html
 
 <p>
-  <img src="https://travis-ci.org/dgholz/App-Rssfilter.png?branch=master" alt="Travis CI build status">
+  <a href="https://travis-ci.org/dgholz/App-Rssfilter">
+    <img src="https://travis-ci.org/dgholz/App-Rssfilter.png?branch=master" alt="Travis CI build status">
+  </a>
 </p>
 
 =end html
