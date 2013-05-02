@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::Duplicates;
 {
-  $App::Rssfilter::Match::Duplicates::VERSION = '0.01';
+  $App::Rssfilter::Match::Duplicates::VERSION = '0.02';
 }
 use Method::Signatures;
 use Try::Tiny;
@@ -38,7 +38,7 @@ App::Rssfilter::Match::Duplicates - match an RSS item which has been seen before
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

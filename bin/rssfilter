@@ -20,7 +20,7 @@ rssfilter - command-line interface to App::Rssfilter
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 OVERVIEW
 

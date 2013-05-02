@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter;
 {
-  $App::Rssfilter::VERSION = '0.01';
+  $App::Rssfilter::VERSION = '0.02';
 }
 
 use Moo;
@@ -24,7 +24,7 @@ App::Rssfilter - remove clutter from your news feeds
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ never want to see duplicate articles
 
 =back
 
-The duplicate matcher is quote pessimistic, and strictly avoids false positives.
+The duplicate matcher is quite pessimistic, and strictly avoids false positives.
 
 =head1 EXTENDING
 
@@ -120,7 +120,7 @@ Include it in your C<PERL5LIB>, and use your package name as the key (for matche
 
     name: things I read
     feeds:
-    - a feed: http:://a.feed.url/
+    - a feed: http://a.feed.url/
     rules:
     - My::Custom::Matcher: My::Custom::Filter
 

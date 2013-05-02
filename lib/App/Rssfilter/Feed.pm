@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Feed;
 {
-  $App::Rssfilter::Feed::VERSION = '0.01';
+  $App::Rssfilter::Feed::VERSION = '0.02';
 }
 
 use Moo;
@@ -120,7 +120,7 @@ App::Rssfilter::Feed - Get the latest or previous version of an RSS feed
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

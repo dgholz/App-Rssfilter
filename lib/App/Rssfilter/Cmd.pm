@@ -5,7 +5,7 @@ use warnings;
 
 package App::Rssfilter::Cmd;
 {
-  $App::Rssfilter::Cmd::VERSION = '0.01';
+  $App::Rssfilter::Cmd::VERSION = '0.02';
 }
 
 use constant plugin_search_path => __PACKAGE__;
@@ -24,7 +24,7 @@ App::Rssfilter::Cmd - App::Rssfilter's App::Cmd
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

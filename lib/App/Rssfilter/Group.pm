@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Group;
 {
-  $App::Rssfilter::Group::VERSION = '0.01';
+  $App::Rssfilter::Group::VERSION = '0.02';
 }
 use Moo;
 with 'App::Rssfilter::Logger';
@@ -125,7 +125,7 @@ App::Rssfilter::Group - associate one or more rules with more than one feed
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
