@@ -51,7 +51,7 @@ You should not use App::Rssfilter if you:
 =for :list
 * never want to see duplicate articles
 
-The duplicate matcher is quote pessimistic, and strictly avoids false positives.
+The duplicate matcher is quite pessimistic, and strictly avoids false positives.
 
 =head1 EXTENDING
 
@@ -72,7 +72,7 @@ Include it in your C<PERL5LIB>, and use your package name as the key (for matche
 
     name: things I read
     feeds:
-    - a feed: http:://a.feed.url/
+    - a feed: http://a.feed.url/
     rules:
     - My::Custom::Matcher: My::Custom::Filter
 
