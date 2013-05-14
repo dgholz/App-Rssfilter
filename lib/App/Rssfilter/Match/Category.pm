@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::Category;
 {
-  $App::Rssfilter::Match::Category::VERSION = '0.02';
+  $App::Rssfilter::Match::Category::VERSION = '0.03'; # TRIAL
 }
 use Method::Signatures;
 use List::MoreUtils qw( any );
@@ -31,7 +31,7 @@ App::Rssfilter::Match::Category - match an RSS item by category
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

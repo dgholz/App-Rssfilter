@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Filter::DeleteItem;
 {
-  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.02';
+  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.03'; # TRIAL
 }
 
 use Method::Signatures;
@@ -27,7 +27,7 @@ App::Rssfilter::Filter::DeleteItem - remove an RSS item from its channel
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

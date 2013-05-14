@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Cmd::runfromconfig;
 {
-  $App::Rssfilter::Cmd::runfromconfig::VERSION = '0.02';
+  $App::Rssfilter::Cmd::runfromconfig::VERSION = '0.03'; # TRIAL
 }
 
 use App::Rssfilter::Cmd -command;
@@ -59,7 +59,7 @@ App::Rssfilter::Cmd::runfromconfig - fetch feeds and constrain with rules, all f
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

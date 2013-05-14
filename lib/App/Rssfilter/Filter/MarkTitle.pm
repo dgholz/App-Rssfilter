@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Filter::MarkTitle;
 {
-  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.02';
+  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.03'; # TRIAL
 }
 
 use Method::Signatures;
@@ -27,7 +27,7 @@ App::Rssfilter::Filter::MarkTitle - add some text to the title of an RSS item
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
