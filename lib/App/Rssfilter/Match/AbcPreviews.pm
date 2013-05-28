@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::AbcPreviews;
 {
-  $App::Rssfilter::Match::AbcPreviews::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Match::AbcPreviews::VERSION = '0.03';
 }
 use Method::Signatures;
 

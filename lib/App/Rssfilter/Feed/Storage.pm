@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Feed::Storage;
 {
-  $App::Rssfilter::Feed::Storage::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Feed::Storage::VERSION = '0.03';
 }
 
 use Method::Signatures;

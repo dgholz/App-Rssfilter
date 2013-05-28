@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Cmd::runfromconfig;
 {
-  $App::Rssfilter::Cmd::runfromconfig::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Cmd::runfromconfig::VERSION = '0.03';
 }
 
 use App::Rssfilter::Cmd -command;

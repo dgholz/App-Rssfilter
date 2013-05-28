@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::Category;
 {
-  $App::Rssfilter::Match::Category::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Match::Category::VERSION = '0.03';
 }
 use Method::Signatures;
 use List::MoreUtils qw( any );

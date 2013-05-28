@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Filter::DeleteItem;
 {
-  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.03';
 }
 
 use Method::Signatures;

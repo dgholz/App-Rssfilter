@@ -1,6 +1,6 @@
 Revision history for Perl module App::Rssfilter
 
-0.03      2013-05-15 00:55:54 Europe/London
+0.03      2013-05-28 23:45:37 Europe/London
  - Feed storage tests pass on Windows
 
 0.02      2013-05-03 00:04:59 Europe/London

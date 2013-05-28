@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Filter::MarkTitle;
 {
-  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.03';
 }
 
 use Method::Signatures;

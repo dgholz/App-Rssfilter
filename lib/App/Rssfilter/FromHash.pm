@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromHash;
 {
-  $App::Rssfilter::FromHash::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::FromHash::VERSION = '0.03';
 }
 
 use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny

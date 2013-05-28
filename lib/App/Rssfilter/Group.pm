@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Group;
 {
-  $App::Rssfilter::Group::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Group::VERSION = '0.03';
 }
 use Moo;
 with 'App::Rssfilter::Logger';

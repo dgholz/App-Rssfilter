@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromYaml;
 {
-  $App::Rssfilter::FromYaml::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::FromYaml::VERSION = '0.03';
 }
 
 use Moo::Role;

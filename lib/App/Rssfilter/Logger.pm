@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Logger;
 {
-  $App::Rssfilter::Logger::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Logger::VERSION = '0.03';
 }
 
 use Moo::Role;

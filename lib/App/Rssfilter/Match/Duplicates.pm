@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::Duplicates;
 {
-  $App::Rssfilter::Match::Duplicates::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Match::Duplicates::VERSION = '0.03';
 }
 use Method::Signatures;
 use Try::Tiny;

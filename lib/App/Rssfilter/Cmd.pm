@@ -5,7 +5,7 @@ use warnings;
 
 package App::Rssfilter::Cmd;
 {
-  $App::Rssfilter::Cmd::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Cmd::VERSION = '0.03';
 }
 
 use constant plugin_search_path => __PACKAGE__;

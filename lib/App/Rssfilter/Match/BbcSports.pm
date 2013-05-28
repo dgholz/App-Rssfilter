@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::BbcSports;
 {
-  $App::Rssfilter::Match::BbcSports::VERSION = '0.03'; # TRIAL
+  $App::Rssfilter::Match::BbcSports::VERSION = '0.03';
 }
 use Method::Signatures;
 
