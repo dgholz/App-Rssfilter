@@ -56,7 +56,9 @@ has tempfile => (
 
 around tempfile => sub {
     my ( $orig, @args ) = @_;
-    Path::Class::File->new( $orig->( @args )->filename );
+    my $temp = $orig->( @args );
+    $temp->close;
+    Path::Class::File->new( $temp->filename );
 };
 
 1;

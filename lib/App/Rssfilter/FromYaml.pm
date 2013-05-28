@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromYaml;
 {
-  $App::Rssfilter::FromYaml::VERSION = '0.02';
+  $App::Rssfilter::FromYaml::VERSION = '0.03';
 }
 
 use Moo::Role;
@@ -31,7 +31,7 @@ App::Rssfilter::FromYaml - create App::Rssfilter objects from YAML configuration
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
