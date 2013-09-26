@@ -15,6 +15,7 @@ requires 'results_of_split_for_ctor';
 
 has mock_object => (
     is => 'ro',
+    lazy => 1,
     default => method {
         my $mock_object = Test::MockObject->new();
         $mock_object->set_isa( $self->fake_class_name );

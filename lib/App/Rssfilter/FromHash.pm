@@ -127,6 +127,7 @@ method split_for_ctor( @list ) {
     my @results;
     while( @list ) {
         use 5.010;
+        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         given( shift @list ) {
             when( 'HASH'  eq ref $_ ) { push @results, [ %{ $_ } ] }
             when( 'ARRAY' eq ref $_ ) { push @results, [ @{ $_ } ] }
