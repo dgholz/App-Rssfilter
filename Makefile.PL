@@ -44,7 +44,9 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "YAML::XS" => 0,
     "constant" => 0,
+    "experimental" => "0.005",
     "feature" => 0,
+    "if" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -59,9 +61,10 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Routine" => 0,
     "Test::Routine::Util" => 0,
+    "lib" => 0,
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t t/app/rssfilter/*.t t/app/rssfilter/feed/*.t t/app/rssfilter/filter/*.t t/app/rssfilter/group/*.t t/app/rssfilter/match/*.t"
   }

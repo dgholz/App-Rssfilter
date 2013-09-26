@@ -15,6 +15,7 @@ has fake_class_name => (
 
 has fake_class => (
     is => 'ro',
+    lazy => 1,
     default => method {
         my $name = $self->fake_class_name;
         my $fake_class = Test::MockObject->new();

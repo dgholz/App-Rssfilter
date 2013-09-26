@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromHash;
 {
-  $App::Rssfilter::FromHash::VERSION = '0.03';
+  $App::Rssfilter::FromHash::VERSION = '0.04';
 }
 
 use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny
@@ -44,6 +44,7 @@ method split_for_ctor( @list ) {
     my @results;
     while( @list ) {
         use 5.010;
+        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         given( shift @list ) {
             when( 'HASH'  eq ref $_ ) { push @results, [ %{ $_ } ] }
             when( 'ARRAY' eq ref $_ ) { push @results, [ @{ $_ } ] }
@@ -67,7 +68,7 @@ App::Rssfilter::FromHash - a role for creating App::Rssfilter objects from a con
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
