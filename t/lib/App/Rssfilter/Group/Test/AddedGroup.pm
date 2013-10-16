@@ -11,8 +11,8 @@ use namespace::autoclean;
 requires 'group';
 requires 'mock_group';
 
-method count_matches( $needle, \@haystack ) {
-    return grep { $needle eq $_ } @haystack;
+method count_matches( $needle, ArrayRef $haystack ) {
+    return grep { $needle eq $_ } @{ $haystack };
 }
 
 method count_mock_group_matches() {

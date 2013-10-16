@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromHash;
 {
-  $App::Rssfilter::FromHash::VERSION = '0.04';
+  $App::Rssfilter::FromHash::VERSION = '0.05';
 }
 
 use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny
@@ -68,7 +68,7 @@ App::Rssfilter::FromHash - a role for creating App::Rssfilter objects from a con
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

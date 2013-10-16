@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Rule;
 {
-  $App::Rssfilter::Rule::VERSION = '0.04';
+  $App::Rssfilter::Rule::VERSION = '0.05';
 }
 
 use Moo;
@@ -188,7 +188,7 @@ App::Rssfilter::Rule - match and filter RSS feeds
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
