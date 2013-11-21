@@ -27,7 +27,7 @@ use warnings;
     
     sub new {
         my ( $class, @bracketed_args) = @_;
-        if ( 'BORING' eq $bracket_args[0] ) {
+        if ( grep { $_ eq 'BORING' } @bracketed_args ) {
             # turn on boredom detection circuits
             ...
         }
@@ -98,7 +98,7 @@ use warnings;
 
 =head1 DESCRIPTION
 
-This module will test all C<item> elements in a L<Mojo::DOM> object against a condition, and apply a action to those tiems where the condition is true.
+This module will test all C<item> elements in a L<Mojo::DOM> object against a condition, and apply an action on items where the condition is true.
 
 It consumes the L<App::Rssfilter::Logger> role.
 
