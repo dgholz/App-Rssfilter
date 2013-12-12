@@ -273,7 +273,7 @@ method constrain( Mojo::DOM $Mojo_DOM ) {
 
 method nice_name_for( $attr, $type ) {
     use feature 'switch';
-    no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+    use experimental 'smartmatch';
     given( ref $attr ) {
         when( 'CODE' ) { return "unnamed RSS ${type}"; }
         when( q{}    ) { return $attr }
@@ -297,7 +297,7 @@ method BUILD( $args ) {
 method coerce_attr( :$attr, :$type ) {
     die "can't use an undefined value to $type RSS items" if not defined $attr;
     use feature 'switch';
-    no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+    use experimental 'smartmatch';
     given( ref $attr ) {
         when( 'CODE' ) {
             return $attr;
