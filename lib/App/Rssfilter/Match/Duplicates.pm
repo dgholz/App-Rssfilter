@@ -86,7 +86,7 @@ Returns true if C<$item> has a GUID or link which matches a previously-seen GUID
 =cut
 
 func match ( $item ) {
-    use 5.010;
+    use feature 'state';
     state %prev;
 
     my @matchables = 
