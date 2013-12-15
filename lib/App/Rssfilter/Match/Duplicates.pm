@@ -81,7 +81,7 @@ use Try::Tiny;
 
     my $item_seen_before = App::Rssfilter::Match::Duplicate::match( $item );
 
-Returns true if C<$item> has a GUID or link which matches a previously-seen GUID or link. Query strings in links and GUIDs will be ignore for the purposes of matching a previous link.
+Returns true if C<$item> has a GUID or link which matches a previously-seen GUID or link. Query strings in links and GUIDs will be ignored for the purposes of matching a previous link.
 
 =cut
 

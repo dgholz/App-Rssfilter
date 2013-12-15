@@ -35,8 +35,6 @@ use Log::Any;
 
 =attr logger
 
-$receiver->logger->debug( 'cutting down trees' );
-
 This is a L<Log::Any> object.
 
 =cut
