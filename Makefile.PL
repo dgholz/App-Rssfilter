@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -46,7 +46,6 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "experimental" => "0.005",
     "feature" => 0,
-    "if" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -64,7 +63,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t t/app/rssfilter/*.t t/app/rssfilter/feed/*.t t/app/rssfilter/filter/*.t t/app/rssfilter/group/*.t t/app/rssfilter/match/*.t"
   }
@@ -99,6 +98,13 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ($] < 5.010) {
+    $WriteMakefileArgs{PREREQ_PM} = {
+        %{ $WriteMakefileArgs{PREREQ_PM} },
+        "Devel::Pragma" => "0.54",
+    };
+}
 
 WriteMakefile(%WriteMakefileArgs);
 

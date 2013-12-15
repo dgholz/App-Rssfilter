@@ -1,5 +1,11 @@
 Revision history for Perl module App::Rssfilter
 
+0.06      2013-12-15 10:10:56 Europe/London
+ - Documentation fixes
+ - Idiomatic use of experimental & state features
+ - Prequisite Devel::Pragma pinned to v0.54 on perl 5.10
+ - Remove 'dzil cover' plugin from authordeps
+
 0.05      2013-10-16 23:54:35 Europe/London
  - Adjust method signatures to avoid using aliased parameters
 

@@ -6,14 +6,14 @@ use warnings;
 
 package App::Rssfilter::Match::Duplicates;
 {
-  $App::Rssfilter::Match::Duplicates::VERSION = '0.05';
+  $App::Rssfilter::Match::Duplicates::VERSION = '0.06'; # TRIAL
 }
 use Method::Signatures;
 use Try::Tiny;
 
 
 func match ( $item ) {
-    use 5.010;
+    use feature 'state';
     state %prev;
 
     my @matchables = 
@@ -38,7 +38,7 @@ App::Rssfilter::Match::Duplicates - match an RSS item which has been seen before
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ This module will match RSS items if either the GUID or link of the item have bee
 
     my $item_seen_before = App::Rssfilter::Match::Duplicate::match( $item );
 
-Returns true if C<$item> has a GUID or link which matches a previously-seen GUID or link. Query strings in links and GUIDs will be ignore for the purposes of matching a previous link.
+Returns true if C<$item> has a GUID or link which matches a previously-seen GUID or link. Query strings in links and GUIDs will be ignored for the purposes of matching a previous link.
 
 =head1 SEE ALSO
 

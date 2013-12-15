@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Logger;
 {
-  $App::Rssfilter::Logger::VERSION = '0.05';
+  $App::Rssfilter::Logger::VERSION = '0.06'; # TRIAL
 }
 
 use Moo::Role;
@@ -31,7 +31,7 @@ App::Rssfilter::Logger - adds a logger to a class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -51,8 +51,6 @@ C<App::Rssfilter::Logger> is a role that can be composed into any class, and add
 =head1 ATTRIBUTES
 
 =head2 logger
-
-$receiver->logger->debug( 'cutting down trees' );
 
 This is a L<Log::Any> object.
 

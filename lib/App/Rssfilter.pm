@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter;
 {
-  $App::Rssfilter::VERSION = '0.05';
+  $App::Rssfilter::VERSION = '0.06'; # TRIAL
 }
 
 use Moo;
@@ -24,7 +24,7 @@ App::Rssfilter - remove clutter from your news feeds
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
