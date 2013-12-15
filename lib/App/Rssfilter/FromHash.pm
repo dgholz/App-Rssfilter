@@ -126,8 +126,8 @@ Returns the elements of C<@args> partitioned into arrayrefs, whose contents are 
 method split_for_ctor( @list ) {
     my @results;
     while( @list ) {
-        use 5.010;
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+        use experimental 'smartmatch';
+        use feature 'switch';
         given( shift @list ) {
             when( 'HASH'  eq ref $_ ) { push @results, [ %{ $_ } ] }
             when( 'ARRAY' eq ref $_ ) { push @results, [ @{ $_ } ] }
