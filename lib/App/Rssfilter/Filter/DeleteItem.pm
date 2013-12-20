@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Filter::DeleteItem;
 {
-  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.06';
 }
 
 use Method::Signatures;
@@ -20,6 +20,8 @@ func filter ( $item, $matcher = 'no reason' ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

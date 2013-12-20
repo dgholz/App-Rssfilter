@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Feed;
 {
-  $App::Rssfilter::Feed::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Feed::VERSION = '0.06';
 }
 
 use Moo;
@@ -113,6 +113,8 @@ method update( ArrayRef :$rules = [], :$storage = $self->storage ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

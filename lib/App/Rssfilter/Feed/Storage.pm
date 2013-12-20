@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Feed::Storage;
 {
-  $App::Rssfilter::Feed::Storage::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Feed::Storage::VERSION = '0.06';
 }
 
 use Method::Signatures;
@@ -106,6 +106,8 @@ method save_feed( $feed ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

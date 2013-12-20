@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Cmd::runfromconfig;
 {
-  $App::Rssfilter::Cmd::runfromconfig::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Cmd::runfromconfig::VERSION = '0.06';
 }
 
 use App::Rssfilter::Cmd -command;
@@ -52,6 +52,8 @@ method execute( $opt, $args ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

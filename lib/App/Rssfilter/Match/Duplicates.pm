@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::Duplicates;
 {
-  $App::Rssfilter::Match::Duplicates::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Match::Duplicates::VERSION = '0.06';
 }
 use Method::Signatures;
 use Try::Tiny;
@@ -31,6 +31,8 @@ func match ( $item ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

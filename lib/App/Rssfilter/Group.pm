@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Group;
 {
-  $App::Rssfilter::Group::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Group::VERSION = '0.06';
 }
 use Moo;
 with 'App::Rssfilter::Logger';
@@ -118,6 +118,8 @@ method feed( $name ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

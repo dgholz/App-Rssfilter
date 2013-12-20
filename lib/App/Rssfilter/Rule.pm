@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Rule;
 {
-  $App::Rssfilter::Rule::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Rule::VERSION = '0.06';
 }
 
 use Moo;
@@ -181,6 +181,8 @@ method coerce_module_name_to_sub( :$module_name, :$type ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

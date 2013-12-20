@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter;
 {
-  $App::Rssfilter::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::VERSION = '0.06';
 }
 
 use Moo;
@@ -17,6 +17,8 @@ extends 'App::Rssfilter::Group';
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

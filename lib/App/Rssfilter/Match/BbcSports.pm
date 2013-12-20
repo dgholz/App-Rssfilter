@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::BbcSports;
 {
-  $App::Rssfilter::Match::BbcSports::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Match::BbcSports::VERSION = '0.06';
 }
 use Method::Signatures;
 
@@ -20,6 +20,8 @@ func match ( $item ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

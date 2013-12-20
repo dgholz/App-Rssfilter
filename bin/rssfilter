@@ -14,6 +14,8 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 rssfilter - command-line interface to App::Rssfilter

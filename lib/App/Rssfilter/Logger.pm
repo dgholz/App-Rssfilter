@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Logger;
 {
-  $App::Rssfilter::Logger::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Logger::VERSION = '0.06';
 }
 
 use Moo::Role;
@@ -24,6 +24,8 @@ has 'logger' => (
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

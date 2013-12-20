@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Filter::MarkTitle;
 {
-  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.06';
 }
 
 use Method::Signatures;
@@ -20,6 +20,8 @@ func filter ( $item, $matcher, $explicit_prefix = $matcher ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

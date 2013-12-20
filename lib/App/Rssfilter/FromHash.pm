@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromHash;
 {
-  $App::Rssfilter::FromHash::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::FromHash::VERSION = '0.06';
 }
 
 use Moo::Role; # test harness uses Test::Routine, which wants a Moose-y role, son no Role::Tiny
@@ -61,6 +61,8 @@ method split_for_ctor( @list ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

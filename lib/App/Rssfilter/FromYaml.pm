@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::FromYaml;
 {
-  $App::Rssfilter::FromYaml::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::FromYaml::VERSION = '0.06';
 }
 
 use Moo::Role;
@@ -24,6 +24,8 @@ method from_yaml( $config ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

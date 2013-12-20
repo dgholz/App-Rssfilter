@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::Category;
 {
-  $App::Rssfilter::Match::Category::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Match::Category::VERSION = '0.06';
 }
 use Method::Signatures;
 use List::MoreUtils qw( any );
@@ -24,6 +24,8 @@ func match ( $item, @bad_cats ) {
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 

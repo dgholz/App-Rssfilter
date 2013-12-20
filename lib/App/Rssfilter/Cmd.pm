@@ -5,7 +5,7 @@ use warnings;
 
 package App::Rssfilter::Cmd;
 {
-  $App::Rssfilter::Cmd::VERSION = '0.06'; # TRIAL
+  $App::Rssfilter::Cmd::VERSION = '0.06';
 }
 
 use constant plugin_search_path => __PACKAGE__;
@@ -17,6 +17,8 @@ use App::Cmd::Setup -app;
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
