@@ -2,7 +2,7 @@ Revision history for Perl module App::Rssfilter
 
 {{$NEXT}}
 
-0.06      2013-12-15 10:10:56 Europe/London
+0.06      2013-12-20 15:48:05 Europe/London
  - Documentation fixes
  - Idiomatic use of experimental & state features
  - Prequisite Devel::Pragma pinned to v0.54 on perl 5.10
