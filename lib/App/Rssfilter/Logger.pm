@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Logger;
 {
-  $App::Rssfilter::Logger::VERSION = '0.06';
+  $App::Rssfilter::Logger::VERSION = '0.07';
 }
 
 use Moo::Role;
@@ -33,7 +33,7 @@ App::Rssfilter::Logger - adds a logger to a class
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::AbcPreviews;
 {
-  $App::Rssfilter::Match::AbcPreviews::VERSION = '0.06';
+  $App::Rssfilter::Match::AbcPreviews::VERSION = '0.07';
 }
 use Method::Signatures;
 
@@ -29,7 +29,7 @@ App::Rssfilter::Match::AbcPreviews - match an ABC preview RSS item
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Feed::Storage;
 {
-  $App::Rssfilter::Feed::Storage::VERSION = '0.06';
+  $App::Rssfilter::Feed::Storage::VERSION = '0.07';
 }
 
 use Method::Signatures;
@@ -115,7 +115,7 @@ App::Rssfilter::Feed::Storage - load and save RSS feeds as files
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

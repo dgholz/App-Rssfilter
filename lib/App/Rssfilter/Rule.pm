@@ -7,7 +7,7 @@ use warnings;
 
 package App::Rssfilter::Rule;
 {
-  $App::Rssfilter::Rule::VERSION = '0.06';
+  $App::Rssfilter::Rule::VERSION = '0.07';
 }
 
 use Moo;
@@ -26,7 +26,6 @@ has condition => (
 
 has _match => (
     is       => 'lazy',
-    required => 1,
     init_arg => undef,
     default  => method { $self->coerce_attr( attr => $self->condition, type => 'match' ) },
 );
@@ -51,7 +50,6 @@ has action => (
 
 has _filter => (
     is       => 'lazy',
-    required => 1,
     init_arg => undef,
     default  => method { $self->coerce_attr( attr => $self->action, type => 'filter' ) },
 );
@@ -190,7 +188,7 @@ App::Rssfilter::Rule - match and filter RSS feeds
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

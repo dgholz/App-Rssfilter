@@ -6,7 +6,7 @@ use warnings;
 
 package App::Rssfilter::Match::BbcSports;
 {
-  $App::Rssfilter::Match::BbcSports::VERSION = '0.06';
+  $App::Rssfilter::Match::BbcSports::VERSION = '0.07';
 }
 use Method::Signatures;
 
@@ -29,7 +29,7 @@ App::Rssfilter::Match::BbcSports - match a BBC sport RSS item
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
