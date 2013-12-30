@@ -163,7 +163,6 @@ C<_match> will then be set to a wrapper:
 
 has _match => (
     is       => 'lazy',
-    required => 1,
     init_arg => undef,
     default  => method { $self->coerce_attr( attr => $self->condition, type => 'match' ) },
 );
@@ -221,7 +220,6 @@ The filter will then be set to a wrapper:
 
 has _filter => (
     is       => 'lazy',
-    required => 1,
     init_arg => undef,
     default  => method { $self->coerce_attr( attr => $self->action, type => 'filter' ) },
 );
