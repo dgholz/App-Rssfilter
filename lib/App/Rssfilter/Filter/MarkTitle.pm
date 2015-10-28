@@ -71,6 +71,6 @@ Prefixes C<$item>'s title with C<$explicit_prefix> (or, if not specified, C<$mat
 =cut
 
 func filter ( $item, $matcher, $explicit_prefix = $matcher ) {
-    $item->title->replace_content(uc($explicit_prefix) ." - ".$item->title->content_xml);
+    $item->at('title')->prepend_content(uc($explicit_prefix)." - ");
 }
 1;
