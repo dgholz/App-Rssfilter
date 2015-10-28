@@ -25,7 +25,7 @@ use Mojo::DOM;
         while( my ($k,$v) = each %replacements ) {
             $item_description =~ s/\Q$k\E/$v/xmseg;
         }
-        $item->at('description')->replace_content( $item_description );
+        $item->at('description')->content( $item_description );
     }
 }
 
@@ -113,7 +113,7 @@ END_OF_ITEM
     package App::Rssfilter::Filter::MoreCowbell;
     sub filter {
       my( $item, $condition_name ) = @_;
-      $item->at('description')->replace_content('cowbell');
+      $item->at('description')->content('cowbell');
     }
 }
 
@@ -143,7 +143,7 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
     }
 
     sub filter {
-        $_[0]->at('description')->replace_content( 'Short Name is all' );
+        $_[0]->at('description')->content( 'Short Name is all' );
     }
 }
 
@@ -230,7 +230,7 @@ subtest 'passing match and filter as strings to modules in INC', sub {
       while( my ($k,$v) = each %replacements ) {
           $item_description =~ s/\Q$k\E/$v/xmseg;
       }
-      $item->at('description')->replace_content( $item_description );
+      $item->at('description')->content( $item_description );
     }
 }
 
@@ -293,7 +293,7 @@ subtest 'passing match and filter as anonymous subs', sub {
           $_[0]->at('title')->text =~ /A[.] [ ] Noni [ ] Mouse/xmsi;
         },
         action    => sub {
-          $_[0]->at('description')->replace_content( 'Kilroy was here' );
+          $_[0]->at('description')->content( 'Kilroy was here' );
         },
     );
 
