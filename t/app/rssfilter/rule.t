@@ -21,11 +21,11 @@ use Mojo::DOM;
     sub filter {
         my( $item, $condition_name, %replacements ) = @_;
         %replacements = ( filter => 'WAS_FILTERED', %replacements );
-        my $item_description = $item->description->text;
+        my $item_description = $item->at('description')->text;
         while( my ($k,$v) = each %replacements ) {
             $item_description =~ s/\Q$k\E/$v/xmseg;
         }
-        $item->description->replace_content( $item_description );
+        $item->at('description')->replace_content( $item_description );
     }
 }
 
@@ -56,7 +56,7 @@ subtest 'passing match & filter as strings referring to locally declared package
     my $count = $string_opt_rule->constrain( $string_opt_rss );
 
     is(
-        $string_opt_rss->find( 'item' )->first->description->text,
+        $string_opt_rss->find( 'item' )->first->at('description')->text,
         'hi hello WAS_FILTERED me please',
         'looks up match & filter when namespace passed as string'
     );
@@ -90,7 +90,7 @@ END_OF_ITEM
     my $count = $addn_args_rule->constrain( $addn_args_rss );
 
     is(
-        $addn_args_rss->find( 'item' )->[1]->description->text,
+        $addn_args_rss->find( 'item' )->[1]->at('description')->text,
         'holla up in this piece',
         'passed additional args were used when matching and filtering'
     );
@@ -113,7 +113,7 @@ END_OF_ITEM
     package App::Rssfilter::Filter::MoreCowbell;
     sub filter {
       my( $item, $condition_name ) = @_;
-      $item->description->replace_content('cowbell');
+      $item->at('description')->replace_content('cowbell');
     }
 }
 
@@ -130,7 +130,7 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
     );
 
     is(
-        $relative_module_rss->find( 'item' )->first->description->text,
+        $relative_module_rss->find( 'item' )->first->at('description')->text,
         'cowbell',
         'fully qualifies condition attr into the App::Rssfilter::Match:: namespace (likewise for filter)'
     );
@@ -143,7 +143,7 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
     }
 
     sub filter {
-        $_[0]->description->replace_content( 'Short Name is all' );
+        $_[0]->at('description')->replace_content( 'Short Name is all' );
     }
 }
 
@@ -168,7 +168,7 @@ END_OF_ITEM
     );
 
     is(
-        $fully_qualified_module_rss->find( 'item' )->[1]->description->text,
+        $fully_qualified_module_rss->find( 'item' )->[1]->at('description')->text,
         'Short Name is all',
         'a fully qualified condition attr is not assumed to be in the App::Rssfilter::Match:: namespace (likewise for filter)'
     );
@@ -226,11 +226,11 @@ subtest 'passing match and filter as strings to modules in INC', sub {
     sub filter {
       my( $self, $item, $condition_name ) = @_;
       my %replacements = ( filter => 'WAS_FILTERED', @{ $self->additional_args } );
-      my $item_description = $item->description->text;
+      my $item_description = $item->at('description')->text;
       while( my ($k,$v) = each %replacements ) {
           $item_description =~ s/\Q$k\E/$v/xmseg;
       }
-      $item->description->replace_content( $item_description );
+      $item->at('description')->replace_content( $item_description );
     }
 }
 
@@ -250,7 +250,7 @@ END_OF_ITEM
     my $count = $oo_rule->constrain( $oo_rss );
 
     is(
-        $oo_rss->find( 'item' )->[1]->description->text,
+        $oo_rss->find( 'item' )->[1]->at('description')->text,
         'bad cop on the beat',
         'looks up match & filter when OO module passed as string, and pass addition args to the ctors'
     );
@@ -281,7 +281,7 @@ END_OF_ITEM
     my $count = $oo_rule->constrain( $oo_rss );
 
     is(
-        $oo_rss->find( 'item' )->[1]->description->text,
+        $oo_rss->find( 'item' )->[1]->at('description')->text,
         'bad cop on the beat',
         'uses objects with match or filter methods'
     );
@@ -293,7 +293,7 @@ subtest 'passing match and filter as anonymous subs', sub {
           $_[0]->at('title')->text =~ /A[.] [ ] Noni [ ] Mouse/xmsi;
         },
         action    => sub {
-          $_[0]->description->replace_content( 'Kilroy was here' );
+          $_[0]->at('description')->replace_content( 'Kilroy was here' );
         },
     );
 
@@ -316,7 +316,7 @@ END_OF_ITEM
     my $count = $anon_sub_rule->constrain( $anon_sub_rss );
 
     is(
-        $anon_sub_rss->find( 'item' )->[1]->description->text,
+        $anon_sub_rss->find( 'item' )->[1]->at('description')->text,
         'Kilroy was here',
         'match and filter can be anonymous subs'
     );

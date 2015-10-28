@@ -18,7 +18,7 @@ use Mojo::DOM;
     package Test::NoFilter;
     sub exclude {
         my( $item, $finder_name ) = @_;
-        $item->description->replace_content( "Found by $finder_name" );
+        $item->at('description')->replace_content( "Found by $finder_name" );
     }
 }
 
@@ -59,7 +59,7 @@ throws_ok {
 
     sub exclude {
         my( $self, $item, $finder_name ) = @_;
-        $item->description->replace_content( "Found by $finder_name" );
+        $item->at('description')->replace_content( "Found by $finder_name" );
     }
 }
 
