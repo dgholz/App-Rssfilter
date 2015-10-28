@@ -133,7 +133,7 @@ method _build_last_modified {
 
 =method load_existing
 
-    print $fs->load_existing->to_xml;
+    print $fs->load_existing->to_string;
 
 Returns a L<Mojo::DOM> object initialised with the content of the previously-saved feed. If the feed has never been saved, returns a L<Mojo::DOM> object initialised with an empty string.
 
@@ -153,7 +153,7 @@ method load_existing {
 
     $fs->save_feed( Mojo::DOM->new( '<rss> ... </rss>' ) );
 
-Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method), and updates C<last_modified()>.
+Saves a L<Mojo::DOM> object (or anything with a C<to_string> method), and updates C<last_modified()>.
 
 =cut
 
@@ -164,7 +164,7 @@ method save_feed( $feed ) {
         $self->logger->debug( "no $target_dir directory! making one" );
         $target_dir->mkpath;
     }
-    $self->_file_path->spew( $feed->to_xml );
+    $self->_file_path->spew( $feed->to_string );
     $self->_clear_last_modified;
 }
 

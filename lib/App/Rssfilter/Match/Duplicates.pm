@@ -48,7 +48,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     my $dupe_rule = App::Rssfilter::Rule->new(
         condition => 'Duplicates',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     );
     $dupe_rule->constrain( $first_rss );
     $dupe_rule->constrain( $second_rss );
