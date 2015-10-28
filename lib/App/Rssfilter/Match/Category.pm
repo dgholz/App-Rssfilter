@@ -75,7 +75,7 @@ Returns true if C<$item> has a category which matches any of C<@categories>. Sin
 =cut
 
 func match ( $item, @bad_cats ) {
-    my @categories = $item->find("category")->pluck( 'text' )->each;
+    my @categories = $item->find("category")->map( sub { $_->text } )->each;
     my @split_categories = map { ( / \A ( [^:]+ ) ( [:] .* ) \z /xms, $_ ) } @categories;
     my %cats = map { $_ => 1 } @split_categories;
     return List::MoreUtils::any { defined $_ } @cats{ @bad_cats };

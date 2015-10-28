@@ -92,7 +92,7 @@ func match ( $item ) {
     my @matchables = 
         map  { s/ [?] .* \z //xms; $_ }
         grep { $_ ne '' }
-        $item->find( 'guid, link' )->pluck( 'text' )->each;
+        $item->find( 'guid, link' )->map( sub { $_->text } )->each;
 
     my $res = grep { defined } @prev{ @matchables };
     @prev{ @matchables } = ( 1 ) x @matchables;
