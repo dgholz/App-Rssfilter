@@ -65,7 +65,7 @@ Returns true if C<$item> contains 'C<preview>' in its GUID and not in its title.
 =cut
 
 func match ( $item ) {
-    return $item->guid->text =~ / [^-] preview /xms and $item->title->text !~ / preview /ixms;
+    return $item->guid->text =~ / [^-] preview /xms and $item->at('title')->text !~ / preview /ixms;
 }
 
 1;

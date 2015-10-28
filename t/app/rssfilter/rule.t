@@ -12,7 +12,7 @@ use Mojo::DOM;
         my( $item, @patterns ) = @_;
         unshift @patterns, 'match';
         @patterns = map { qr/\Q$_\E/ } @patterns;
-        return List::MoreUtils::any { $item->title->text =~ $_ } @patterns;
+        return List::MoreUtils::any { $item->at('title')->text =~ $_ } @patterns;
     }
 }
 
@@ -139,7 +139,7 @@ subtest 'passing match and filter as non-fully qualified strings', sub {
 {
     package ShortName;
     sub match {
-        $_[0]->title->text =~ /shortname/xmsi;
+        $_[0]->at('title')->text =~ /shortname/xmsi;
     }
 
     sub filter {
@@ -208,7 +208,7 @@ subtest 'passing match and filter as strings to modules in INC', sub {
     sub match {
         my( $self, $item ) = @_;
         my @patterns = map { qr/\Q$_\E/ } @{ $self->additional_args };
-        return List::MoreUtils::any { $item->title->text =~ $_ } @patterns;
+        return List::MoreUtils::any { $item->at('title')->text =~ $_ } @patterns;
     }
 }
 
@@ -290,7 +290,7 @@ END_OF_ITEM
 subtest 'passing match and filter as anonymous subs', sub {
     my $anon_sub_rule = App::Rssfilter::Rule->new(
         condition => sub {
-          $_[0]->title->text =~ /A[.] [ ] Noni [ ] Mouse/xmsi;
+          $_[0]->at('title')->text =~ /A[.] [ ] Noni [ ] Mouse/xmsi;
         },
         action    => sub {
           $_[0]->description->replace_content( 'Kilroy was here' );

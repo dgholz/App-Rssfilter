@@ -67,7 +67,7 @@ use warnings;
     my $space_the_final_frontier_rule = App::Rssfilter:Rule->new(
         condition => sub {
             my ( $item_to_match ) = @_;
-            return $item_to_match->title->text =~ / \b space \b /ixms;
+            return $item_to_match->at('title')->text =~ / \b space \b /ixms;
         },
         action => sub {
             my ( $reason_for_match, $matched_item ) = @_;
