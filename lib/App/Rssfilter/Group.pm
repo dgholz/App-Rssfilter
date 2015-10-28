@@ -61,6 +61,7 @@ Use a group to:
 =cut
 
 package App::Rssfilter::Group;
+
 use Moo;
 with 'App::Rssfilter::Logger';
 with 'App::Rssfilter::FromHash';

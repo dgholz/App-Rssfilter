@@ -58,6 +58,7 @@ This module will match an RSS item if it has one or more specific category.
 =cut
 
 package App::Rssfilter::Match::Category;
+
 use Method::Signatures;
 use List::MoreUtils qw( any );
 

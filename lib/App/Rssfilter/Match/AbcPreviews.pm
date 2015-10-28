@@ -53,6 +53,7 @@ This module will match an RSS item if its GUID contains 'C<preview>', unless 'C<
 =cut
 
 package App::Rssfilter::Match::AbcPreviews;
+
 use Method::Signatures;
 
 =func match

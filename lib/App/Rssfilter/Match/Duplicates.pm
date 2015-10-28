@@ -74,6 +74,7 @@ This module will match RSS items if either the GUID or link of the item have bee
 =cut
 
 package App::Rssfilter::Match::Duplicates;
+
 use Method::Signatures;
 use Try::Tiny;
 

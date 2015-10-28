@@ -54,6 +54,7 @@ This module will match items from BBC RSS feeds which are about sporting events.
 =cut
 
 package App::Rssfilter::Match::BbcSports;
+
 use Method::Signatures;
 
 =func match
