@@ -180,12 +180,12 @@ subtest 'passing match and filter as strings to modules in INC', sub {
     $module_rss->find( 'item' )->grep(
         sub {
             my( $item ) = @_;
-            defined $item && 'http://example.org/test/1' eq $item->guid->text;
+            defined $item && 'http://example.org/test/1' eq $item->at('guid')->text;
         }
     )->first->append_content( '<category>matchme</category>' );
     my $count = $module_rule->constrain( $module_rss );
 
-    my %seen_items = map { $_->guid->text => $_ } grep { defined } $module_rss->find( 'item' )->each;
+    my %seen_items = map { $_->at('guid')->text => $_ } grep { defined } $module_rss->find( 'item' )->each;
 
     isnt(
         exists $seen_items{ 'http://example.org/test/1' },

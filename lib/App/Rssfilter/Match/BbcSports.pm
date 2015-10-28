@@ -66,7 +66,7 @@ Returns true if ther GUID of C<$item> looks like a BBC sport GUID (like C<http:/
 =cut
 
 func match ( $item ) {
-    return $item->guid->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
+    return $item->at('guid')->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
 }
 
 1;
