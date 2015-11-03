@@ -77,6 +77,7 @@ package App::Rssfilter::Match::Duplicates;
 
 use Method::Signatures;
 use Try::Tiny;
+use List::MoreUtils qw< apply >;
 
 =func match
 
@@ -91,7 +92,7 @@ func match ( $item ) {
     state %prev;
 
     my @matchables = 
-        map  { s/ [?] .* \z //xms; $_ }
+        apply { s/ [?] .* \z //xms }
         grep { $_ ne '' }
         $item->find( 'guid, link' )->map( sub { $_->text } )->each;
 
