@@ -10,8 +10,8 @@ before_install:
 
 install:
 - cpanm --quiet --notest --skip-satisfied Dist::Zilla
-- dzil authordeps | grep -vP '[^\w:]' | cpanm --quiet --notest --skip-satisfied
-- dzil listdeps | grep -vP '[^\w:]' | cpanm --verbose
+- dzil authordeps --missing | grep --invert-match --perl-regex '[^\w:]' | cpanm --quiet --notest --skip-satisfied
+- dzil listdeps --author --missing | grep --invert-match --perl-regex '[^\w:]' | cpanm --quiet --notest --skip-satisfied
 
 script:
 - dzil smoke --release --author
