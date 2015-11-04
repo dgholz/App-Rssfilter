@@ -31,7 +31,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => 'BbcSports',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     )->constrain( $rss );
 
     # either way, prints
@@ -54,6 +54,7 @@ This module will match items from BBC RSS feeds which are about sporting events.
 =cut
 
 package App::Rssfilter::Match::BbcSports;
+
 use Method::Signatures;
 
 =func match
@@ -65,7 +66,7 @@ Returns true if ther GUID of C<$item> looks like a BBC sport GUID (like C<http:/
 =cut
 
 func match ( $item ) {
-    return $item->guid->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
+    return $item->at('guid')->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
 }
 
 1;

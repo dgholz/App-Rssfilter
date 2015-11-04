@@ -48,7 +48,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     my $dupe_rule = App::Rssfilter::Rule->new(
         condition => 'Duplicates',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     );
     $dupe_rule->constrain( $first_rss );
     $dupe_rule->constrain( $second_rss );
@@ -74,8 +74,10 @@ This module will match RSS items if either the GUID or link of the item have bee
 =cut
 
 package App::Rssfilter::Match::Duplicates;
+
 use Method::Signatures;
 use Try::Tiny;
+use List::MoreUtils qw< apply >;
 
 =func match
 
@@ -90,9 +92,9 @@ func match ( $item ) {
     state %prev;
 
     my @matchables = 
-        map  { s/ [?] .* \z //xms; $_ }
+        apply { s/ [?] .* \z //xms }
         grep { $_ ne '' }
-        $item->find( 'guid, link' )->pluck( 'text' )->each;
+        $item->find( 'guid, link' )->map( sub { $_->text } )->each;
 
     my $res = grep { defined } @prev{ @matchables };
     @prev{ @matchables } = ( 1 ) x @matchables;

@@ -35,7 +35,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => 'Category[Sport]',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     )->constrain( $rss );
 
     # either way, prints
@@ -58,6 +58,7 @@ This module will match an RSS item if it has one or more specific category.
 =cut
 
 package App::Rssfilter::Match::Category;
+
 use Method::Signatures;
 use List::MoreUtils qw( any );
 
@@ -75,7 +76,7 @@ Returns true if C<$item> has a category which matches any of C<@categories>. Sin
 =cut
 
 func match ( $item, @bad_cats ) {
-    my @categories = $item->find("category")->pluck( 'text' )->each;
+    my @categories = $item->find("category")->map( sub { $_->text } )->each;
     my @split_categories = map { ( / \A ( [^:]+ ) ( [:] .* ) \z /xms, $_ ) } @categories;
     my %cats = map { $_ => 1 } @split_categories;
     return List::MoreUtils::any { defined $_ } @cats{ @bad_cats };

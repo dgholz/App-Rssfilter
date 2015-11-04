@@ -30,7 +30,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => 'AbcPreviews',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     )->constrain( $rss );
 
     # either way, prints
@@ -53,6 +53,7 @@ This module will match an RSS item if its GUID contains 'C<preview>', unless 'C<
 =cut
 
 package App::Rssfilter::Match::AbcPreviews;
+
 use Method::Signatures;
 
 =func match
@@ -64,7 +65,11 @@ Returns true if C<$item> contains 'C<preview>' in its GUID and not in its title.
 =cut
 
 func match ( $item ) {
-    return $item->guid->text =~ / [^-] preview /xms and $item->title->text !~ / preview /ixms;
+    my $guid  = $item->at('guid');
+    my $title = $item->at('title');
+    my $guid_preview     = defined $guid  && $guid->text  =~ / [^-] preview /xms;
+    my $title_no_preview = defined $title && $title->text =~ / preview /ixms;
+    return $guid_preview && ! $title_no_preview;
 }
 
 1;

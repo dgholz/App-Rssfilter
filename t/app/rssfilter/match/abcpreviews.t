@@ -16,12 +16,12 @@ throws_ok(
 );
 
 ok(
-    App::Rssfilter::Match::AbcPreviews::match( Mojo::DOM->new( '<guid>I am a preview<\guid>' ) ),
+    App::Rssfilter::Match::AbcPreviews::match( Mojo::DOM->new( '<guid>I am a preview</guid>' ) ),
     'match item whose guid contains "preview"'
 );
 
 ok(
-    ! App::Rssfilter::Match::AbcPreviews::match( Mojo::DOM->new( '<guid>I am a human being<\guid>' ) ),
+    ! App::Rssfilter::Match::AbcPreviews::match( Mojo::DOM->new( '<guid>I am a human being</guid>' ) ),
     'does not match item whose guid does not contain "preview"'
 );
 
