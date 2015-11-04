@@ -5,10 +5,7 @@ use warnings;
 
 
 package App::Rssfilter::Feed;
-{
-  $App::Rssfilter::Feed::VERSION = '0.07';
-}
-
+$App::Rssfilter::Feed::VERSION = '0.08'; # TRIAL
 use Moo;
 with 'App::Rssfilter::Logger';
 use Method::Signatures;
@@ -122,7 +119,7 @@ App::Rssfilter::Feed - Get the latest or previous version of an RSS feed
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -259,7 +256,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

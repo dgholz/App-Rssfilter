@@ -6,10 +6,7 @@ use warnings;
 
 
 package App::Rssfilter::Logger;
-{
-  $App::Rssfilter::Logger::VERSION = '0.07';
-}
-
+$App::Rssfilter::Logger::VERSION = '0.08'; # TRIAL
 use Moo::Role;
 use Log::Any;
 
@@ -33,7 +30,7 @@ App::Rssfilter::Logger - adds a logger to a class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -76,7 +73,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

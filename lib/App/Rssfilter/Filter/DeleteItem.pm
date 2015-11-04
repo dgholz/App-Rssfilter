@@ -5,10 +5,7 @@ use warnings;
 
 
 package App::Rssfilter::Filter::DeleteItem;
-{
-  $App::Rssfilter::Filter::DeleteItem::VERSION = '0.07';
-}
-
+$App::Rssfilter::Filter::DeleteItem::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 
 
@@ -29,7 +26,7 @@ App::Rssfilter::Filter::DeleteItem - remove an RSS item from its channel
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -64,7 +61,7 @@ End_of_RSS
     )->constrain( $rss );
 
     # either way
-    print $rss->to_xml;
+    print $rss->to_string;
 
     # <?xml version="1.0" encoding="UTF-8"?>
     # <rss>
@@ -107,7 +104,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

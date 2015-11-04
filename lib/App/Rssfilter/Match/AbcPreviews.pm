@@ -5,14 +5,16 @@ use warnings;
 
 
 package App::Rssfilter::Match::AbcPreviews;
-{
-  $App::Rssfilter::Match::AbcPreviews::VERSION = '0.07';
-}
+$App::Rssfilter::Match::AbcPreviews::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 
 
 func match ( $item ) {
-    return $item->guid->text =~ / [^-] preview /xms and $item->title->text !~ / preview /ixms;
+    my $guid  = $item->at('guid');
+    my $title = $item->at('title');
+    my $guid_preview     = defined $guid  && $guid->text  =~ / [^-] preview /xms;
+    my $title_no_preview = defined $title && $title->text =~ / preview /ixms;
+    return $guid_preview && ! $title_no_preview;
 }
 
 1;
@@ -29,7 +31,7 @@ App::Rssfilter::Match::AbcPreviews - match an ABC preview RSS item
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -58,7 +60,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => 'AbcPreviews',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     )->constrain( $rss );
 
     # either way, prints
@@ -100,7 +102,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,15 +5,12 @@ use warnings;
 
 
 package App::Rssfilter::Filter::MarkTitle;
-{
-  $App::Rssfilter::Filter::MarkTitle::VERSION = '0.07';
-}
-
+$App::Rssfilter::Filter::MarkTitle::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 
 
 func filter ( $item, $matcher, $explicit_prefix = $matcher ) {
-    $item->title->replace_content(uc($explicit_prefix) ." - ".$item->title->content_xml);
+    $item->at('title')->prepend_content(uc($explicit_prefix)." - ");
 }
 1;
 
@@ -29,7 +26,7 @@ App::Rssfilter::Filter::MarkTitle - add some text to the title of an RSS item
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -64,7 +61,7 @@ End_of_RSS
     )->constrain( $rss );
 
     # either way
-    print $rss->to_xml;
+    print $rss->to_string;
 
     # <?xml version="1.0" encoding="UTF-8"?>
     # <rss>
@@ -106,7 +103,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

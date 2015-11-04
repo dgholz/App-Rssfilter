@@ -5,10 +5,7 @@ use warnings;
 
 
 package App::Rssfilter::Feed::Storage;
-{
-  $App::Rssfilter::Feed::Storage::VERSION = '0.07';
-}
-
+$App::Rssfilter::Feed::Storage::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 use Moo;
 with 'App::Rssfilter::Logger';
@@ -97,7 +94,7 @@ method save_feed( $feed ) {
         $self->logger->debug( "no $target_dir directory! making one" );
         $target_dir->mkpath;
     }
-    $self->_file_path->spew( $feed->to_xml );
+    $self->_file_path->spew( $feed->to_string );
     $self->_clear_last_modified;
 }
 
@@ -115,7 +112,7 @@ App::Rssfilter::Feed::Storage - load and save RSS feeds as files
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -172,7 +169,7 @@ Returns this object if its name is already C<$new_name>, else returns a clone of
 
 =head2 load_existing
 
-    print $fs->load_existing->to_xml;
+    print $fs->load_existing->to_string;
 
 Returns a L<Mojo::DOM> object initialised with the content of the previously-saved feed. If the feed has never been saved, returns a L<Mojo::DOM> object initialised with an empty string.
 
@@ -180,7 +177,7 @@ Returns a L<Mojo::DOM> object initialised with the content of the previously-sav
 
     $fs->save_feed( Mojo::DOM->new( '<rss> ... </rss>' ) );
 
-Saves a L<Mojo::DOM> object (or anything with a C<to_xml> method), and updates C<last_modified()>.
+Saves a L<Mojo::DOM> object (or anything with a C<to_string> method), and updates C<last_modified()>.
 
 =head1 AUTHOR
 
@@ -188,7 +185,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

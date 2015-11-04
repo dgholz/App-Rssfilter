@@ -8,7 +8,7 @@ use Mojo::DOM;
 
 {
     package Test::NoMatch;
-    sub finder {
+    sub finder { # deliberately not called match
         my( $item ) = @_;
         return 1;
     }
@@ -16,9 +16,9 @@ use Mojo::DOM;
 
 {
     package Test::NoFilter;
-    sub exclude {
+    sub exclude { # deliberately not called filter
         my( $item, $finder_name ) = @_;
-        $item->description->replace_content( "Found by $finder_name" );
+        $item->at('description')->content( "Found by $finder_name" );
     }
 }
 
@@ -59,7 +59,7 @@ throws_ok {
 
     sub exclude {
         my( $self, $item, $finder_name ) = @_;
-        $item->description->replace_content( "Found by $finder_name" );
+        $item->at('description')->content( "Found by $finder_name" );
     }
 }
 

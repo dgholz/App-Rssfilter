@@ -6,10 +6,7 @@ use warnings;
 
 
 package App::Rssfilter::Rule;
-{
-  $App::Rssfilter::Rule::VERSION = '0.07';
-}
-
+$App::Rssfilter::Rule::VERSION = '0.08'; # TRIAL
 use Moo;
 use Method::Signatures;
 use Module::Runtime qw<>;
@@ -188,7 +185,7 @@ App::Rssfilter::Rule - match and filter RSS feeds
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -254,7 +251,7 @@ version 0.07
     my $space_the_final_frontier_rule = App::Rssfilter:Rule->new(
         condition => sub {
             my ( $item_to_match ) = @_;
-            return $item_to_match->title->text =~ / \b space \b /ixms;
+            return $item_to_match->at('title')->text =~ / \b space \b /ixms;
         },
         action => sub {
             my ( $reason_for_match, $matched_item ) = @_;
@@ -425,7 +422,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

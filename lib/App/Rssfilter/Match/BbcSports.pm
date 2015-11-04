@@ -5,14 +5,12 @@ use warnings;
 
 
 package App::Rssfilter::Match::BbcSports;
-{
-  $App::Rssfilter::Match::BbcSports::VERSION = '0.07';
-}
+$App::Rssfilter::Match::BbcSports::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 
 
 func match ( $item ) {
-    return $item->guid->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
+    return $item->at('guid')->text =~ qr{ www [.] bbc [.] co [.] uk / sport [1]? / }xms;
 }
 
 1;
@@ -29,7 +27,7 @@ App::Rssfilter::Match::BbcSports - match a BBC sport RSS item
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -59,7 +57,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => 'BbcSports',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     )->constrain( $rss );
 
     # either way, prints
@@ -101,7 +99,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

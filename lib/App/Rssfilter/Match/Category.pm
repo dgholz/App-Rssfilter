@@ -5,15 +5,13 @@ use warnings;
 
 
 package App::Rssfilter::Match::Category;
-{
-  $App::Rssfilter::Match::Category::VERSION = '0.07';
-}
+$App::Rssfilter::Match::Category::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 use List::MoreUtils qw( any );
 
 
 func match ( $item, @bad_cats ) {
-    my @categories = $item->find("category")->pluck( 'text' )->each;
+    my @categories = $item->find("category")->map( sub { $_->text } )->each;
     my @split_categories = map { ( / \A ( [^:]+ ) ( [:] .* ) \z /xms, $_ ) } @categories;
     my %cats = map { $_ => 1 } @split_categories;
     return List::MoreUtils::any { defined $_ } @cats{ @bad_cats };
@@ -33,7 +31,7 @@ App::Rssfilter::Match::Category - match an RSS item by category
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -67,7 +65,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     App::Rssfilter::Rule->new(
         condition => 'Category[Sport]',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     )->constrain( $rss );
 
     # either way, prints
@@ -125,7 +123,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

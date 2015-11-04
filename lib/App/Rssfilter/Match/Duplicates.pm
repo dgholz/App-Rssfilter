@@ -5,11 +5,10 @@ use warnings;
 
 
 package App::Rssfilter::Match::Duplicates;
-{
-  $App::Rssfilter::Match::Duplicates::VERSION = '0.07';
-}
+$App::Rssfilter::Match::Duplicates::VERSION = '0.08'; # TRIAL
 use Method::Signatures;
 use Try::Tiny;
+use List::MoreUtils qw< apply >;
 
 
 func match ( $item ) {
@@ -17,9 +16,9 @@ func match ( $item ) {
     state %prev;
 
     my @matchables = 
-        map  { s/ [?] .* \z //xms; $_ }
+        apply { s/ [?] .* \z //xms }
         grep { $_ ne '' }
-        $item->find( 'guid, link' )->pluck( 'text' )->each;
+        $item->find( 'guid, link' )->map( sub { $_->text } )->each;
 
     my $res = grep { defined } @prev{ @matchables };
     @prev{ @matchables } = ( 1 ) x @matchables;
@@ -40,7 +39,7 @@ App::Rssfilter::Match::Duplicates - match an RSS item which has been seen before
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -87,7 +86,7 @@ End_of_RSS
     use App::Rssfilter::Rule;
     my $dupe_rule = App::Rssfilter::Rule->new(
         condition => 'Duplicates',
-        action    => sub { print shift->to_xml, "\n" },
+        action    => sub { print shift->to_string, "\n" },
     );
     $dupe_rule->constrain( $first_rss );
     $dupe_rule->constrain( $second_rss );
@@ -131,7 +130,7 @@ Daniel Holz <dgholz@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Daniel Holz.
+This software is copyright (c) 2015 by Daniel Holz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
